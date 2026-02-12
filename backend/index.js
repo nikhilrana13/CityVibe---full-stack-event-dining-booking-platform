@@ -1,9 +1,9 @@
-import express from "express"
-import cors from "cors"
-import cookieParser from "cookie-parser"
-import dotenv from "dotenv"
-import { configure } from "./config/db.js"
-
+const express = require("express")
+const cors = require("cors")
+const cookieParser = require("cookie-parser")
+const dotenv = require("dotenv")
+const {configure} = require("./config/db.js")
+const AuthRoute = require("./routes/authroutes.js")
 dotenv.config()
 
 const PORT = process.env.PORT || 5000
@@ -18,7 +18,7 @@ app.use(express.urlencoded({extended: false}))
 
 
 // routes
-
+app.use("/api/auth",AuthRoute)
 
 
 // connect to db  
