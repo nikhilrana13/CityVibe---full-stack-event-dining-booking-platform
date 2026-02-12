@@ -1,6 +1,8 @@
-const User = require("../models/userModel");
+const User = require("../models/usermodel");
 const jwt = require("jsonwebtoken"); 
 const Response = require("../utils/responsehandler");
+const bcrypt = require("bcryptjs");
+const AdminMapper = require("../mappers/adminmapper");
 
 
 // verify firebase token login with phone
@@ -77,7 +79,30 @@ const LoginWithGoogle = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
+// for admin login 
+const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user || user.role !== "admin") {
+      return Response(res, 401, "Invalid credentials");
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
 
+    if (!isMatch) {
+      return Response(res, 401, "Invalid credentials");
+    }
+    const token = jwt.sign({ id: user._id, role: user.role },process.env.JWT_SECRET_KEY,{ expiresIn: "1d" });
+    res.cookie("token", token, {httpOnly: true,secure:true,sameSite: "none"});
+
+    return Response(res, 200, "Admin login successful",{admin:AdminMapper(user),token});
+
+  } catch (error) {
+    return Response(res, 500, "Internal server error");
+  }
+};
+
+// logout
  const Logout = async(req,res)=>{
     try {
         
@@ -89,4 +114,5 @@ const LoginWithGoogle = async (req, res) => {
     }
  }
 
- module.exports = {verifyFirebaseToken,LoginWithGoogle,Logout}
+ module.exports = {verifyFirebaseToken,LoginWithGoogle,Logout,adminLogin} 
+ 

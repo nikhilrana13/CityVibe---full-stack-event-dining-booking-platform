@@ -1,6 +1,7 @@
 const express = require("express") 
-const { verifyFirebaseToken, LoginWithGoogle } = require("../controllers/AuthController.js")
+const { verifyFirebaseToken, LoginWithGoogle, adminLogin } = require("../controllers/AuthController.js")
 const IsGoogleAuth = require("../middleware/IsGoogleAuth.js") 
+const AuthMiddleware = require("../middleware/AuthMiddleware.js")
 const router = express.Router()
 
 
@@ -8,6 +9,8 @@ const router = express.Router()
 router.post("/verify-firebase-token",verifyFirebaseToken) 
 // login with google 
 router.post("/google-login",IsGoogleAuth,LoginWithGoogle) 
+// login for admin 
+router.post("/admin-login",adminLogin)
 
 // for test
 router.post("/test-google", async (req, res) => {
