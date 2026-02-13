@@ -84,6 +84,8 @@ const OnBoardingOrganizer = async (req, res) => {
   }
 };
 
+
+
 module.exports = OnBoardingOrganizer 
 
 

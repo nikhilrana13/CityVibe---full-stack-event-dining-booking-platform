@@ -22,11 +22,8 @@ router.post("/test-google", async (req, res) => {
       name: "Test User",
       picture: "test.jpg"
     };
-
     req.user = fakeDecodedUser;
-
     return LoginWithGoogle(req, res);
-
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Test failed" });
