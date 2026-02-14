@@ -7,6 +7,9 @@ const AuthRoute = require("./routes/authroutes.js")
 const OrganizerRoute = require("./routes/organizerroutes.js")
 const AdminRoute = require("./routes/adminroutes.js")
 const EventRoute = require("./routes/eventroutes.js")
+const diningRoute = require("./routes/diningroutes.js")
+const searchRoute = require("./routes/searchroutes.js")
+const HomeRoute = require("./routes/homeroutes.js")
 
 dotenv.config()
 
@@ -26,12 +29,12 @@ app.use("/api/auth",AuthRoute)
 app.use("/api/organizer",OrganizerRoute)
 app.use("/api/admin",AdminRoute)
 app.use("/api/event",EventRoute)
-
+app.use("/api/dining",diningRoute)
+app.use("/api",searchRoute)
+app.use("/api",HomeRoute)
 
 // connect to db  
 configure()
-
-
 
 app.listen(PORT,()=>{
     console.log(`server is running on port ${PORT}`)

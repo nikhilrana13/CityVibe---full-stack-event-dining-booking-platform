@@ -168,9 +168,9 @@ const getOrganizerAllevents = async (req, res) => {
   try {
     const userId = req.user;
     let { page = 1, limit = 6 } = req.query;
-    const skip = (page - 1) * limit;
     page = parseInt(page);
     limit = parseInt(limit);
+    const skip = (page - 1) * limit;
     // check organiser is approved or exists
     const organizer = await Organizer.findOne({
       user: userId,
@@ -217,9 +217,6 @@ const DeleteEvent = async (req, res) => {
     if (!organizer) {
       return Response(res, 403, "Only approved organizers can access");
     }
-    if(organizer.user._id.toString() !== userId){
-       return Response(res,403,"You are not authorized to cancel this event")
-    }
     // find event
     const event = await Event.findById(eventId);
     if (!event) {
@@ -230,15 +227,15 @@ const DeleteEvent = async (req, res) => {
       return Response(res, 403, "You are not authorized to delete this event");
     }
     await Event.findByIdAndDelete(eventId);
-    return Response(res,200,"Event Deleted Successfully")
+    return Response(res, 200, "Event Deleted Successfully");
   } catch (error) {
     console.error("Failed to delete event", error);
     return Response(res, 500, "Internal server error");
   }
 };
 // Cancel Event
-const CancelEvent = async(req,res)=>{
-    try {
+const CancelEvent = async (req, res) => {
+  try {
     const userId = req.user;
     const eventId = req.params.id;
     // check organiser is approved or exists
@@ -249,15 +246,141 @@ const CancelEvent = async(req,res)=>{
     if (!organizer) {
       return Response(res, 403, "Only approved organizers can access");
     }
-    const updatedEvent = await Event.findOneAndUpdate({ _id: eventId, organizer: organizer._id },{ eventIsActive: false },{ new: true });
+    const updatedEvent = await Event.findOneAndUpdate(
+      { _id: eventId, organizer: organizer._id },
+      { eventIsActive: false },
+      { new: true },
+    );
     if (!updatedEvent) {
-      return Response(res, 403,"Event not found or not authorized");
+      return Response(res, 403, "Event not found or not authorized");
     }
-    return Response(res,200,"Event Cancelled successfully")
-    } catch (error) {
-        console.log("failed to cancel event",error)
-        return Response(res,500,"Internal server error")
-    }
-}
+    return Response(res, 200, "Event Cancelled successfully");
+  } catch (error) {
+    console.log("failed to cancel event", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+// get all events with filters
+const GetAllEvents = async (req, res) => {
+  try {
+    let {
+      page = 1,
+      limit = 6,
+      city,
+      category,
+      startDate,
+      sortby,
+      title,
+    } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const skip = (page - 1) * limit;
 
-module.exports = { CreateEvent, EachEventDetails, getOrganizerAllevents,DeleteEvent,CancelEvent};
+    let filter = { eventIsActive: true };
+    // category filter for multiple categories
+    if (category) {
+      const categories = category.split(",").map((c) => c.trim());
+      filter.$or = categories.map((c) => ({
+        category: { $regex: new RegExp(c, "i") },
+      }));
+    }
+    // city filter
+    if (city) {
+      filter.city = { $regex: new RegExp(city, "i") };
+    }
+    // date filter
+    if (startDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // midnight reset
+      let start, end;
+      if (startDate === "Today") {
+        start = today;
+        end = new Date(today);
+        end.setHours(23, 59, 59, 999);
+      } else if (startDate === "Tomorrow") {
+        start = new Date(today);
+        start.setDate(start.getDate() + 1);
+        start.setHours(0, 0, 0, 0);
+        end = new Date(start);
+        end.setHours(23, 59, 59, 999);
+      } else if (startDate === "ThisWeek") {
+        const dayOfWeek = today.getDay(); // Sunday = 0
+        start = new Date(today);
+        start.setDate(today.getDate() - dayOfWeek); // week start
+        start.setHours(0, 0, 0, 0);
+        end = new Date(start);
+        end.setDate(start.getDate() + 6); // week end
+        end.setHours(23, 59, 59, 999);
+      } else if (startDate === "ThisMonth") {
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        end.setHours(23, 59, 59, 999);
+      }
+      if (start && end) {
+        filter.startDate = { $gte: start, $lte: end };
+      }
+    }
+    // title filter
+    if (title) {
+      filter.title = { $regex: new RegExp(title, "i") };
+    }
+    // sorting
+    let sortStage = { createdAt: -1 }; // default
+    if (sortby === "lowtohigh") {
+      sortStage = { minPrice: 1 };
+    } else if (sortby === "hightolow") {
+      sortStage = { minPrice: -1 };
+    } else if (sortby === "relevant") {
+      sortStage = { startDate: 1 };
+    }
+
+    const events = await Event.aggregate([
+      { $match: filter },
+      {
+        $lookup: {
+          from: "tickets",
+          localField: "_id",
+          foreignField: "event",
+          as: "ticket",
+        },
+      },
+      {
+        $addFields: {
+          minPrice: { $min: "$ticket.price" },
+          totalTicketsSold: {
+            $subtract: ["$totalSeats", "$availableSeats"],
+          },
+        },
+      },
+      { $sort: sortStage },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
+    const totalEvents = await Event.countDocuments(filter);
+    if (events.length === 0) {
+      return Response(res, 200, "No Events found", []);
+    }
+    const totalPages = Math.ceil(totalEvents / limit);
+    return Response(res, 200, "Events found", {
+      events,
+      pagination: {
+        totalEvents,
+        totalPages,
+        currentPage: page,
+        limit: limit,
+      },
+    });
+  } catch (error) {
+    console.log("failed to get events", error);
+    return Response(res, 500, "Internal server error");
+  }
+}; 
+
+module.exports = {
+  CreateEvent,
+  EachEventDetails,
+  getOrganizerAllevents,
+  DeleteEvent,
+  CancelEvent,
+  GetAllEvents
+};

@@ -40,5 +40,7 @@ const TicketSchema = new mongoose.Schema({
   }
 },{timestamps:true})
 
+TicketSchema.index({ event: 1, price: 1 });
+
 const Ticket = mongoose.model("Ticket",TicketSchema)
 module.exports = Ticket
