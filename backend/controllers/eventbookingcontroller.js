@@ -5,6 +5,39 @@ const User = require("../models/usermodel.js");
 const Response = require("../utils/responsehandler.js");
 const StripeInstance = require("../utils/stripe.js");
 
+/** 
+ * 
+ * Create Event Booking & Initiate Stripe Payment
+ *
+ * Flow:
+ * 1. Validate user, event, and selected tickets.
+ * 2. Ensure tickets belong to the event and have sufficient availability.
+ * 3. Calculate:
+ *      - totalAmount (price × quantity)
+ *      - totalSeats (quantity × paxCount)
+ * 4. Verify event-level availableSeats.
+ * 5. Prevent duplicate bookings (pending/confirmed).
+ * 6. Create booking with:
+ *      - paymentStatus: "pending"
+ *      - bookingStatus: "pending"
+ * 7. Generate Stripe Checkout session.
+ * 8. Return Stripe session URL to frontend.
+ *
+ * Important:
+ * - Seat deduction happens ONLY after successful payment
+ *   (handled in webhook or payment confirmation handler).
+ * - paxCount defines how many seats one ticket represents
+ *   (e.g., Couple Pass = 2 seats).
+ *
+ * Request Body Example:
+ * {
+ *   eventId: "eventId",
+ *   tickets: [
+ *     { ticketId: "ticketId1", quantity: 2 },
+ *     { ticketId: "ticketId2", quantity: 1 }
+ *   ]
+ * }
+ */
 // event booking
 const CreateEventBooking = async (req, res) => {
   try {
@@ -73,6 +106,7 @@ const CreateEventBooking = async (req, res) => {
     if (event.availableSeats < totalSeatsToBook) {
       return Response(res, 400, "Not enough seats available for this event");
     }
+    // console.log("totalseatstobook",totalSeatsToBook)
     // checked booking already exists
     const existingBooking = await Eventbooking.findOne({
       event: eventId,
@@ -92,6 +126,7 @@ const CreateEventBooking = async (req, res) => {
       bookingStatus: "pending",
       totalSeats: totalSeatsToBook,
     });
+    
     // Create Stripe line items
     const lineItems = [];
     for (let item of bookingTickets) {
@@ -231,8 +266,8 @@ const UpdatePaymentStatus = async (req, res) => {
      if (isNaN(booking.totalSeats)) {
       return Response(res, 400, "Invalid booking seat data");
     }
-  console.log("Booking totalSeats:", booking.totalSeats);
-  console.log("Event availableSeats before:", event.availableSeats);
+  // console.log("Booking totalSeats:", booking.totalSeats);
+  // console.log("Event availableSeats before:", event.availableSeats);
     if (event) {
       event.availableSeats -= booking.totalSeats;
       await event.save();

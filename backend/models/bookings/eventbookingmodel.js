@@ -8,10 +8,9 @@ const eventbookingSchema = new mongoose.Schema({
     }],
     totalAmount:{type:Number,required:true},
     paymentStatus:{type:String,enum:["pending","paid","failed"],default:"pending"},
-    bookingStatus: {type: String,enum: ["confirmed", "cancelled","pending"],default: "pending",
+    bookingStatus: {type: String,enum: ["confirmed", "cancelled","pending"],default: "pending"},
     stripePaymentId:{type:String},
-    totalSeats:{type:Number}
-  }
+    totalSeats:{type:Number,required:true}
 },{timestamps:true})
 
 const Eventbooking = mongoose.model("Eventbooking",eventbookingSchema)
