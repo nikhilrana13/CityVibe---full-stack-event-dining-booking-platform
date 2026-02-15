@@ -10,6 +10,7 @@ const EventRoute = require("./routes/eventroutes.js")
 const diningRoute = require("./routes/diningroutes.js")
 const searchRoute = require("./routes/searchroutes.js")
 const HomeRoute = require("./routes/homeroutes.js")
+const RestaurantBookingRoute = require("./routes/restaurantbookingroutes.js")
 
 dotenv.config()
 
@@ -32,6 +33,7 @@ app.use("/api/event",EventRoute)
 app.use("/api/dining",diningRoute)
 app.use("/api",searchRoute)
 app.use("/api",HomeRoute)
+app.use("/api",RestaurantBookingRoute)
 
 // connect to db  
 configure()

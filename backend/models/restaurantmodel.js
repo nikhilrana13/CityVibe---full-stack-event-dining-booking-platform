@@ -13,7 +13,12 @@ const RestaurentSchema = new mongoose.Schema({
   closingTime: { type: String,required:true},
   images: [{type:String}],
   isActive: { type: Boolean, default: true },
-  availablefacility:{type:[String],default:[]}
+  availablefacility:{type:[String],default:[]},
+  slotInterval: { type: Number, default: 15 }, // 15 min gap
+  lunchStart: String, // "12:00"
+  lunchEnd: String,   // "14:00"
+  dinnerStart: String, // "18:00"
+  dinnerEnd: String,    // "23:00"
 },{timestamps:true});
 
 const Restaurant = mongoose.model("Restaurant",RestaurentSchema)

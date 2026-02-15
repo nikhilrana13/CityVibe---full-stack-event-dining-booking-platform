@@ -89,7 +89,9 @@ const ApproveandRejectorganizer = async(req,res)=>{
         console.error("failed to approve or reject organizer",error)
         return Response(res,500,"Internal server error")
     }
-}
+} 
+
+
 
 
 module.exports = {GetOrganizers,ApproveandRejectorganizer}

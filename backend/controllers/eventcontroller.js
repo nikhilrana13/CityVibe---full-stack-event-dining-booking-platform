@@ -376,11 +376,5 @@ const GetAllEvents = async (req, res) => {
   }
 }; 
 
-module.exports = {
-  CreateEvent,
-  EachEventDetails,
-  getOrganizerAllevents,
-  DeleteEvent,
-  CancelEvent,
-  GetAllEvents
-};
+
+module.exports = {CreateEvent,EachEventDetails,getOrganizerAllevents,DeleteEvent,CancelEvent,GetAllEvents};
