@@ -5,13 +5,14 @@ const eventbookingSchema = new mongoose.Schema({
     tickets:[{
         ticket:{type:mongoose.Types.ObjectId,ref:"Ticket"},
         quantity:{type:Number,required:true},
-        priceAtPurchase:{type:Number,required:true}
     }],
     totalAmount:{type:Number,required:true},
     paymentStatus:{type:String,enum:["pending","paid","failed"],default:"pending"},
-    bookingStatus: {type: String,enum: ["confirmed", "cancelled"],default: "confirmed"
+    bookingStatus: {type: String,enum: ["confirmed", "cancelled","pending"],default: "pending",
+    stripePaymentId:{type:String},
+    totalSeats:{type:Number}
   }
 },{timestamps:true})
 
-const Eventbooking = mongoose.Schema("Eventbooking",eventbookingSchema)
+const Eventbooking = mongoose.model("Eventbooking",eventbookingSchema)
 module.exports = Eventbooking
