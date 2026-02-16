@@ -4,13 +4,18 @@ const Response = require("../utils/responsehandler.js");
 const sharp = require("sharp");
 const cloudinary = require("../config/cloudinary.js");
 
-
-
 // onboarding organizer
 const OnBoardingOrganizer = async (req, res) => {
   try {
     const userId = req.user;
-    const {businessName,businessEmail,businessPhone,panNumber,bankAccountNumber,ifscCode, } = req.body;
+    const {
+      businessName,
+      businessEmail,
+      businessPhone,
+      panNumber,
+      bankAccountNumber,
+      ifscCode,
+    } = req.body;
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -37,7 +42,7 @@ const OnBoardingOrganizer = async (req, res) => {
       return Response(res, 400, "Invalid Business email");
     }
     if (businessPhone.length < 10) {
-     return Response(res, 400, "Invalid business phone");
+      return Response(res, 400, "Invalid business phone");
     }
 
     if (!file) {
@@ -55,7 +60,7 @@ const OnBoardingOrganizer = async (req, res) => {
     }
     //optimized pan card image using sharp
     const optimizedImage = await sharp(file.buffer)
-      .resize({ width: 500})
+      .resize({ width: 500 })
       .webp({ quality: 80 })
       .toBuffer();
     const imageBase64 = `data:image/webp;base64,${optimizedImage.toString("base64")}`;
@@ -83,10 +88,59 @@ const OnBoardingOrganizer = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
+// update Organizer business profile
+const UpdateBusinessProfile = async (req, res) => {
+  try {
+    const userId = req.user;
+    const { businessName, businessEmail, businessPhone } = req.body;
+    // check organiser is approved or exists
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    }).populate("user", "name email");
+    if (!organizer) {
+      return Response(res, 403, "Only approved organizers can access");
+    }
+    let updateData = {};
+    if (businessEmail) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(businessEmail)) {
+        return Response(res, 400, "Invalid Business email");
+      }
+      // Check duplicate email
+      const existingEmail = await Organizer.findOne({
+        businessEmail,
+        _id: { $ne: organizer._id },
+      });
+      if (existingEmail) {
+        return Response(res, 400, "Business email already in use");
+      }
+      updateData.businessEmail = businessEmail;
+    }
+    if (businessPhone) {
+      if (businessPhone.length < 10) {
+        return Response(res, 400, "Invalid business phone");
+      }
+      updateData.businessPhone = businessPhone;
+    }
+    if (businessName) {
+      updateData.businessName = businessName.trim();
+    }
+    if (Object.keys(updateData).length === 0) {
+      return Response(res, 200, "No fields provided to update");
+    }
+    const updatedOrganizer = await Organizer.findByIdAndUpdate(
+      organizer._id,
+      { $set: updateData },
+      { new: true },
+    );
+    return Response(res, 200, "profile updated successsfully", {
+      updatedOrganizer,
+    });
+  } catch (error) {
+    console.log("failed to update organizer profile", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
 
-
-
-module.exports = OnBoardingOrganizer 
-
-
-
+module.exports = {OnBoardingOrganizer,UpdateBusinessProfile}

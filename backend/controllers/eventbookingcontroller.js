@@ -1,6 +1,6 @@
 const Eventbooking = require("../models/bookings/eventbookingmodel.js");
 const Event = require("../models/eventmodel.js");
-const Ticket = require("../models/ticketmodel");
+const Ticket = require("../models/ticketmodel.js");
 const User = require("../models/usermodel.js");
 const Response = require("../utils/responsehandler.js");
 const StripeInstance = require("../utils/stripe.js");
@@ -111,7 +111,7 @@ const CreateEventBooking = async (req, res) => {
     const existingBooking = await Eventbooking.findOne({
       event: eventId,
       user: userId,
-      bookingStatus: { $in: ["pending", "confirmed"] },
+      bookingStatus:"pending",
     });
     if (existingBooking) {
       return Response(res, 400, "You have already booked this event");
@@ -282,6 +282,101 @@ const UpdatePaymentStatus = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
+// User all booked events
+const UserAllBookedEvents = async(req,res)=>{
+  try {
+      const userId = req.user
+       let {page=1} = req.query 
+       const limit = 5 
+       page = parseInt(page)
+       const skip = (page - 1) * limit
 
+       const user = await User.findById(userId)
+       if(!user){
+        return Response(res,404,"User not found")
+       }
+       const bookings = await Eventbooking.find({user:userId}).populate("user","name phonenumber email").sort({createdAt:1}).skip(skip).limit(limit).populate("tickets.ticket",
+      "name price paxCount",)
+       const totalbookings = await Eventbooking.countDocuments({user:userId})
+       const totalPages = Math.ceil(totalbookings / limit)
+       if(bookings.length === 0){
+        return  Response(res,200,"No Bookings found",[])
+       }
+       return Response(res,200,"bookings found",{bookings,pagination:{
+        totalbookings,totalPages,currentpage:page,limit
+       }})
+  } catch (error) {
+    console.log("failed to get event bookings",error)
+    return Response(res,500,"Internal server error")
+  }
+}
+// Each booking details 
+const GetEventBookingDetail = async(req,res)=>{
+  try {
+      const userId = req.user 
+      const bookingId = req.params.id;
 
-module.exports = { CreateEventBooking, StripeWebhookHandler,UpdatePaymentStatus};
+      const user = await User.findById(userId)
+      if(!user){
+        return Response(res,404,"User not found")
+      }
+      const booking = await Eventbooking.findById(bookingId).populate("tickets.ticket","name paxCount price")
+      if (!booking) {
+        return Response(res, 404, "booking not found");
+      }
+      return Response(res, 200, "booking details found", {booking });
+    } catch (error) {
+      console.log("failed to get booking details", error);
+      return Response(res, 500, "Internal server error");
+    }
+}
+// Cancel user Event booking
+  const CancelEventBooking = async (req, res) => {
+  try {
+    const userId = req.user;
+    const bookingId = req.params.id;
+    const booking = await Eventbooking.findById(bookingId);
+
+    if (!booking) {
+      return Response(res, 404, "Booking not found");
+    }
+
+    if (booking.user.toString() !== userId) {
+      return Response(res, 403, "Unauthorized");
+    }
+
+    // Already cancelled
+    if (booking.bookingStatus === "cancelled") {
+      return Response(res, 400, "Booking already cancelled");
+    }
+
+    // Restore only if paid
+    if (booking.paymentStatus === "paid") {
+      
+      // Restore ticket quantities
+      for (let item of booking.tickets) {
+        const ticket = await Ticket.findById(item.ticket);
+        if (ticket) {
+          ticket.availableQuantity += item.quantity;
+          await ticket.save();
+        }
+      }
+
+      // Restore event seats
+      const event = await Event.findById(booking.event);
+      if (event) {
+        event.availableSeats += booking.totalSeats;
+        event.totalTicketsSold -= booking.totalSeats; 
+        await event.save();
+      }
+    }
+    booking.bookingStatus = "cancelled";
+    await booking.save();
+    return Response(res, 200, "Booking cancelled successfully", booking);
+
+  } catch (error) {
+    console.log("Cancel booking error", error);
+    return Response(res, 500, "Internal server error");
+  }
+}
+module.exports = { CreateEventBooking, StripeWebhookHandler,UpdatePaymentStatus,UserAllBookedEvents,GetEventBookingDetail,CancelEventBooking}

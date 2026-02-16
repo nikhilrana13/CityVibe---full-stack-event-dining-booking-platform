@@ -4,6 +4,7 @@ const cloudinary = require("../config/cloudinary.js");
 const Event = require("../models/eventmodel.js");
 const Ticket = require("../models/ticketmodel.js");
 const Response = require("../utils/responsehandler.js");
+const Eventbooking = require("../models/bookings/eventbookingmodel.js");
 
 // create event
 const CreateEvent = async (req, res) => {
@@ -375,6 +376,47 @@ const GetAllEvents = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 }; 
+// get organizer all events bookings
+const GetOrganizerEventBookings = async(req,res)=>{
+  try {
+        const userId = req.user
+        let {page=1,status} = req.query 
+        page = parseInt(page)
+        const  limit = 10 
+        const skip = (page - 1) * limit 
+        // check organiser is approved or exists
+         const organizer = await Organizer.findOne({
+           user: userId,
+           isApproved: true,
+         }).populate("user", "name email");
+         if (!organizer) {
+           return Response(res, 403, "Only approved organizers can access");
+         }
+         // get organizer events  
+          const events = await Event.find({organizer:organizer._id}).select("_id")
+          const eventIds = events.map((e)=>e._id) 
+          if(eventIds.length === 0){
+            return Response(res,200,"No Events found",[])
+          }
+         let filter = {event:{$in:eventIds}}
+         if(status){
+          filter.bookingStatus = status
+         }
+         const eventbookings = await Eventbooking.find(filter).sort({createdAt:1}).skip(skip).limit(limit).populate("user","name email phonenumber").populate("tickets.ticket","name price paxCount").populate("event", "title startDate city");
+         const totalbookings = await Eventbooking.countDocuments(filter)
+         const totalPages = Math.ceil(totalbookings / limit)
+         if(eventbookings.length === 0){
+          return Response(res,200,"No Bookings found",[])
+         }
+          return Response(res,200,"bookings found",{eventbookings,pagination:{
+                 totalbookings,totalPages,currentpage:page,limit
+                }})
+
+    } catch (error) {
+       console.log("failed to get bookings",error)
+    return Response(res,500,"Internal server error")
+    }
+}
 
 
-module.exports = {CreateEvent,EachEventDetails,getOrganizerAllevents,DeleteEvent,CancelEvent,GetAllEvents};
+module.exports = {CreateEvent,EachEventDetails,getOrganizerAllevents,DeleteEvent,CancelEvent,GetAllEvents,GetOrganizerEventBookings};

@@ -1,6 +1,7 @@
 const generateSlots = require("../helpers/generateSlots.js");
 const Restaurantbooking = require("../models/bookings/restaurantbookingmodel.js");
 const Restaurant = require("../models/restaurantmodel.js");
+const Ticket = require("../models/ticketmodel.js");
 const User = require("../models/usermodel.js");
 const Response = require("../utils/responsehandler.js")
 
@@ -246,6 +247,26 @@ const UserallDiningbookings = async(req,res)=>{
     return Response(res,500,"Internal server error")
    }
 }
+// each booking detail
+const GetDiningBookingDetail = async(req,res)=>{
+   try {
+      const userId = req.user 
+      const bookingId = req.params.id;
+
+      const user = await User.findById(userId)
+      if(!user){
+        return Response(res,404,"User not found")
+      }
+      const booking = await Restaurantbooking.findById(bookingId).populate("user","name email phonenumber")
+      if (!booking) {
+        return Response(res, 404, "booking not found");
+      }
+      return Response(res, 200, "booking details found", {booking });
+    } catch (error) {
+      console.log("failed to get booking details", error);
+      return Response(res, 500, "Internal server error");
+    }
+}
 
 
-module.exports = {CreateRestaurantBooking,GetAvailableSlots,CancelBooking,UserallDiningbookings}
+module.exports = {CreateRestaurantBooking,GetAvailableSlots,CancelBooking,UserallDiningbookings,GetDiningBookingDetail}
