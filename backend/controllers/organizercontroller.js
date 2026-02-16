@@ -3,6 +3,10 @@ const User = require("../models/usermodel.js");
 const Response = require("../utils/responsehandler.js");
 const sharp = require("sharp");
 const cloudinary = require("../config/cloudinary.js");
+const Event = require("../models/eventmodel.js");
+const Eventbooking = require("../models/bookings/eventbookingmodel.js");
+const Restaurantbooking = require("../models/bookings/restaurantbookingmodel.js");
+const Restaurant = require("../models/restaurantmodel.js");
 
 // onboarding organizer
 const OnBoardingOrganizer = async (req, res) => {
@@ -142,5 +146,331 @@ const UpdateBusinessProfile = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
+// organizer dashboard stats
+const OrganizerDashboardStats = async (req, res) => {
+  try {
+    const userId = req.user;
+    // check organiser is approved or exists
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    }).populate("user", "name email");
+    if (!organizer) {
+      return Response(res, 403, "Only approved organizers can access");
+    }
+    // get organizer all events
+    const events = await Event.find({ organizer: organizer._id });
+    //find events id
+    const eventIds = events.map((e) => e._id);
+    // find payment status paid or booking status confirmed event bookings
+    const eventbookings = await Eventbooking.find({
+      event: { $in: eventIds },
+      paymentStatus: "paid",
+      bookingStatus: "confirmed",
+    }).select("totalAmount totalSeats");
+    // total revenue
+    const totalRevenue =
+      eventbookings.reduce((sum, booking) => sum + booking.totalAmount, 0) || 0;
+    // total tickets sold
+    const totalTicketsolds =
+      eventbookings.reduce((sum, booking) => sum + booking.totalSeats, 0) || 0;
+    const totalEvents = events.length || 0;
+    const totaleventbookings = eventbookings.length || 0;
+    // find dining bookings
+    const restaurant = await Restaurant.findOne({ organizer: organizer._id });
+    const diningbookings = await Restaurantbooking.find({
+      restaurant: restaurant._id,
+      bookingStatus: "confirmed",
+    });
+    const totaldiningbookings = diningbookings.length || 0;
+    return Response(res, 200, "dashboard stats fetched successfully", {
+      totalRevenue,
+      totalTicketsolds,
+      totaleventbookings,
+      totalEvents,
+      totaldiningbookings,
+    });
+  } catch (error) {
+    console.log("Failed to get dashboard stats", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+// organizer event management stats
+const EventManagementStats = async (req, res) => {
+  try {
+    const userId = req.user;
+    // check organiser is approved or exists
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    }).populate("user", "name email");
+    if (!organizer) {
+      return Response(res, 403, "Only approved organizers can access");
+    }
+    // get organizer all events
+    const events = await Event.find({
+      organizer: organizer._id,
+      eventIsActive: true,
+    });
+    //find events id
+    const eventIds = events.map((e) => e._id);
+    // find payment status paid or booking status confirmed event bookings
+    const eventbookings = await Eventbooking.find({
+      event: { $in: eventIds },
+      paymentStatus: "paid",
+      bookingStatus: "confirmed",
+    }).select("totalAmount totalSeats");
+    // total revenue
+    const totalRevenue = eventbookings.reduce((sum, booking) => sum + booking.totalAmount, 0) || 0;
+    // total tickets sold
+    const totalTicketsolds = eventbookings.reduce((sum, booking) => sum + booking.totalSeats, 0) || 0;
+    // current month revenue
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    const monthRevenueBookings = await Eventbooking.find({
+      event: { $in: eventIds },
+      paymentStatus: "paid",
+      bookingStatus: "confirmed",
+      createdAt: { $gte: startOfMonth },
+    }).select("totalAmount");
 
-module.exports = {OnBoardingOrganizer,UpdateBusinessProfile}
+    const currentMonthRevenue = monthRevenueBookings.reduce(
+      (sum, b) => sum + b.totalAmount,
+      0,
+    );
+    const totalEvents = events.length || 0;
+    return Response(res, 200, "event mangement stats fetched successfully", {
+      totalRevenue,
+      totalTicketsolds,
+      currentMonthRevenue,
+      totalEvents,
+    });
+  } catch (error) {
+    console.log("Failed to event management stats", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+// organizer dining management stats
+const ManageDiningStats = async (req, res) => {
+  try {
+    const userId = req.user;
+    // Check organizer
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    });
+    if (!organizer) {
+      return Response(res, 403, "Only approved organizers can access");
+    }
+    // Get organizer restaurant
+    const restaurant = await Restaurant.findOne({
+      organizer: organizer._id,
+    });
+
+    if (!restaurant) {
+      return Response(res, 404, "Restaurant not found");
+    }
+
+    // Date ranges
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+    // Queries
+    const [
+      totalbookings,
+      confirmedbookings,
+      cancelledbookings,
+      todaysbookings,
+      thisMonthbookings,
+    ] = await Promise.all([
+      // Total
+      Restaurantbooking.countDocuments({
+        restaurant: restaurant._id,
+      }),
+      // Confirmed
+      Restaurantbooking.countDocuments({
+        restaurant: restaurant._id,
+        bookingStatus: "confirmed",
+      }),
+      // Cancelled
+      Restaurantbooking.countDocuments({
+        restaurant: restaurant._id,
+        bookingStatus: "cancelled",
+      }),
+      // Today
+      Restaurantbooking.countDocuments({
+        restaurant: restaurant._id,
+        bookingdate: { $gte: todayStart, $lte: todayEnd },
+      }),
+      // This Month
+      Restaurantbooking.countDocuments({
+        restaurant: restaurant._id,
+        createdAt: { $gte: monthStart },
+      }),
+    ]);
+
+    return Response(res, 200, "Dining dashboard stats fetched", {
+      totalbookings,
+      confirmedbookings,
+      cancelledbookings,
+      todaysbookings,
+      thisMonthbookings,
+    });
+  } catch (error) {
+    console.log("Failed to fetch dining stats", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+// organizer event booking stats (manage event bookings page)
+const EventBookingPageStats = async (req, res) => {
+  try {
+    const userId = req.user;
+    // Check approved organizer
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    });
+    if (!organizer) {
+      return Response(res, 403, "Only approved organizers can access");
+    }
+    // Get organizer events
+    const events = await Event.find({ organizer: organizer._id }).select("_id");
+    if (!events.length) {
+      return Response(res, 200, "No events found", {
+        totalBookings: 0,
+        confirmedBookings: 0,
+        cancelledBookings: 0,
+        pendingBookings: 0,
+      });
+    }
+    const eventIds = events.map((e) => e._id);
+    // Aggregate booking stats
+    const bookingStats = await Eventbooking.aggregate([
+      {
+        $match: {
+          event: { $in: eventIds },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalBookings: { $sum: 1 },
+          confirmedBookings: {
+            $sum: {
+              $cond: [{ $eq: ["$bookingStatus", "confirmed"] }, 1, 0],
+            },
+          },
+          cancelledBookings: {
+            $sum: {
+              $cond: [{ $eq: ["$bookingStatus", "cancelled"] }, 1, 0],
+            },
+          },
+          pendingBookings: {
+            $sum: {
+              $cond: [{ $eq: ["$bookingStatus", "pending"] }, 1, 0],
+            },
+          },
+        },
+      },
+    ]);
+
+    const stats = bookingStats[0] || {
+      totalBookings: 0,
+      confirmedBookings: 0,
+      cancelledBookings: 0,
+      pendingBookings: 0,
+    };
+
+    return Response(res, 200, "Booking stats fetched", stats);
+  } catch (error) {
+    console.log("Failed to fetch booking stats", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+// organizer dining booking page stats (manage dining bookings page)
+const DiningBookingPageStats = async (req, res) => {
+  try {
+    const userId = req.user;
+    // Check approved organizer
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    });
+
+    if (!organizer) {
+      return Response(res, 403, "Only approved organizers can access");
+    }
+
+    // Find Organizer restaurant
+    const restaurant = await Restaurant.findOne({
+      organizer: organizer._id,
+    }).select("_id");
+
+    if (!restaurant) {
+      return Response(res, 200, "No restaurant found", {
+        totalBookings: 0,
+        confirmedBookings: 0,
+        cancelledBookings: 0,
+        pendingBookings: 0,
+      });
+    }
+    // Aggregate booking stats
+    const bookingStats = await Restaurantbooking.aggregate([
+      {
+        $match: {
+          restaurant: restaurant._id,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalBookings: { $sum: 1 },
+          confirmedBookings: {
+            $sum: {
+              $cond: [{ $eq: ["$bookingStatus", "confirmed"] }, 1, 0],
+            },
+          },
+          cancelledBookings: {
+            $sum: {
+              $cond: [{ $eq: ["$bookingStatus", "cancelled"] }, 1, 0],
+            },
+          },
+          pendingBookings: {
+            $sum: {
+              $cond: [{ $eq: ["$bookingStatus", "pending"] }, 1, 0],
+            },
+          },
+        },
+      },
+    ]);
+
+    const stats = bookingStats[0] || {
+      totalBookings: 0,
+      confirmedBookings: 0,
+      cancelledBookings: 0,
+      pendingBookings: 0,
+    };
+
+    return Response(res, 200, "Dining booking stats fetched", stats);
+  } catch (error) {
+    console.log("Failed to fetch dining booking stats", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+
+module.exports = {
+  OnBoardingOrganizer,
+  UpdateBusinessProfile,
+  OrganizerDashboardStats,
+  EventManagementStats,
+  ManageDiningStats,
+  EventBookingPageStats,
+  DiningBookingPageStats
+};
