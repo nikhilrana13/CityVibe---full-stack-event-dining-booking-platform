@@ -27,8 +27,10 @@ const EventSchema = new mongoose.Schema({
 
 // index for query performance
 EventSchema.index({ city: 1 })
-EventSchema.index({ category: 1 })
+EventSchema.index({eventIsActive:1})
 EventSchema.index({ startDate: 1 })
+EventSchema.index({ endDate: 1 })
+EventSchema.index({ category: 1 })
 
 EventSchema.pre("save", function(next){
    if(this.endDate && this.endDate < this.startDate){
