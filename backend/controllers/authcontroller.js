@@ -113,5 +113,5 @@ const adminLogin = async (req, res) => {
     }
  }
 
- module.exports = {verifyFirebaseToken,LoginWithGoogle,Logout,adminLogin} 
+ module.exports = {verifyFirebaseToken,LoginWithGoogle,Logout,adminLogin,Logout} 
  
