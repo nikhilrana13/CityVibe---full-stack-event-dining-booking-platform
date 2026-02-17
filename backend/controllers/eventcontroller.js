@@ -5,6 +5,7 @@ const Event = require("../models/eventmodel.js");
 const Ticket = require("../models/ticketmodel.js");
 const Response = require("../utils/responsehandler.js");
 const Eventbooking = require("../models/bookings/eventbookingmodel.js");
+const moment = require("moment-timezone")
 
 // create event
 const CreateEvent = async (req, res) => {
@@ -276,8 +277,14 @@ const GetAllEvents = async (req, res) => {
     page = parseInt(page);
     limit = parseInt(limit);
     const skip = (page - 1) * limit;
-
-    let filter = { eventIsActive: true };
+    // today date
+    const today = moment().tz("Asia/Kolkata").startOf("day").toDate()
+    let filter = { eventIsActive: true,$or:[
+    // Multi-day ongoing events
+    { endDate: { $ne: null, $gte: today } },
+    // Single-day upcoming events
+    { endDate: null, startDate: { $gte: today } }
+   ]};
     // category filter for multiple categories
     if (category) {
       const categories = category.split(",").map((c) => c.trim());

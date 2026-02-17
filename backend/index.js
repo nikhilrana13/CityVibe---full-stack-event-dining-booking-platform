@@ -14,6 +14,7 @@ const RestaurantBookingRoute = require("./routes/restaurantbookingroutes.js")
 const EventBooking = require("./routes/eventbookingroutes.js")
 const UserRoute = require("./routes/userroutes.js")
 const WebhookRoute = require("./routes/stripewebhookroute.js")
+const EventStatusUpdater = require("./jobs/eventstatusupdater.js")
 
 dotenv.config()
 
@@ -46,6 +47,7 @@ configure()
 
 app.listen(PORT,()=>{
     console.log(`server is running on port ${PORT}`)
+    EventStatusUpdater()
 })
 
 

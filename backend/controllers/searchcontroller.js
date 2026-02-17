@@ -1,6 +1,7 @@
 const Event = require("../models/eventmodel.js");
 const Restaurant = require("../models/restaurantmodel.js");
 const Response = require("../utils/responsehandler.js");
+const moment = require("moment-timezone")
 
 // find result based on query trending mixed trending events trending restaurant search results
 const Search = async (req, res) => {
@@ -10,10 +11,15 @@ const Search = async (req, res) => {
       return Response(res, 400, "Type and city is Required");
     }
     const isTrending = !query; // if no query show trending
+    const today = moment().tz("Asia/Kolkata").startOf("day").toDate();
     // event
     if (type === "event") {
       const filter = {
         eventIsActive: true,
+         $or: [
+        { endDate: { $ne: null, $gte: today } },
+        { endDate: null, startDate: { $gte: today } }
+          ],
         city: { $regex: new RegExp(city, "i") },
       };
       if (!isTrending) {
@@ -53,7 +59,11 @@ const Search = async (req, res) => {
     // dining
     if (type === "dining") {
       const filter = {
-        isActive: true,
+      isActive: true,
+      $or: [
+    { endDate: { $ne: null, $gte: today } },
+    { endDate: null, startDate: { $gte: today } }
+   ],
         city: { $regex: new RegExp(city, "i") },
       };
 
@@ -73,6 +83,10 @@ const Search = async (req, res) => {
     if (type === "all") {
       const eventFilter = {
         eventIsActive: true,
+        $or: [
+        { endDate: { $ne: null, $gte: today } },
+        { endDate: null, startDate: { $gte: today } }
+     ],
         city: { $regex: new RegExp(city, "i") },
       };
       const restaurantFilter = {

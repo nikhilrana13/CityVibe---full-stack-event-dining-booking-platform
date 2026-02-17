@@ -1,5 +1,6 @@
 const Event = require("../models/eventmodel.js");
 const Response = require("../utils/responsehandler.js");
+const moment = require("moment-timezone")
 
 const Home = async (req, res) => {
   try {
@@ -7,8 +8,13 @@ const Home = async (req, res) => {
     if (!city) {
       return Response(res, 400, "City is required");
     }
+    const todaydate = moment().tz("Asia/Kolkata").startOf("day").toDate()
     const cityFilter = {
       eventIsActive: true,
+       $or: [
+        { endDate: { $ne: null, $gte: todaydate } },
+        { endDate: null, startDate: { $gte: todaydate } }
+          ],
       city: { $regex: new RegExp(city, "i") },
     };
     // trending
@@ -58,9 +64,7 @@ const Home = async (req, res) => {
     const thisWeek = await Event.find({
       ...cityFilter,
       startDate: { $gte: today, $lte: weekEnd },
-    })
-      .limit(10)
-      .select(
+    }).limit(10).select(
         "title coverimage startDate endDate city minPrice venue location",
       );
     //  Comedy
@@ -75,7 +79,11 @@ const Home = async (req, res) => {
       {
         $match: {
           eventIsActive: true,
-          city: { $in:topCities.map(c=> c.toLowerCase())},
+           $or: [
+        { endDate: { $ne: null, $gte: todaydate } },
+        { endDate: null, startDate: { $gte: todaydate } }
+          ],
+          city: {$in:topCities.map(c => new RegExp(`^${c}$`, "i"))},
         },
       },
         {
