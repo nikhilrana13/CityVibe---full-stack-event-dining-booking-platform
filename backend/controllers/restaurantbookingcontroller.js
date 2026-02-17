@@ -209,7 +209,7 @@ const CancelBooking = async(req,res)=>{
         if(!booking){
           return Response(res,400,"Booking not found")
         }
-        if(booking.paymentStatus === "cancelled"){
+        if(booking.bookingStatus === "cancelled"){
           return Response(res,200,"Booking already cancelled")
         }
         booking.bookingStatus = "cancelled",
@@ -266,7 +266,6 @@ const GetDiningBookingDetail = async(req,res)=>{
       console.log("failed to get booking details", error);
       return Response(res, 500, "Internal server error");
     }
-}
-
+}  
 
 module.exports = {CreateRestaurantBooking,GetAvailableSlots,CancelBooking,UserallDiningbookings,GetDiningBookingDetail}

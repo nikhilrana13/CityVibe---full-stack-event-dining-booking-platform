@@ -232,7 +232,7 @@ const StripeWebhookHandler = async (req, res) => {
     }
   }
   res.json({ received: true });
-};
+}; 
 //test only - Manual payment confirmation
 const UpdatePaymentStatus = async (req, res) => {
   try {

@@ -16,6 +16,8 @@ const UserRoute = require("./routes/userroutes.js")
 const WebhookRoute = require("./routes/stripewebhookroute.js")
 const EventStatusUpdater = require("./jobs/eventstatusupdater.js")
 const responseTimeLogger = require("./middleware/responsetimelogger.js")
+const { limiter} = require("./middleware/ratelimiters.js")
+const setupSwagger = require("./config/swagger.js")
 
 dotenv.config()
 
@@ -23,14 +25,21 @@ const PORT = process.env.PORT || 5000
 const app = express()
 // stripe webhook 
 app.use("/api",WebhookRoute)
+app.set("trust proxy", 1);
+
+
 
 // middlewares
 app.use(cors())
+// global limiter
+app.use(limiter)
 app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
 // middleware to find response time of requests
 app.use(responseTimeLogger)
+
+setupSwagger(app);
 
 // routes
 app.use("/api/auth",AuthRoute)

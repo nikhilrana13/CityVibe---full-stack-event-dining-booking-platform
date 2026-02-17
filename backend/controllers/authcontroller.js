@@ -9,7 +9,7 @@ const AdminMapper = require("../mappers/adminmapper");
 const verifyFirebaseToken = async (req, res) => {
   try {
     const { token } = req.body;
-    if (!token) return Response(res, 404, "Token is required");
+    if (!token) return Response(res, 400,"Token is required");
     const decoded = await admin.auth().verifyIdToken(token);
     const uid = decoded.uid;
     const phone = decoded.phone_number;
