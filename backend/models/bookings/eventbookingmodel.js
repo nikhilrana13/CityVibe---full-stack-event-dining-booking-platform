@@ -10,7 +10,10 @@ const eventbookingSchema = new mongoose.Schema({
     paymentStatus:{type:String,enum:["pending","paid","failed"],default:"pending"},
     bookingStatus: {type: String,enum: ["confirmed", "cancelled","pending"],default: "pending"},
     stripePaymentId:{type:String},
-    totalSeats:{type:Number,required:true}
+    totalSeats:{type:Number,required:true},
+    ticketCode:{type:String,unique:true},
+    isScan: { type: Boolean, default: false },
+    scanTime: { type: Date }
 },{timestamps:true})
 
 const Eventbooking = mongoose.model("Eventbooking",eventbookingSchema)

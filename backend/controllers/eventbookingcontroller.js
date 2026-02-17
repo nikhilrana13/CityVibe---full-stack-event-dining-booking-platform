@@ -4,6 +4,9 @@ const Ticket = require("../models/ticketmodel.js");
 const User = require("../models/usermodel.js");
 const Response = require("../utils/responsehandler.js");
 const StripeInstance = require("../utils/stripe.js");
+const {nanoid} = require("nanoid")
+const moment = require("moment-timezone");
+const Organizer = require("../models/organizermodel.js");
 
 /** 
  * 
@@ -197,6 +200,7 @@ const StripeWebhookHandler = async (req, res) => {
     }
     booking.paymentStatus = "paid";
     booking.bookingStatus = "confirmed";
+    booking.ticketCode = nanoid(10)
     await booking.save();
     // Deduct ticket quantities
     for (let item of booking.tickets) {
@@ -252,6 +256,7 @@ const UpdatePaymentStatus = async (req, res) => {
     // Update booking status
     booking.paymentStatus = "paid";
     booking.bookingStatus = "confirmed";
+    booking.ticketCode = nanoid(10)
     await booking.save();
     // Deduct ticket quantities
     for (let item of booking.tickets) {
@@ -379,4 +384,59 @@ const GetEventBookingDetail = async(req,res)=>{
     return Response(res, 500, "Internal server error");
   }
 }
-module.exports = { CreateEventBooking, StripeWebhookHandler,UpdatePaymentStatus,UserAllBookedEvents,GetEventBookingDetail,CancelEventBooking}
+// verify ticket 
+const VerifyTicket = async(req,res)=>{
+  try {
+  const { ticketCode } = req.body;
+    const userId = req.user; // organizer
+    if (!ticketCode) {
+      return Response(res, 400, "Ticket code required");
+    }
+    // check organiser is approved or exists
+        const organizer = await Organizer.findOne({
+          user: userId,
+          isApproved: true,
+        });
+        if (!organizer) {
+          return Response(res, 403, "Only approved organizers can verify ticket");
+        }
+    // Find booking
+     const booking = await Eventbooking.findOne({ ticketCode }).populate({path:"event",select:"title organizer endDate startDate"});
+      if (!booking) {
+      return Response(res, 404, "Invalid ticket");
+      }
+      // Organizer ownership check
+      if (booking.event.organizer.toString() !== organizer._id.toString()) {
+      return Response(res, 403, "You cannot verify tickets for this event");
+      }
+     // Only confirmed & paid bookings allowed
+     if (booking.paymentStatus !== "paid" || booking.bookingStatus !== "confirmed") {
+      return Response(res, 400, "Ticket not valid");
+     }
+    // Prevent double scan
+    if (booking.isScan) {
+      return Response(res, 400, "Ticket already used");
+    }
+    // Check event not expired
+    const today = moment().tz("Asia/Kolkata").startOf("day").toDate();
+    const isExpired = (booking.event.endDate && booking.event.endDate < today || !booking.event.endDate && booking.event.startDate < today)
+       if (isExpired){
+      return Response(res, 400, "Event already ended");
+       }
+    booking.isScan = true;
+    booking.scanTime = new Date(); 
+    await booking.save();
+
+    return Response(res, 200, "Ticket verified successfully", {
+      user: booking.user,
+      event: booking.event.title,
+      totalSeats: booking.totalSeats,
+      scanTime: booking.scanTime
+    });
+
+  } catch (error) {
+    console.log("Ticket verification failed", error);
+    return Response(res, 500, "Internal server error");
+  }
+}
+module.exports = { CreateEventBooking, StripeWebhookHandler,UpdatePaymentStatus,UserAllBookedEvents,GetEventBookingDetail,CancelEventBooking,VerifyTicket}
