@@ -15,6 +15,7 @@ const EventBooking = require("./routes/eventbookingroutes.js")
 const UserRoute = require("./routes/userroutes.js")
 const WebhookRoute = require("./routes/stripewebhookroute.js")
 const EventStatusUpdater = require("./jobs/eventstatusupdater.js")
+const responseTimeLogger = require("./middleware/responsetimelogger.js")
 
 dotenv.config()
 
@@ -23,12 +24,13 @@ const app = express()
 // stripe webhook 
 app.use("/api",WebhookRoute)
 
-// middleware 
+// middlewares
 app.use(cors())
 app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
-
+// middleware to find response time of requests
+app.use(responseTimeLogger)
 
 // routes
 app.use("/api/auth",AuthRoute)
