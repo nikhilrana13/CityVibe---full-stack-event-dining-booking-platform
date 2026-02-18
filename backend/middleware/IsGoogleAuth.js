@@ -16,7 +16,7 @@ const IsgoogleAuth = async(req,res,next) => {
          next()
     } catch (error) {
       console.log("error in isGoogleAuth middleware",error)
-      return Response(res,500,"Internal server error")
+      return Response(res,401,"Unauthorized: Invalid or expired firebase token")
     }
 }
 
