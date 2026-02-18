@@ -33,7 +33,7 @@ const UpdateUserProfile = async (req, res) => {
       if (dobDate > new Date()) {
         return Response(res, 400, "Invalid date of birth");
       }
-       updata.dob = dobDate
+       updateData.dob = dobDate
     }
     if (gender){
     const allowedGenders = ["male", "female", "other"];
