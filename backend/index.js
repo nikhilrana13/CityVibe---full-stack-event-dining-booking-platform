@@ -49,7 +49,7 @@ app.use("/api/event",EventRoute)
 app.use("/api/dining",diningRoute)
 app.use("/api",searchRoute)
 app.use("/api",HomeRoute)
-app.use("/api",RestaurantBookingRoute)
+app.use("/api",RestaurantBookingRoute) 
 app.use("/api",EventBooking)
 app.use("/api/user",UserRoute)
 

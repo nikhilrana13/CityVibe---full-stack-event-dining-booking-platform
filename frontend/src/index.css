@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&family=Poppins&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body{
+  font-family:"Rubik", sans-serif;
+}
+
+.fixed-sidebar {
+  z-index: 10000; /* sidebar should be above overlay */
+}
+.fixed-overlay {
+  z-index: 9999;  /* overlay below sidebar */
+}
+/* login phone input css */
+/* container */
+.react-tel-input {
+  font-family: inherit;
+}
+/* input field */
+.react-tel-input .form-control {
+  width: 100% !important;
+  height: 52px;
+  padding-left: 58px !important;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  font-size: 15px;
+  box-shadow: none;
+}
+
+.react-tel-input .form-control:focus {
+  border-color: #6748E4;
+  box-shadow: 0 0 0 2px rgba(103, 72, 228, 0.15);
+}
+
+/* flag button */
+.react-tel-input .flag-dropdown {
+  border: none;
+  background: transparent;
+  border-radius: 14px 0 0 14px;
+}
+
+/* flag hover */
+.react-tel-input .flag-dropdown.open,
+.react-tel-input .flag-dropdown:hover {
+  background: #f5f3ff;
+}
+
+/* country list dropdown */
+.react-tel-input .country-list {
+  border-radius: 12px;
+  margin-top: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  max-height: 260px;
+}
+
+/* country item */
+.react-tel-input .country-list .country {
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+/* selected & hover */
+.react-tel-input .country-list .country:hover,
+.react-tel-input .country-list .country.highlight {
+  background: #ede9fe;
+}
+
+/* search box */
+.react-tel-input .search-box {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  margin: 8px;
+}
+
+/* global.css */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
