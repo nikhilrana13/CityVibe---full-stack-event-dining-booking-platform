@@ -16,7 +16,7 @@ const limiter = rateLimit({
 // auth limiter
 const AuthLimiter = rateLimit({
      windowMs: 15 * 60 * 1000,
-     max: 5, // only 5 login attempts
+     max: 10, // only 5 login attempts
     standardHeaders: true,
     legacyHeaders: false,
     message: {

@@ -6,7 +6,7 @@ const router = express.Router()
 
 
 // login with phone number 
-router.post("/verify-firebase-token",AuthLimiter,verifyFirebaseToken) 
+// router.post("/verify-firebase-token",AuthLimiter,verifyFirebaseToken) 
 // login with google 
 router.post("/google-login",AuthLimiter,IsGoogleAuth,LoginWithGoogle) 
 // login for admin 

@@ -12,9 +12,14 @@ import { GoArrowLeft } from 'react-icons/go';
 import { LiaClipboardListSolid } from 'react-icons/lia';
 import { BiLogOut } from 'react-icons/bi';
 import { RxDashboard } from 'react-icons/rx';
+import { useSelector } from 'react-redux';
+import useLogout from '../../hooks/useLogout';
+import nouserimg from "../../assets/user.png"
 
 const Navbar = () => {
   const [isSidebarOpen, SetIsSidebarOpen] = useState(false)
+  const user = useSelector((state)=>state.Auth.user)
+  const {handleLogout} = useLogout()
   const location = useLocation()
 
   return (
@@ -59,11 +64,15 @@ const Navbar = () => {
                 <span className='text-gray-500 whitespace-wrap text-[1rem]'>Search for events and restaurants</span>
               </div>
               {/* login dialog open */}
-              {/* <LoginDialog /> */}
-              {/* sidebar open */}
+              {
+                user ? (
               <button onClick={() => SetIsSidebarOpen(true)} className='rounded-full cursor-pointer p-2 bg-[#D1D5DB]'>
                         <CiUser size={25} className='text-white' />
               </button>
+                ):(
+                   <LoginDialog />
+                )
+              }
             </div>
           </div>
           {/* for mobile */}
@@ -89,11 +98,11 @@ const Navbar = () => {
           </div>
         </nav>
         {/* Sidebar */}
-        <div className={` fixed fixed-sidebar top-0  rounded-none sm:rounded-l-2xl  right-0 h-screen w-full sm:w-[450px] md:w-[600px] z-[10000] bg-white shadow-lg  transform transition-transform duration-300 will-change-transform  ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
+        <div className={` fixed fixed-sidebar top-0  rounded-none sm:rounded-l-2xl  right-0 h-screen w-full sm:w-[450px] md:w-[600px] z-[10000] bg-white shadow-lg  transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]  ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
           } overflow-y-auto scrollbar-hidden`}
         >
           <div className='w-full p-4 border-b bg-white border'>
-            <NavLink className="flex gap-4 font-[500] text-[1.3rem] items-center"> <GoArrowLeft onClick={()=>SetIsSidebarOpen(false)} /> Profile</NavLink>
+            <div className="flex gap-4 font-[500] cursor-pointer text-[1.3rem] items-center"> <GoArrowLeft onClick={()=>SetIsSidebarOpen(false)} /> Profile</div>
           </div>
           {/* my details */}
           <div className='flex w-full bg-[#F1F1F2] flex-col flex-1 min-h-full'>
@@ -101,19 +110,26 @@ const Navbar = () => {
                <div className='flex p-5 flex-col gap-8'>
                 <div className='flex  items-center gap-5'>
                 <div className='rounded-full border'>
-                         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgWkA3X9cdGn3tggpvy_hnWe0QmRZW-DjwHw&s" alt="user pic" className='w-[64px] rounded-full object-cover h-[64px]' />
+                <img src={user?.profilepic || nouserimg} alt="user pic" className='w-[64px] rounded-full object-cover h-[64px]' />
                 </div>
                 <div className='flex flex-col gap-1'>
-                  <span className='text-[1.2rem] font-[500]'>User</span>
-                  <span className='text-[#545459] text-[0.8rem]'>+91646464646</span>
+                  <span className='text-[1.2rem] font-[500]'>{user?.name|| "User"}</span>
+                  <span className='text-[#545459] text-[0.8rem]'>{user?.email || user?.phonenumber || "NA"}</span>
                 </div>
                </div>
               <NavLink to="/" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
               <LiaClipboardListSolid size={22} />
               View all bookings</NavLink>
-               <NavLink to="/" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
-              <RxDashboard size={23} />
-              Dashboard</NavLink> 
+              {user?.hasOrganizerAccount === true ? (
+                <NavLink to="/" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
+                <RxDashboard size={23} />
+               Dashboard</NavLink> 
+              ):(
+                 <NavLink to="/events/list-your-events" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
+                <LuGuitar size={23} />
+                 List your events</NavLink> 
+              )
+            }
                </div>
                {/* more */}
                 <div className='flex p-5 flex-col gap-8'>
@@ -129,9 +145,9 @@ const Navbar = () => {
                  
                </div>
                <div className='p-5'>
-                  <NavLink to="/" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
+                <button onClick={()=>{handleLogout(),SetIsSidebarOpen(false)}} className="bg-white w-full flex gap-3 border items-center rounded-xl py-4 px-4" >
               <BiLogOut size={22} />
-              Logout</NavLink>
+              Logout</button>
                </div>
             </div>
         </div>
@@ -139,7 +155,7 @@ const Navbar = () => {
         {isSidebarOpen && (
           <div
             onClick={() => SetIsSidebarOpen(false)}
-            className="fixed fixed-overlay h-screen inset-0 bg-black/30 transition-opacity duration-300  backdrop-blur-md backdrop-saturate-150 z-[10001]"
+            className="fixed fixed-overlay h-screen inset-0 bg-black/30 transition-opacity duration-500 ease-out  backdrop-blur-md backdrop-saturate-150 z-[10001]"
           ></div>
 
         )}

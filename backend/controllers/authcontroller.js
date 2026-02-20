@@ -6,32 +6,32 @@ const AdminMapper = require("../mappers/adminmapper");
 
 
 // verify firebase token login with phone
-const verifyFirebaseToken = async (req, res) => {
-  try {
-    const { token } = req.body;
-    if (!token) return Response(res, 400,"Token is required");
-    const decoded = await admin.auth().verifyIdToken(token);
-    const uid = decoded.uid;
-    const phone = decoded.phone_number;
-    let user = await User.findOne({
-      $or: [{ uid }, { phonenumber: phone }]
-    });
-    if (!user) {
-      user = await User.create({
-        uid,
-        provider: "phone",
-        phonenumber: phone,
-        role: "user"
-      });
-    }
-    const jwttoken = jwt.sign({ id: user._id, role: user.role },process.env.JWT_SECRET_KEY,{ expiresIn: "1d" });
-    res.cookie("token", jwttoken, { httpOnly: true,secure: true,sameSite:"none"});
-    return Response(res, 201, "Login successfully", { user, token: jwttoken });
-  } catch (error) {
-    console.log("Failed to verify Firebase token", error);
-    return Response(res, 500, "Internal server error");
-  }
-};
+// const verifyFirebaseToken = async (req, res) => {
+//   try {
+//     const { token } = req.body;
+//     if (!token) return Response(res, 400,"Token is required");
+//     const decoded = await admin.auth().verifyIdToken(token);
+//     const uid = decoded.uid;
+//     const phone = decoded.phone_number;
+//     let user = await User.findOne({
+//       $or: [{ uid }, { phonenumber: phone }]
+//     });
+//     if (!user) {
+//       user = await User.create({
+//         uid,
+//         provider: "phone",
+//         phonenumber: phone,
+//         role: "user"
+//       });
+//     }
+//     const jwttoken = jwt.sign({ id: user._id, role: user.role },process.env.JWT_SECRET_KEY,{ expiresIn: "1d" });
+//     res.cookie("token", jwttoken, { httpOnly: true,secure: true,sameSite:"none"});
+//     return Response(res, 201, "Login successfully", { user, token: jwttoken });
+//   } catch (error) {
+//     console.log("Failed to verify Firebase token", error);
+//     return Response(res, 500, "Internal server error");
+//   }
+// };
 // login with google
 const LoginWithGoogle = async (req, res) => {
   try {
@@ -113,5 +113,5 @@ const adminLogin = async (req, res) => {
     }
  }
 
- module.exports = {verifyFirebaseToken,LoginWithGoogle,Logout,adminLogin,Logout} 
+ module.exports = {LoginWithGoogle,Logout,adminLogin,Logout} 
  

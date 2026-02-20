@@ -1,0 +1,33 @@
+import { Setuser } from '../redux/AuthSlice'
+import axios from 'axios'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
+
+const useLogout = () => {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+
+    const handleLogout = async()=>{
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`,{
+                headers:{
+                    Authorization:`Bearer ${localStorage.getItem("token")}`
+                },
+            })
+            if(response.data){
+                toast.success(response?.data?.message)
+                dispatch(Setuser(null))
+                localStorage.removeItem("token")
+                navigate("/")
+            }
+        } catch (error) {
+            console.error("failed to logout",error)
+            toast.error(error?.response?.data?.message || "Internal server error")
+        }
+    }
+  return {handleLogout}
+}
+
+export default useLogout

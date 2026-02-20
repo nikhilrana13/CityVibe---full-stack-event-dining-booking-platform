@@ -30,7 +30,10 @@ app.set("trust proxy", 1);
 
 
 // middlewares
-app.use(cors())
+app.use(cors({
+    origin:process.env.FRONTEND_URL,
+    credentials:true
+}))
 // global limiter
 app.use(limiter)
 app.use(express.json())

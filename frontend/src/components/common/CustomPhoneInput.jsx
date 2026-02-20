@@ -3,14 +3,21 @@ import { Listbox } from "@headlessui/react";
 import { countries } from "../data/Countries";
 import * as Flags from "country-flag-icons/react/3x2";
 
-const CustomPhoneInput = ({value,onChange}) => {
+const CustomPhoneInput = ({value,onChange,onCountryChange}) => {
    const [selectedCountry, setSelectedCountry] = useState(countries[0]);
-  const Flag = Flags[selectedCountry.code];
+    const Flag = Flags[selectedCountry.code];
+
+    const handleCountryChange = (country)=>{
+      setSelectedCountry(country)
+      onCountryChange?.(country)
+    }
+
+
   return (
     <div className="w-full max-w-[380px] mx-auto m-3">
       <div className="flex border border-gray-300 rounded-xl relative focus-within:ring-2 focus-within:ring-purple-500">
         {/* Country Selector */}
-        <Listbox value={selectedCountry} onChange={setSelectedCountry}>
+        <Listbox value={selectedCountry} onChange={handleCountryChange}>
           <div className="relative">
             <Listbox.Button className="flex items-center border-r gap-2 px-3 h-[52px] ">
               <Flag className="w-5 h-4" />
