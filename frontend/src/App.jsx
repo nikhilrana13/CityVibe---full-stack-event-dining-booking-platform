@@ -4,21 +4,34 @@ import Diningpage from "./pages/Diningpage"
 import Eventspage from "./pages/Eventspage"
 import { Toaster } from "./components/ui/sonner"
 import ListYourEvents from "./pages/ListYourEvents"
-import OrganizerDashboard from "./pages/OrganizerDashboard"
-
+import OnBoarding from "./components/organizerdashboard/OnBoarding"
+import Dashboard from "./components/organizerdashboard/Dashboard"
+import OrganizerLayout from "./pages/OrganizerLayout"
+import OnBoardingForm from "./components/organizerdashboard/OnBoardingForm"
+import OnBoardingPending from "./components/organizerdashboard/OnBoardingPending"
+import OnBoardingRejected from "./components/organizerdashboard/OnBoardingRejected"
 
 const App = () => {
   return (
     <div className="w-full">
-      <div id="recaptcha-container"></div>
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/dining" element={<Diningpage />} />
         <Route path="/events" element={<Eventspage />} />
         {/* for organizers */}
         <Route path="/events/list-your-events" element={<ListYourEvents />} />
-        <Route path="/organizer" element={<OrganizerDashboard />} />
-        
+        {/* onboarding flow */}
+        <Route path="/organizer" element={<OrganizerLayout />}>
+           <Route path="onboarding">
+            <Route index element={<OnBoarding />} />
+            <Route path="form" element={<OnBoardingForm />} /> 
+            <Route path="pending" element={<OnBoardingPending />} /> 
+            <Route path="rejected" element={<OnBoardingRejected />} />
+        </Route>
+           {/*main dashboard */}
+           <Route path="dashboard" element={<Dashboard />} />  
+
+        </Route>
       </Routes>
       <Toaster />
     </div>

@@ -15,13 +15,17 @@ import { RxDashboard } from 'react-icons/rx';
 import { useSelector } from 'react-redux';
 import useLogout from '../../hooks/useLogout';
 import nouserimg from "../../assets/user.png"
+import useFetchOrganizer from '../../hooks/useFetchOrganizer';
 
 const Navbar = () => {
   const [isSidebarOpen, SetIsSidebarOpen] = useState(false)
   const user = useSelector((state)=>state.Auth.user)
   const {handleLogout} = useLogout()
-  const location = useLocation()
-
+  const shouldfetch = user?.hasOrganizerAccount === true
+  const {organizer,loading} = useFetchOrganizer(shouldfetch)
+  if (loading) return null
+  // console.log("response",organizer)
+ 
   return (
     <>
       <header className='flex border w-full transition-all py-3 duration-300 ease-in-out px-2 sm:px-4 items-center z-[9999] 
@@ -120,12 +124,12 @@ const Navbar = () => {
               <NavLink to="/" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
               <LiaClipboardListSolid size={22} />
               View all bookings</NavLink>
-              {user?.hasOrganizerAccount === true ? (
-                <NavLink to="/" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
+              {organizer?.verificationStatus === "approved" ? (
+                <NavLink to="/organizer/dashboard" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
                 <RxDashboard size={23} />
                Dashboard</NavLink> 
               ):(
-                 <NavLink to="/events/list-your-events" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
+                 <NavLink to="/organizer/onboarding" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
                 <LuGuitar size={23} />
                  List your events</NavLink> 
               )

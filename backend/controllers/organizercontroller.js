@@ -92,6 +92,21 @@ const OnBoardingOrganizer = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
+// get organizer profile 
+const OrganizerProfile = async(req,res)=>{
+  try {
+      const userId = req.user 
+      const organizer = await Organizer.findOne({user:userId})
+      if(!organizer){
+        return Response(res,404,"Organizer not found")
+      }
+      return Response(res,200,"Organizer found",{organizer})
+  } catch (error) {
+    console.log("failed to fetch organizer",error)
+    return Response(res,500,"Internal server error")
+    
+  }
+}
 // update Organizer business profile
 const UpdateBusinessProfile = async (req, res) => {
   try {
@@ -472,5 +487,6 @@ module.exports = {
   EventManagementStats,
   ManageDiningStats,
   EventBookingPageStats,
-  DiningBookingPageStats
+  DiningBookingPageStats,
+  OrganizerProfile
 };

@@ -2,19 +2,20 @@ import React, { useRef, useState } from 'react'
 import { CiUser } from 'react-icons/ci'
 import loginbg from "../../assets/loginbg.avif"
 import { IoMdClose } from 'react-icons/io'
-import { signInWithPopup,} from 'firebase/auth'
+import { signInWithPopup, } from 'firebase/auth'
 import { auth, GoogleProvider } from '../../config/firebase.js'
 import { toast } from 'sonner'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { Setuser } from '../../redux/AuthSlice'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const LoginDialog = () => {
     const [open, setOpen] = useState(false)
     const dispatch = useDispatch()
     const navigate = useNavigate()
-   
+    const location = useLocation()
+
 
     const handleLoginWithgoogle = async () => {
         try {
@@ -32,11 +33,27 @@ const LoginDialog = () => {
                 localStorage.setItem("token", response?.data?.data?.token)
                 const user = response?.data?.data?.user
                 dispatch(Setuser(user))
-               if(user?.hasOrganizerAccount === true){
-                 navigate("/organizer")
-               }else{
-                navigate("/")
-               }
+                if (user?.hasOrganizerAccount === true) {
+                    try {
+                        const orgRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/organizer/profile`, {
+                            headers: {
+                                Authorization: `Bearer ${response.data.data.token}`
+                            }
+                        })
+                        const status = orgRes?.data?.data?.organizer.verificationStatus
+                        if (status === "approved") {
+                            navigate("/organizer/dashboard")
+                        } else if (status === "pending") {
+                            navigate("/organizer/pending")
+                        } else {
+                            navigate("/organizer/rejected")
+                        }
+                    } catch (error) {
+                        navigate("/")
+                    }
+                } else {
+                    navigate("/");
+                }
                 handleClose()
             }
         } catch (error) {
@@ -49,9 +66,18 @@ const LoginDialog = () => {
     };
     return (
         <>
-            <button onClick={() => setOpen(true)} className='rounded-full cursor-pointer p-2 bg-[#D1D5DB]'>
-                <CiUser size={25} className='text-white' />
-            </button>
+            {
+                location.pathname === "/events/list-your-events" ? (
+                    <button onClick={() => setOpen(true)} className="mt-10 px-10 py-4 rounded-2xl  text-white font-semibold text-lg bg-gradient-to-r  from-[#6a4dff] to-[#8b5cf6] hover:scale-105  hover:shadow-purple-500/50 transition-all duration-300 shadow-lg 
+                 shadow-purple-600/30">
+                        Get started
+                    </button>
+                ) : (
+                    <button onClick={() => setOpen(true)} className='rounded-full cursor-pointer p-2 bg-[#D1D5DB]'>
+                        <CiUser size={25} className='text-white' />
+                    </button>
+                )
+            }
             {/* model */}
             {
                 open && (

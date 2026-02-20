@@ -5,15 +5,21 @@ import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { Persistor, Store } from './redux/Store'
 import { PersistGate } from 'redux-persist/es/integration/react'
+import ErrorBoundary from './components/common/ErrorBoundary'
 
 createRoot(document.getElementById('root')).render(
-
-   <Provider store={Store}>
+  
+     <Provider store={Store}>
      <PersistGate loading={null} persistor={Persistor}>
         <BrowserRouter>
-          <App />
+        <ErrorBoundary>
+            <App />
+        </ErrorBoundary>
+        
         </BrowserRouter>
      </PersistGate>
    </Provider>
+  
+  
  
 )
