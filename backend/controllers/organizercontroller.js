@@ -86,7 +86,7 @@ const OnBoardingOrganizer = async (req, res) => {
     });
     user.hasOrganizerAccount = true;
     await user.save();
-    return Response(res, 200, "OnBoarding successful", { organizer });
+    return Response(res, 200, "OnBoarding successful", { organizer});
   } catch (error) {
     console.log("failed to create organizer", error);
     return Response(res, 500, "Internal server error");

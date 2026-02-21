@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import Homepage from "./pages/Homepage"
 import Diningpage from "./pages/Diningpage"
 import Eventspage from "./pages/Eventspage"
@@ -10,6 +10,7 @@ import OrganizerLayout from "./pages/OrganizerLayout"
 import OnBoardingForm from "./components/organizerdashboard/OnBoardingForm"
 import OnBoardingPending from "./components/organizerdashboard/OnBoardingPending"
 import OnBoardingRejected from "./components/organizerdashboard/OnBoardingRejected"
+import OrganizerStatusGuard from "./middlewares/OrganizerStatusGuard"
 
 const App = () => {
   return (
@@ -22,15 +23,19 @@ const App = () => {
         <Route path="/events/list-your-events" element={<ListYourEvents />} />
         {/* onboarding flow */}
         <Route path="/organizer" element={<OrganizerLayout />}>
-           <Route path="onboarding">
-            <Route index element={<OnBoarding />} />
-            <Route path="form" element={<OnBoardingForm />} /> 
-            <Route path="pending" element={<OnBoardingPending />} /> 
+          <Route element={<OrganizerStatusGuard />}>
+          
+           <Route index element={<Navigate to="dashboard" replace />} />
+          {/* onboarding */}
+            <Route path="onboarding">
+              <Route index element={<OnBoarding />} />
+              <Route path="form" element={<OnBoardingForm />} />
+            </Route>
+            <Route path="pending" element={<OnBoardingPending />} />
             <Route path="rejected" element={<OnBoardingRejected />} />
-        </Route>
-           {/*main dashboard */}
-           <Route path="dashboard" element={<Dashboard />} />  
-
+            {/* main dashboard */}
+            <Route path="dashboard" element={<Dashboard />} />
+          </Route>
         </Route>
       </Routes>
       <Toaster />

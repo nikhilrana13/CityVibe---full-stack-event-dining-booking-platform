@@ -128,8 +128,16 @@ const Navbar = () => {
                 <NavLink to="/organizer/dashboard" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
                 <RxDashboard size={23} />
                Dashboard</NavLink> 
+              ):organizer?.verificationStatus === "pending" ? (
+                 <NavLink to="/organizer/pending" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
+                <LuGuitar size={23} />
+                 List your events</NavLink> 
+              ):organizer?.verificationStatus === "rejected" ? (
+                  <NavLink to="/organizer/rejected" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
+                <LuGuitar size={23} />
+                 List your events</NavLink> 
               ):(
-                 <NavLink to="/organizer/onboarding" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
+                  <NavLink to="/organizer/onboarding" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
                 <LuGuitar size={23} />
                  List your events</NavLink> 
               )

@@ -16,7 +16,7 @@ const useFetchOrganizer = (shouldfetch = false) => {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
                 })
-                console.log("response", response.data)
+                // console.log("response", response.data)
                 if (response.data) {
                     setOrganizer(response?.data?.data?.organizer)
                 }
