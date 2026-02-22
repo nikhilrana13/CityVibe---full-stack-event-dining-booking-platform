@@ -49,10 +49,9 @@ const OrganizerLayout = () => {
           />
         )}
         {/* Content */}
-        <div className="w-full lg:w-[80%] bg-[#FAFAFA] pt-[75px] overflow-y-auto ">
+        <div className="w-full lg:w-[80%] bg-[#FAFAFA] pt-[75px] overflow-y-auto h-screen ">
           <Outlet />
         </div>
-
       </div>
     </div>
   )

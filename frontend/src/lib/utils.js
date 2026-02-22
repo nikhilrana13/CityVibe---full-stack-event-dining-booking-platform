@@ -25,3 +25,27 @@ export function formatIndianNumber(value) {
   const formattedOther = otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
   return formattedOther + lastThree + (decimal ? "." + decimal : "");
 }
+export const formatDateRange = (start, end) => {
+  const startFormatted = new Date(start)
+    .toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })
+    .replace(/,/g, "");
+
+  if (!end || start === end) {
+    return startFormatted;
+  }
+
+  const endFormatted = new Date(end)
+    .toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })
+    .replace(/,/g, "");
+
+  return `${startFormatted} - ${endFormatted}`;
+};
+

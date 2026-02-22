@@ -169,7 +169,7 @@ const EachEventDetails = async (req, res) => {
 const getOrganizerAllevents = async (req, res) => {
   try {
     const userId = req.user;
-    let { page = 1, limit = 6 } = req.query;
+    let { page = 1, limit = 6,title,eventIsActive} = req.query;
     page = parseInt(page);
     limit = parseInt(limit);
     const skip = (page - 1) * limit;
@@ -181,13 +181,18 @@ const getOrganizerAllevents = async (req, res) => {
     if (!organizer) {
       return Response(res, 403, "Only approved organizers can access");
     }
-    const events = await Event.find({ organizer: organizer._id })
+    let filters = {organizer: organizer._id}
+    if(title){
+      filters.title = {$regex:title,$options:'i'}
+    }
+    if(eventIsActive){
+      filters.eventIsActive = eventIsActive
+    }
+    const events = await Event.find(filters)
       .sort({ createdAt: 1 })
       .skip(skip)
       .limit(limit);
-    const totalevents = await Event.countDocuments({
-      organizer: organizer._id,
-    });
+    const totalevents = await Event.countDocuments(filters);
     const totalPages = Math.ceil(totalevents / limit);
     if (events.length === 0) {
       return Response(res, 200, "No Events found", []);

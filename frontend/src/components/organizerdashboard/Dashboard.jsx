@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import DashboardStatsCard from './DashboardStatsCard'
 import axios from 'axios'
-import DashboardStatsCardShimmer from './DashboardStatsCardShimmer'
 import RevenueChart from './RevenueChart'
 import RevenueChartSkeleton from './RevenueChartSkeleton'
+import { CalendarDays, IndianRupee, Ticket, TrendingUp } from 'lucide-react'
+import { formatIndianNumber } from '../../lib/utils.js'
+import StatsCard from './StatsCard'
+import StatsCardShimmer from './StatsCardShimmer'
+
 
 const Dashboard = () => {
   const user = useSelector((state) => state.Auth.user)
@@ -19,6 +22,7 @@ const Dashboard = () => {
   const [growth,setGrowth] = useState(0)
   const [loading,setloading] = useState(false)
   const [chartloading,setChartloading] = useState(false)
+ 
   // fetch dashboard stats
   useEffect(()=>{
        const fetchDashboardStats = async()=>{
@@ -55,6 +59,33 @@ const Dashboard = () => {
        }
        fetchDashboardStats()
   },[])
+  // stats data
+  const statsdata = [
+  {
+    title: "Total Events",
+    value: stats.totalEvents || 0,
+    icon: CalendarDays,
+    gradient: "from-[#6a4dff] to-[#8b5cf6]",
+  },
+  {
+    title: "Total Event Bookings",
+    value: stats.totaleventbookings || 0,
+    icon: Ticket,
+    gradient: "from-[#0ea5e9] to-[#06b6d4]",
+  },
+  {
+    title: "Revenue",
+    value: stats.totalRevenue ? formatIndianNumber(stats.totalRevenue) : 0,
+    icon: IndianRupee,
+    gradient: "from-[#22c55e] to-[#16a34a]",
+  },
+  {
+    title: "Total Dining bookings",
+    value: stats.totaldiningbookings || 0,
+    icon: TrendingUp,
+    gradient: "from-[#f59e0b] to-[#f97316]",
+  },
+  ]
   // revenue analytics 
   useEffect(()=>{
       const fetchAnalyticsRevenue = async()=>{
@@ -88,18 +119,12 @@ const Dashboard = () => {
              <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6'>
               {[1,2,3,4].map((_,index)=>{
                 return (
-                  <DashboardStatsCardShimmer key={index} />
+                  <StatsCardShimmer key={index} />
                 )
               })}
              </div>
           ):(
-          <DashboardStatsCard
-          totalEvents={stats.totalEvents}
-          totalTicketsolds={stats.totalTicketsolds}
-          totaldiningbookings={stats.totaldiningbookings}
-          totaleventbookings={stats.totaleventbookings}
-          totalRevenue={stats.totalRevenue}
-          />
+          <StatsCard statsdata={statsdata}/>
           )
         }
         {/* revenue chart */}
@@ -107,7 +132,7 @@ const Dashboard = () => {
           chartloading ? (
             <RevenueChartSkeleton />
           ):(
-            <RevenueChart monthlyRevenue={monthlyRevenue} growth={growth} />
+            <RevenueChart monthlyRevenue={monthlyRevenue} growth={growth}  />
           )
         }
       </div>
