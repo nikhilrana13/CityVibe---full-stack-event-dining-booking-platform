@@ -193,11 +193,14 @@ const OrganizerDashboardStats = async (req, res) => {
     const totaleventbookings = eventbookings.length || 0;
     // find dining bookings
     const restaurant = await Restaurant.findOne({ organizer: organizer._id });
-    const diningbookings = await Restaurantbooking.find({
-      restaurant: restaurant._id,
-      bookingStatus: "confirmed",
-    });
-    const totaldiningbookings = diningbookings.length || 0;
+    let totaldiningbookings = 0;
+    if (restaurant) {
+      const diningbookings = await Restaurantbooking.find({
+        restaurant: restaurant._id,
+        bookingStatus: "confirmed",
+      });
+      totaldiningbookings = diningbookings?.length || 0;
+    }
     return Response(res, 200, "dashboard stats fetched successfully", {
       totalRevenue,
       totalTicketsolds,
@@ -210,6 +213,81 @@ const OrganizerDashboardStats = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
+// revenue analytics
+const OrganizerRevenueAnalytics = async (req, res) => {
+  try {
+    const userId = req.user;
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    });
+    if (!organizer) {
+      return Response(res, 403, "Only approved organizers can access");
+    }
+    const events = await Event.find({ organizer: organizer._id }).select("_id");
+    const eventIds = events.map((e) => e._id);
+    if (!eventIds.length) {
+      return Response(res, 200, "No events found", {
+        monthlyRevenue: [],
+        growth: 0,
+      });
+    }
+    // last 12 months by default
+    const range = parseInt(req.query.range) || 12;
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - range);
+
+    const monthlyRevenue = await Eventbooking.aggregate([
+      {
+        $match: {
+          event: { $in: eventIds },
+          paymentStatus: "paid",
+          bookingStatus: "confirmed",
+          createdAt: { $gte: startDate },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+          },
+          revenue: { $sum: "$totalAmount" },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
+        },
+      },
+    ]);
+    const monthNames = [
+      "", "Jan", "Feb", "Mar", "Apr", "May",
+      "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    const formattedRevenue = monthlyRevenue.map((item) => ({
+      month: monthNames[item._id.month],
+      revenue: item.revenue,
+    }));
+    // calculate growth %
+    const currentMonth = formattedRevenue.at(-1)?.revenue || 0;
+    const lastMonth = formattedRevenue.at(-2)?.revenue || 0;
+    const growth =
+      lastMonth === 0
+        ? 0
+        : (((currentMonth - lastMonth) / lastMonth) * 100).toFixed(1);
+    return Response(res, 200, "Revenue analytics fetched", {
+      monthlyRevenue: formattedRevenue,
+      growth: Number(growth),
+    });
+
+  } catch (error) {
+    console.error("Revenue analytics error", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+
 // organizer event management stats
 const EventManagementStats = async (req, res) => {
   try {
@@ -488,5 +566,6 @@ module.exports = {
   ManageDiningStats,
   EventBookingPageStats,
   DiningBookingPageStats,
-  OrganizerProfile
+  OrganizerProfile,
+  OrganizerRevenueAnalytics
 };

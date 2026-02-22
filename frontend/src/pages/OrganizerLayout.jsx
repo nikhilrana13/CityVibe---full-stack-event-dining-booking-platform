@@ -13,7 +13,7 @@ const OrganizerLayout = () => {
     <div className="w-full">
 
       {/* Navbar */}
-      <header className="fixed top-0 left-0 right-0 justify-between bg-white border z-[9999] min-h-[75px] flex items-center px-4">
+      <header className="fixed top-0 left-0 right-0 justify-between bg-white border-b z-[9999] min-h-[75px] flex items-center px-4">
         <div className="flex flex-col leading-none">
           <h1 className="text-[32px] font-black tracking-tight">
             CITYVIBE

@@ -40,12 +40,14 @@ const OrganizerStatusGuard = () => {
   }
   //  Approved
   if (status === "approved") {
-    if (!path.includes("dashboard")) {
+    if(path.includes("onboarding")){
       return <Navigate to="/organizer/dashboard" replace />;
     }
+     if (path.includes("pending") || path.includes("rejected")) {
+      return <Navigate to="/organizer/dashboard" replace />;
+     }
     return <Outlet />;
   }
- 
   return <Outlet />;
 };
 
