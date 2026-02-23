@@ -181,7 +181,6 @@ const EventsTable = ({ Search, isActive }) => {
                                                     </button>
                                                     <div className="absolute right-0 mt-2 w-40 bg-white border rounded-xl shadow-lg opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-200 z-50">
                                                         <div className="flex flex-col text-sm">
-    
                                                             {
                                                                 event?.eventIsActive === true && (
                                                                      <button onClick={() => handleCancelEvent(event?._id)} className="px-4 py-2 hover:bg-gray-50 text-left">Cancel</button>
