@@ -12,6 +12,7 @@ import OnBoardingPending from "./components/organizerdashboard/OnBoardingPending
 import OnBoardingRejected from "./components/organizerdashboard/OnBoardingRejected"
 import OrganizerStatusGuard from "./middlewares/OrganizerStatusGuard"
 import ManageEvents from "./components/organizerdashboard/Events/ManageEvents"
+import CreateEventForm from "./components/organizerdashboard/Events/CreateEventForm"
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
             {/* main dashboard */}
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="manage-events" element={<ManageEvents />} />
+            <Route path="create-event" element={<CreateEventForm />} />
 
           </Route>
         </Route>

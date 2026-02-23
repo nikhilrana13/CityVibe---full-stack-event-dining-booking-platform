@@ -7,7 +7,7 @@ const Event = require("../models/eventmodel.js")
 // Runs every night at 12:05 AM IST
 
 const EventStatusUpdater = ()=>{
-    cron.schedule(" 5 0 * * *",async()=>{
+    cron.schedule(" * * * * *",async()=>{
         console.log("running event status updater")
         try {
             // get current date

@@ -1,6 +1,6 @@
 import useFetchOrganizer from '../../hooks/useFetchOrganizer'
 import useLogout from '../../hooks/useLogout'
-import { Building2, LogOut, Settings2 } from 'lucide-react'
+import { Building2, LogOut, Plus, Settings2 } from 'lucide-react'
 import React from 'react'
 import { BiBuilding } from 'react-icons/bi'
 import { FaTicketSimple } from 'react-icons/fa6'
@@ -19,6 +19,7 @@ const Sidebar = () => {
     const links = [
         { to: "dashboard", label: "Dashboard", icon: LuLayoutDashboard },
         { to: "manage-events", label: "Manage Events", icon: MdEventNote },
+         { to: "create-event", label: "Create Event", icon: Plus },
         { to: "manage-dining", label: "Manage Dining", icon: MdDining },
         { to: "bookings", label: "Manage Bookings", icon: FaTicketSimple },
         { to: "settings", label: "Settings", icon: Settings2 },
