@@ -214,7 +214,6 @@ const CreateEventForm = () => {
                         </div>
                     </form>
                 </FormProvider>
-
             </div>
         </div>
     )

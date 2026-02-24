@@ -13,6 +13,8 @@ import OnBoardingRejected from "./components/organizerdashboard/OnBoardingReject
 import OrganizerStatusGuard from "./middlewares/OrganizerStatusGuard"
 import ManageEvents from "./components/organizerdashboard/Events/ManageEvents"
 import CreateEventForm from "./components/organizerdashboard/Events/CreateEventForm"
+import ManageDining from "./components/organizerdashboard/dining/ManageDining"
+import AddRestaurantform from "./components/organizerdashboard/dining/AddRestaurant/AddRestaurantform"
 
 const App = () => {
   return (
@@ -39,6 +41,8 @@ const App = () => {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="manage-events" element={<ManageEvents />} />
             <Route path="create-event" element={<CreateEventForm />} />
+            <Route path="manage-dining" element={<ManageDining />} />
+            <Route path="add-restaurant" element={<AddRestaurantform />} />
 
           </Route>
         </Route>

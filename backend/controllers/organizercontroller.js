@@ -287,7 +287,6 @@ const OrganizerRevenueAnalytics = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
-
 // organizer event management stats
 const EventManagementStats = async (req, res) => {
   try {

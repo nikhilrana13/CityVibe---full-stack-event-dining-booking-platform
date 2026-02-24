@@ -186,7 +186,7 @@ const EventsTable = ({ Search, isActive }) => {
                                                                      <button onClick={() => handleCancelEvent(event?._id)} className="px-4 py-2 hover:bg-gray-50 text-left">Cancel</button>
                                                                 )
                                                             }
-                                                           
+                                                
                                                             <button onClick={() => handleDeleteEvent(event?._id)} className="px-4 py-2 hover:bg-red-50 text-red-600 text-left">
                                                                 Delete
                                                             </button>

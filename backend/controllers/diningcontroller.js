@@ -33,8 +33,10 @@ const CreateRestaurant = async (req, res) => {
       "city",
       "location",
       "address",
+      "averagePrice",
       "openingTime",
       "closingTime",
+      "description"
     ];
     for (let field of allowedFields) {
       if (!req.body[field]) {
@@ -65,9 +67,13 @@ const CreateRestaurant = async (req, res) => {
       try {
         availablefacility = JSON.parse(availablefacility);
       } catch (err) {
-        return Response(res, 400, "Invalid availabel facility format");
+        return Response(res, 400, "Invalid available facility format");
       }
     }
+     if (!files || files.length === 0) {
+      return Response(res, 400, "At least one image is required");
+    }
+
     if (!files || files.length < 5) {
       return Response(res, 400, "At least 5 images is Required");
     }
@@ -370,5 +376,6 @@ const OrganizerDiningBookings = async(req,res)=>{
     return Response(res,500,"Internal server error")
     }
 }
+
 
 module.exports = { CreateRestaurant, getEachRestaurantDetails,GetOrganizerRestaurant,DeleteRestaurant,updateRestaurant,toggleEnableandDisableRestaurant,OrganizerDiningBookings};
