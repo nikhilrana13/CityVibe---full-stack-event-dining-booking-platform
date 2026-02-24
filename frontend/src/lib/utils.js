@@ -48,4 +48,20 @@ export const formatDateRange = (start, end) => {
 
   return `${startFormatted} - ${endFormatted}`;
 };
+ export const formatDuration = (minutes) => {
+    if (!minutes) return "";
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins === 0 ? `${hrs} Hours` : `${hrs}h ${mins}m`;
+  };
+
+  export const formatDate = (date) => {
+    if (!date) return "";
+    return new Date(date).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+}
+
 

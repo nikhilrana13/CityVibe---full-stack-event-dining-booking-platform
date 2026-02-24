@@ -3,13 +3,13 @@ import { useFormContext } from "react-hook-form";
 import { MdDelete } from "react-icons/md";
 
 const ArtistCard = ({ index, remove, total }) => {
-    const { register, watch, formState: { errors, touchedFields, isSubmitted }, } = useFormContext();
+    const { register, watch, setValue, formState: { errors, touchedFields, isSubmitted }, } = useFormContext();
     const [preview, setPreview] = useState(null);
     const artistFile = watch(`artists.${index}.artistimage`);
 
     useEffect(() => {
-        if (artistFile && artistFile[0]) {
-            const objectUrl = URL.createObjectURL(artistFile[0]);
+        if (artistFile instanceof File) {
+            const objectUrl = URL.createObjectURL(artistFile);
             setPreview(objectUrl);
             return () => URL.revokeObjectURL(objectUrl);
         }
@@ -34,15 +34,26 @@ const ArtistCard = ({ index, remove, total }) => {
                             Upload Artist Image
                         </span>
                     )}
-
+                    {/* hidden RHF register field */}
+                    <input
+                        type="hidden"
+                        {...register(`artists.${index}.artistimage`, {
+                            validate: (file) =>
+                                file instanceof File || "Artist Image is Required",
+                        })}
+                    />
                     <input
                         id={`artistimage-${index}`}
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        {...register(`artists.${index}.artistimage`, {
-                            required: "Artist Image is Required",
-                        })}
+                        onChange={(e) => {
+                            const file = e.target.files[0];
+                            setValue(`artists.${index}.artistimage`, file, {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                            });
+                        }}
                     />
                 </label>
 

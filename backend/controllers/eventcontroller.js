@@ -5,7 +5,7 @@ const Event = require("../models/eventmodel.js");
 const Ticket = require("../models/ticketmodel.js");
 const Response = require("../utils/responsehandler.js");
 const Eventbooking = require("../models/bookings/eventbookingmodel.js");
-const moment = require("moment-timezone")
+const moment = require("moment-timezone");
 
 // create event
 const CreateEvent = async (req, res) => {
@@ -15,6 +15,8 @@ const CreateEvent = async (req, res) => {
     const categoriesWithArtists = ["music", "comedy", "performances"];
     const coverFile = req.files?.coverimage?.[0];
     const artistfiles = req.files?.artistimage || [];
+    // console.log("req.body",req.body)
+    // console.log("req.file",req.files)
     //required fields validation
     const allowedFields = [
       "title",
@@ -118,12 +120,14 @@ const CreateEvent = async (req, res) => {
     });
     eventdata.coverimage = cloudResponse.secure_url;
     // seat validation
-    const totalTicketQuantity = tickets.reduce(
-      (sum, ticket) => sum + Number(ticket.totalQuantity),
-      0,
-    );
+    const totalUsedSeats = tickets.reduce((sum, ticket) => {
+      const qty = Number(ticket.totalQuantity);
+      const pax = Number(ticket.paxCount || 1);
+      return sum + qty * pax;
+    }, 0);
+
     eventdata.totalSeats = Number(eventdata.totalSeats);
-    if (totalTicketQuantity !== Number(eventdata.totalSeats)) {
+    if (totalUsedSeats > Number(eventdata.totalSeats)) {
       return Response(res, 400, "Total ticket quantity must equal total seats");
     }
 
@@ -169,7 +173,7 @@ const EachEventDetails = async (req, res) => {
 const getOrganizerAllevents = async (req, res) => {
   try {
     const userId = req.user;
-    let { page = 1, limit = 6,title,eventIsActive} = req.query;
+    let { page = 1, limit = 6, title, eventIsActive } = req.query;
     page = parseInt(page);
     limit = parseInt(limit);
     const skip = (page - 1) * limit;
@@ -181,12 +185,12 @@ const getOrganizerAllevents = async (req, res) => {
     if (!organizer) {
       return Response(res, 403, "Only approved organizers can access");
     }
-    let filters = {organizer: organizer._id}
-    if(title){
-      filters.title = {$regex:title,$options:'i'}
+    let filters = { organizer: organizer._id };
+    if (title) {
+      filters.title = { $regex: title, $options: "i" };
     }
-    if(eventIsActive){
-      filters.eventIsActive = eventIsActive
+    if (eventIsActive) {
+      filters.eventIsActive = eventIsActive;
     }
     const events = await Event.find(filters)
       .sort({ createdAt: 1 })
@@ -283,13 +287,16 @@ const GetAllEvents = async (req, res) => {
     limit = parseInt(limit);
     const skip = (page - 1) * limit;
     // today date
-    const today = moment().tz("Asia/Kolkata").startOf("day").toDate()
-    let filter = { eventIsActive: true,$or:[
-    // Multi-day ongoing events
-    { endDate: { $ne: null, $gte: today } },
-    // Single-day upcoming events
-    { endDate: null, startDate: { $gte: today } }
-   ]};
+    const today = moment().tz("Asia/Kolkata").startOf("day").toDate();
+    let filter = {
+      eventIsActive: true,
+      $or: [
+        // Multi-day ongoing events
+        { endDate: { $ne: null, $gte: today } },
+        // Single-day upcoming events
+        { endDate: null, startDate: { $gte: today } },
+      ],
+    };
     // category filter for multiple categories
     if (category) {
       const categories = category.split(",").map((c) => c.trim());
@@ -387,48 +394,66 @@ const GetAllEvents = async (req, res) => {
     console.log("failed to get events", error);
     return Response(res, 500, "Internal server error");
   }
-}; 
+};
 // get organizer all events bookings
-const GetOrganizerEventBookings = async(req,res)=>{
+const GetOrganizerEventBookings = async (req, res) => {
   try {
-        const userId = req.user
-        let {page=1,status} = req.query 
-        page = parseInt(page)
-        const  limit = 10 
-        const skip = (page - 1) * limit 
-        // check organiser is approved or exists
-         const organizer = await Organizer.findOne({
-           user: userId,
-           isApproved: true,
-         }).populate("user", "name email");
-         if (!organizer) {
-           return Response(res, 403, "Only approved organizers can access");
-         }
-         // get organizer events  
-          const events = await Event.find({organizer:organizer._id}).select("_id")
-          const eventIds = events.map((e)=>e._id) 
-          if(eventIds.length === 0){
-            return Response(res,200,"No Events found",[])
-          }
-         let filter = {event:{$in:eventIds}}
-         if(status){
-          filter.bookingStatus = status
-         }
-         const eventbookings = await Eventbooking.find(filter).sort({createdAt:1}).skip(skip).limit(limit).populate("user","name email phonenumber").populate("tickets.ticket","name price paxCount").populate("event", "title startDate city");
-         const totalbookings = await Eventbooking.countDocuments(filter)
-         const totalPages = Math.ceil(totalbookings / limit)
-         if(eventbookings.length === 0){
-          return Response(res,200,"No Bookings found",[])
-         }
-          return Response(res,200,"bookings found",{eventbookings,pagination:{
-                 totalbookings,totalPages,currentpage:page,limit
-                }})
-
-    } catch (error) {
-       console.log("failed to get bookings",error)
-    return Response(res,500,"Internal server error")
+    const userId = req.user;
+    let { page = 1, status } = req.query;
+    page = parseInt(page);
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    // check organiser is approved or exists
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    }).populate("user", "name email");
+    if (!organizer) {
+      return Response(res, 403, "Only approved organizers can access");
     }
-}
+    // get organizer events
+    const events = await Event.find({ organizer: organizer._id }).select("_id");
+    const eventIds = events.map((e) => e._id);
+    if (eventIds.length === 0) {
+      return Response(res, 200, "No Events found", []);
+    }
+    let filter = { event: { $in: eventIds } };
+    if (status) {
+      filter.bookingStatus = status;
+    }
+    const eventbookings = await Eventbooking.find(filter)
+      .sort({ createdAt: 1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("user", "name email phonenumber")
+      .populate("tickets.ticket", "name price paxCount")
+      .populate("event", "title startDate city");
+    const totalbookings = await Eventbooking.countDocuments(filter);
+    const totalPages = Math.ceil(totalbookings / limit);
+    if (eventbookings.length === 0) {
+      return Response(res, 200, "No Bookings found", []);
+    }
+    return Response(res, 200, "bookings found", {
+      eventbookings,
+      pagination: {
+        totalbookings,
+        totalPages,
+        currentpage: page,
+        limit,
+      },
+    });
+  } catch (error) {
+    console.log("failed to get bookings", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
 
-
-module.exports = {CreateEvent,EachEventDetails,getOrganizerAllevents,DeleteEvent,CancelEvent,GetAllEvents,GetOrganizerEventBookings};
+module.exports = {
+  CreateEvent,
+  EachEventDetails,
+  getOrganizerAllevents,
+  DeleteEvent,
+  CancelEvent,
+  GetAllEvents,
+  GetOrganizerEventBookings,
+};

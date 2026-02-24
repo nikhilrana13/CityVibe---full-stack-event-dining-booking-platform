@@ -68,6 +68,35 @@ const BasicInfo = () => {
                             <p className="text-red-500 text-sm">{errors.description.message}</p>
                         )}
                     </div>
+                    {/* language */}
+                    <div className='flex flex-col gap-1'>
+                        <label className="text-sm text-gray-400">Language</label>
+                        <input
+                            type="text"
+                            placeholder="e.g. English,hindi,punjabi"
+                            className="mt-2 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" {...register("language",)}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-1'>
+                        <label className="text-sm text-gray-400">Duration</label>
+                            <select {...register("duration")} className='mt-2 w-full  text-black rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500' >
+                            <option value="">Select Duration</option>
+                            {Array.from({ length: 24 }, (_, i) => {
+                                const minutes = (i + 1) * 30;
+                                const hours = minutes / 60;
+
+                                return (
+                                    <option key={minutes} value={minutes}>
+                                        {minutes < 60
+                                            ? `${minutes} Minutes`
+                                            : hours % 1 === 0
+                                                ? `${hours} Hour`
+                                                : `${hours} Hours`}
+                                    </option>
+                                );
+                            })}
+                        </select>
+                    </div>
                 </div>
                 {/* Right Side - Upload UI */}
                 <div className="flex flex-col gap-6">

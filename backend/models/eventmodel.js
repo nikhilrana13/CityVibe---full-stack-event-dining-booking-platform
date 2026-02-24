@@ -9,7 +9,7 @@ const EventSchema = new mongoose.Schema({
     endDate:{type:Date,default:null},
     starttime:{type:String,required:true},
     city:{type:String,required:true,trim:true,lowercase:true},
-    location:{type:String,required:true},
+    location:{type:String,required:true,lowercase:true},
     venue:{type:String,required:true},
     coverimage:{type:String,default:null},
     language:{type:String,default:""},
