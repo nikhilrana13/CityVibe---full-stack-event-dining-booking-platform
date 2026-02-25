@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 import ResBasicInfo from './ResBasicInfo';
 import AmenitiesAndContact from './AmenitiesAndContact';
 import { Check, Loader2 } from 'lucide-react';
 import TimingAndSlots from './TimingAndSlots';
 import AddImages from './AddImages';
 import RestaurantReview from './RestaurantReview';
-import axios from 'axios';
-import { toast } from 'sonner';
+import { useRestaurantForm } from '../../../../hooks/useRestaurantForm';
 
 const steps = [
     "Basic Info",
@@ -17,33 +15,10 @@ const steps = [
     "Images",
     "Review",
 ];
-const AddRestaurantform = () => {
+const Restaurantform = () => {
     const [Step, SetStep] = useState(1)
-    const methods = useForm({
-        mode: "onChange",
-        defaultValues: {
-            name: "",
-            description: "",
-            location: "",
-            city: "",
-            address: "",
-            cuisine: [],
-            averagePrice: 100,
-            openingTime: "",
-            closingTime: "",
-            availablefacility: [],
-            contactnumbers: [""],
-            images: [],
-            slotInterval: 15,
-            lunchStart: "",
-            lunchEnd: "",
-            dinnerStart: "",
-            dinnerEnd: "",
-        }
-    })
-    const { handleSubmit, trigger, watch, getValues } = methods
-    const [loading, setLoading] = useState(false)
-    const navigate = useNavigate()
+    const {methods,loading,onSubmit,isEdit} = useRestaurantForm()
+    const { trigger, handleSubmit } = methods
 
     const NextStep = async () => {
         // current step fields validation
@@ -66,56 +41,14 @@ const AddRestaurantform = () => {
     const prevStep = async () => {
         SetStep((prev) => Math.max(prev - 1, 1))
     }
-
-    const onSubmit = async (data) => {
-        const formdata = new FormData()
-        formdata.append("name", data.name)
-        formdata.append("description", data.description)
-        formdata.append("location", data.location)
-        formdata.append("city", data.city)
-        formdata.append("address", data.address)
-        formdata.append("averagePrice", data.averagePrice)
-        formdata.append("openingTime", data.openingTime)
-        formdata.append("closingTime", data.closingTime)
-        formdata.append("lunchStart", data.lunchStart)
-        formdata.append("slotInterval", data.slotInterval)
-        formdata.append("lunchEnd", data.lunchEnd)
-        formdata.append("dinnerStart", data.dinnerStart)
-        formdata.append("dinnerEnd", data.dinnerEnd)
-        formdata.append("cuisine", JSON.stringify(data.cuisine))
-        formdata.append("availablefacility", JSON.stringify(data.availablefacility))
-        formdata.append("contactnumbers", JSON.stringify(data.contactnumbers))
-        data.images.forEach((file) => {
-            formdata.append("images", file)
-        })
-        // for(let pair of formdata.entries()){
-        //     console.log(pair[0] + " " + pair[1])
-        // }
-        try {
-            setLoading(true)
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/dining/restaurant/create`, formdata, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            if (response.data) {
-                toast.success(response?.data?.message)
-                navigate("/organizer/manage-dining")
-            }
-        } catch (error) {
-            console.error("failed to Add restaurant", error)
-            toast.error(error?.response?.data?.message || "Internal server error")
-        } finally {
-            setLoading(false)
-        }
-    }
-
     return (
         <div className='w-full px-4 py-3'>
             <div className=' min-h-screen bg-gradient-to-br rounded-xl from-[#0f0c29] via-[#14132b] to-[#1b1b3a] text-white px-4 py-10'>
                 {/* header */}
                 <div className="max-w-5xl mx-auto text-center mb-10">
-                    <h1 className="text-3xl font-semibold">Create Restaurant Listing</h1>
+                    <h1 className="text-3xl font-semibold">
+                         {isEdit ? "Edit Restaurant" : "Create Restaurant Listing"}
+                    </h1>
                     <p className="text-gray-400 mt-2">
                         Set up your restaurant profile to showcase your space, cuisine, and dining experience.
                     </p>
@@ -180,8 +113,8 @@ const AddRestaurantform = () => {
                                     {loading ? (
                                         <span className="flex items-center gap-2">
                                             <Loader2 className="animate-spin" size={16} />
-                                            Publishing...
-                                        </span>) : ("Publish")} </button>
+                                            {isEdit ? "Updating..." : "Publishing..."}
+                                        </span>) : (isEdit ? "Update Restaurant" : "Publish Restaurant")} </button>
                             }
                         </div>
                     </form>
@@ -192,4 +125,4 @@ const AddRestaurantform = () => {
     )
 }
 
-export default AddRestaurantform
+export default Restaurantform

@@ -41,21 +41,30 @@ const RestaurantReview = () => {
                         </div>
                         {/* Right Image Preview */}
                         <div className="rounded-2xl bg-gradient-to-br from-indigo-500/30 to-purple-600/20 h-48 flex items-center justify-center text-gray-400 text-sm">
-                            {data.images && data.images.length > 0 ? (
-                                <img 
-                                    src={URL.createObjectURL(data.images[0])}
-                                    alt="Restaurant Preview"
-                                    className="w-full h-full object-cover rounded-2xl"
-                                />
-                            ) : (
-                                <div className="h-full flex items-center justify-center text-gray-400">
-                                    No Image Selected
-                                </div>
-                            )}
+                            {(() => {
+                                const firstImage = data.images?.[0]
+                                if (!firstImage) {
+                                    return (
+                                        <div className="h-full flex items-center justify-center text-gray-400">
+                                            No Image Selected
+                                        </div>
+                                    )
+                                }
+                                const imageSrc =
+                                    typeof firstImage === "string"
+                                        ? firstImage
+                                        : URL.createObjectURL(firstImage)
+                                return (
+                                    <img
+                                        src={imageSrc}
+                                        alt="Restaurant Preview"
+                                        className="w-full h-full object-cover rounded-2xl"
+                                    />
+                                )
+                            })()}
                         </div>
                     </div>
                 </div>
-
                 {/* Amenities (Available facility) */}
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-xl">
                     <h3 className="text-lg font-semibold mb-6">Amenities</h3>

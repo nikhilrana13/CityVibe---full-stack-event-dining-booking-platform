@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 
 const AddImages = () => {
     const { control, watch,formState: { errors } } = useFormContext();
-    const [previewImages, setPreviewImages] = useState([]);
 
     // handle file change 
     const handleFileChange = (e, onChange, value) => {
@@ -22,21 +21,12 @@ const AddImages = () => {
             toast.error("You can only upload maximum 5 images");
         }
         const updatedFiles = [...currentFiles, ...allowedFiles]
-        // update previews
-        const newPreviews = allowedFiles.map((file) => ({
-            file,
-            url: URL.createObjectURL(file)
-        }))
-        setPreviewImages((prev) => [...prev, ...newPreviews])
         // update rhk state
         onChange(updatedFiles)
     }
     // Handle Delete
     const handleDeleteImage = (index, value, onChange) => {
         const updated = value.filter((_, i) => i !== index)
-        const updatedPreviews = previewImages.filter((_, i) => i !== index)
-
-        setPreviewImages(updatedPreviews);
         onChange(updated); // Update form state
     };
     // console.log("images",watch("images"))
@@ -82,10 +72,12 @@ const AddImages = () => {
                                     </label>
                                 )}
                                 {/* Preview Cards */}
-                                {previewImages.map((img, index) => (
+                                {value.map((img, index) => {
+                                    const imageSrc = typeof img === "string" ? img : URL.createObjectURL(img)
+                                    return(
                                     <div key={index} className="aspect-square rounded-2xl border border-white/10 relative overflow-hidden group">
                                         <img
-                                            src={img.url}
+                                            src={imageSrc}
                                             alt="preview"
                                             className="w-full h-full object-cover"
                                         />
@@ -99,7 +91,7 @@ const AddImages = () => {
                                             </button>
                                         </div>
                                     </div>
-                                ))}
+                                     )})}
                             </div>
                             {errors.images && (
                                 <p className="text-red-500 mt-3 text-sm">

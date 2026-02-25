@@ -16,9 +16,9 @@ const ManageDining = () => {
     const [restaurant, setRestaurant] = useState({})
     const [stats, SetStats] = useState({
         totalbookings: 0,
-        confirmedbookings: 2,
-        cancelledbookings: 1,
-        thisMonthbookings: 3
+        confirmedbookings: 0,
+        cancelledbookings: 0,
+        thisMonthbookings: 0
     })
     // fetch event stats
     useEffect(() => {
@@ -36,7 +36,6 @@ const ManageDining = () => {
                     const confirmedbookings = response?.data?.data?.confirmedbookings;
                     const cancelledbookings = response?.data?.data?.cancelledbookings;
                     const thisMonthbookings = response?.data?.data?.thisMonthbookings;
-
                     SetStats((prev) => ({
                         ...prev,
                         totalbookings,
@@ -85,7 +84,7 @@ const ManageDining = () => {
         const fetchRestaurant = async () => {
             try {
                 setResloading(true)
-                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/dining/organizer/restauran`, {
+                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/dining/organizer/restaurant`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
@@ -117,7 +116,7 @@ const ManageDining = () => {
                     </div>
                     <div>
                         <NavLink
-                            to={restaurant?._id ? "/organizer/edit" : "/organizer/add-restaurant"}
+                            to={restaurant?._id ? `/organizer/edit-restaurant/${restaurant?._id}` : "/organizer/add-restaurant"}
                             className="mt-10 px-10 py-4 rounded-2xl text-white font-semibold text-sm 
                            bg-gradient-to-r from-[#6a4dff] to-[#8b5cf6] hover:scale-105 
                              hover:shadow-purple-500/50 transition-all duration-300 shadow-lg shadow-purple-600/30"

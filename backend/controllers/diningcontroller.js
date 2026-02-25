@@ -24,7 +24,8 @@ const CreateRestaurant = async (req, res) => {
       lunchStart,
       lunchEnd,
       dinnerStart,
-      dinnerEnd
+      slotInterval,
+      dinnerEnd,
     } = req.body;
     const files = req.files || [];
     //required fields validation
@@ -37,7 +38,7 @@ const CreateRestaurant = async (req, res) => {
       "openingTime",
       "closingTime",
       "contactnumbers",
-      "description"
+      "description",
     ];
     for (let field of allowedFields) {
       if (!req.body[field]) {
@@ -71,7 +72,7 @@ const CreateRestaurant = async (req, res) => {
         return Response(res, 400, "Invalid available facility format");
       }
     }
-     if (!files || files.length === 0) {
+    if (!files || files.length === 0) {
       return Response(res, 400, "At least one image is required");
     }
 
@@ -129,6 +130,7 @@ const CreateRestaurant = async (req, res) => {
       availablefacility: availablefacility || [],
       openingTime,
       closingTime,
+      slotInterval,
       averagePrice,
       images: imagesurl,
       lunchStart,
@@ -161,16 +163,23 @@ const GetOrganizerRestaurant = async (req, res) => {
   try {
     const userId = req.user;
     // check organiser is approved or exists
-    const organizer = await Organizer.findOne({user: userId,isApproved: true,});
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    });
     if (!organizer) {
-      return Response(res,403,"Only approved organizers can create restaurant",);
+      return Response(
+        res,
+        403,
+        "Only approved organizers can create restaurant",
+      );
     }
-    // find restaurant exists or not 
-    const restaurant = await Restaurant.findOne({organizer:organizer._id})
-    if(!restaurant){
-        return Response(res,400,"Restaurant not found")
+    // find restaurant exists or not
+    const restaurant = await Restaurant.findOne({ organizer: organizer._id });
+    if (!restaurant) {
+      return Response(res, 400, "Restaurant not found");
     }
-    return Response(res,200,"Restaurant found",{restaurant})
+    return Response(res, 200, "Restaurant found", { restaurant });
   } catch (error) {
     console.log("failed to get organizer restaurant", error);
     return Response(res, 500, "Internal server error");
@@ -196,7 +205,11 @@ const DeleteRestaurant = async (req, res) => {
     }
     // check event belongs to this organizer
     if (restaurant.organizer.toString() !== organizer._id.toString()) {
-      return Response(res, 403, "You are not authorized to delete this restaurant");
+      return Response(
+        res,
+        403,
+        "You are not authorized to delete this restaurant",
+      );
     }
     await Restaurant.findByIdAndDelete(restaurant);
     return Response(res, 200, "Restaurant Deleted Successfully");
@@ -205,8 +218,8 @@ const DeleteRestaurant = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
-// update restaurant 
-const updateRestaurant = async(req,res)=>{
+// update restaurant
+const updateRestaurant = async (req, res) => {
   try {
     const userId = req.user;
     let {
@@ -220,12 +233,14 @@ const updateRestaurant = async(req,res)=>{
       closingTime,
       cuisine,
       availablefacility,
-    } = req.body || {}
+      slotInterval,
+      existingImages,
+    } = req.body || {};
     // console.log("req body",req.body)
     const files = req.files || [];
-    const restaurantId = req.params.id
+    const restaurantId = req.params.id;
 
-      // check organiser is approved or exists
+    // check organiser is approved or exists
     const organizer = await Organizer.findOne({
       user: userId,
       isApproved: true,
@@ -238,7 +253,10 @@ const updateRestaurant = async(req,res)=>{
       );
     }
     // check  restaurant exists or not
-    const restaurant = await Restaurant.findOne({_id:restaurantId,organizer:organizer._id});
+    const restaurant = await Restaurant.findOne({
+      _id: restaurantId,
+      organizer: organizer._id,
+    });
     if (!restaurant) {
       return Response(res, 400, "Restaurant not found and unauthorized");
     }
@@ -266,117 +284,159 @@ const updateRestaurant = async(req,res)=>{
         return Response(res, 400, "Invalid availabel facility format");
       }
     }
-    let updateData = {}
-    if(name) updateData.name = name 
-    if(description) updateData.description = description 
-    if(contactnumbers) updateData.contactnumbers = contactnumbers
-    if(averagePrice) updateData.averagePrice = averagePrice 
-    if(cuisine) updateData.cuisine = cuisine 
-    if(openingTime) updateData.openingTime = openingTime 
-    if(closingTime) updateData.closingTime = closingTime 
-    if(location) updateData.location = location 
-    if(address) updateData.address = address 
-    if(availablefacility) updateData.availablefacility = availablefacility
-
-    if(files.length > 0 ){
-    let imagesurl = [];
-    for (let file of files) {
+    let parsedExistingImages = [];
+    if (existingImages) {
       try {
-        //  optimize image
-        const optimizedimage = await sharp(file.buffer)
-          .resize({ width: 500 })
-          .webp({ quality: 80 })
-          .toBuffer();
-        const imageBase64 = `data:image/webp;base64,${optimizedimage.toString("base64")}`;
-        const cloudresponse = await cloudinary.uploader.upload(imageBase64, {
-          folder: "city-vibe-organizer-restaurant-images",
-          resource_type: "image",
-        });
-        imagesurl.push(cloudresponse.secure_url);
-      } catch (error) {
-        console.log("cloudinary upload error", error);
-        return Response(res, 500, "Image upload failed");
+        parsedExistingImages = JSON.parse(existingImages);
+      } catch (err) {
+        return Response(res, 400, "Invalid existing images format");
       }
     }
-     updateData.images = imagesurl
+
+    let updateData = {};
+    if (name) updateData.name = name;
+    if (description) updateData.description = description;
+    if (contactnumbers) updateData.contactnumbers = contactnumbers;
+    if (averagePrice !== undefined)
+    updateData.averagePrice = averagePrice;
+    if (cuisine) updateData.cuisine = cuisine;
+    if(slotInterval) updateData.slotInterval = slotInterval
+    if (openingTime) updateData.openingTime = openingTime;
+    if (closingTime) updateData.closingTime = closingTime;
+    if (location) updateData.location = location;
+    if (address) updateData.address = address;
+    if (availablefacility) updateData.availablefacility = availablefacility;
+
+    let newUploadedImages = [];
+    if (files.length > 0) {
+      for (let file of files) {
+        try {
+          //  optimize image
+          const optimizedimage = await sharp(file.buffer)
+            .resize({ width: 500 })
+            .webp({ quality: 80 })
+            .toBuffer();
+          const imageBase64 = `data:image/webp;base64,${optimizedimage.toString("base64")}`;
+          const cloudresponse = await cloudinary.uploader.upload(imageBase64, {
+            folder: "city-vibe-organizer-restaurant-images",
+            resource_type: "image",
+          });
+          newUploadedImages.push(cloudresponse.secure_url);
+        } catch (error) {
+          console.log("cloudinary upload error", error);
+          return Response(res, 500, "Image upload failed");
+        }
+      }
     }
-    if(Object.keys(updateData).length === 0){
-      return Response(res,200,"No fields provided to update")
+    // Always set images if edit request includes image data
+    if (existingImages !== undefined || files.length > 0) {
+      updateData.images = [...parsedExistingImages, ...newUploadedImages];
     }
-    const updatedRestaurant = await Restaurant.findByIdAndUpdate(restaurantId,{$set:updateData},{new:true})
-    return Response(res,200,"Redtaurant details updated",{updatedRestaurant})
+    if (Object.keys(updateData).length === 0) {
+      return Response(res, 200, "No fields provided to update");
+    }
+    const updatedRestaurant = await Restaurant.findByIdAndUpdate(
+      restaurantId,
+      { $set: updateData },
+      { new: true },
+    );
+    return Response(res, 200, "Restaurant details updated", {
+      updatedRestaurant,
+    });
   } catch (error) {
     console.log("failed to update restaurant", error);
     return Response(res, 500, "Internal server error");
   }
-}
-// disable restaurant 
-const toggleEnableandDisableRestaurant = async(req,res)=>{
-      try {
-         const userId = req.user;
-         const restaurantId = req.params.id;
-         const {isActive} = req.body 
-         // check organiser is approved or exists
-         const organizer = await Organizer.findOne({
-           user: userId,
-           isApproved: true,
-         }).populate("user", "name email");
-         if (!organizer) {
-           return Response(res, 403, "Only approved organizers can access");
-         }
-         const updatedrestaurant = await Restaurant.findOneAndUpdate(
-           { _id: restaurantId, organizer: organizer._id },
-           { isActive: isActive },
-           { new: true },
-         );
-         if (!updatedrestaurant) {
-           return Response(res, 403, "restaurant not found or not authorized");
-         }
-         return Response(res, 200, `restaurant ${isActive ? 'enabled' :'disabled'} successfully`);
-       } catch (error) {
-         console.log("failed to toggle restaurant", error);
-         return Response(res, 500, "Internal server error");
-       }
-}
-// organizer dining all bookings 
-const OrganizerDiningBookings = async(req,res)=>{
-    try {
-        const userId = req.user
-        let {page=1,status} = req.query 
-        page = parseInt(page)
-        const  limit = 10 
-        const skip = (page - 1) * limit 
-        // check organiser is approved or exists
-         const organizer = await Organizer.findOne({
-           user: userId,
-           isApproved: true,
-         }).populate("user", "name email");
-         if (!organizer) {
-           return Response(res, 403, "Only approved organizers can access");
-         }
-         const restaurant = await Restaurant.findOne({organizer:organizer._id})
-         if(!restaurant){
-          return Response(res,400,"Restaurant not found")
-         }
-         let filter = {restaurant: restaurant._id,}
-         if(status){
-          filter.bookingStatus = status
-         }
-         const diningbookings = await Restaurantbooking.find(filter).sort({createdAt:1}).skip(skip).limit(limit).populate("user","name email phonenumber")
-         const totalbookings = await Restaurantbooking.countDocuments({restaurant:restaurant._id})
-         const totalPages = Math.ceil(totalbookings / limit)
-         if(diningbookings.length === 0){
-          return Response(res,200,"No Bookings found",[])
-         }
-          return Response(res,200,"bookings found",{diningbookings,pagination:{
-                 totalbookings,totalPages,currentpage:page,limit
-                }})
-
-    } catch (error) {
-       console.log("failed to get bookings",error)
-    return Response(res,500,"Internal server error")
+};
+// disable restaurant
+const toggleEnableandDisableRestaurant = async (req, res) => {
+  try {
+    const userId = req.user;
+    const restaurantId = req.params.id;
+    const { isActive } = req.body;
+    // check organiser is approved or exists
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    }).populate("user", "name email");
+    if (!organizer) {
+      return Response(res, 403, "Only approved organizers can access");
     }
-}
+    const updatedrestaurant = await Restaurant.findOneAndUpdate(
+      { _id: restaurantId, organizer: organizer._id },
+      { isActive: isActive },
+      { new: true },
+    );
+    if (!updatedrestaurant) {
+      return Response(res, 403, "restaurant not found or not authorized");
+    }
+    return Response(
+      res,
+      200,
+      `restaurant ${isActive ? "enabled" : "disabled"} successfully`,
+    );
+  } catch (error) {
+    console.log("failed to toggle restaurant", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+// organizer dining all bookings
+const OrganizerDiningBookings = async (req, res) => {
+  try {
+    const userId = req.user;
+    let { page = 1, status } = req.query;
+    page = parseInt(page);
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    // check organiser is approved or exists
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    }).populate("user", "name email");
+    if (!organizer) {
+      return Response(res, 403, "Only approved organizers can access");
+    }
+    const restaurant = await Restaurant.findOne({ organizer: organizer._id });
+    if (!restaurant) {
+      return Response(res, 400, "Restaurant not found");
+    }
+    let filter = { restaurant: restaurant._id };
+    if (status) {
+      filter.bookingStatus = status;
+    }
+    const diningbookings = await Restaurantbooking.find(filter)
+      .sort({ createdAt: 1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("user", "name email phonenumber");
+    const totalbookings = await Restaurantbooking.countDocuments({
+      restaurant: restaurant._id,
+    });
+    const totalPages = Math.ceil(totalbookings / limit);
+    if (diningbookings.length === 0) {
+      return Response(res, 200, "No Bookings found", []);
+    }
+    return Response(res, 200, "bookings found", {
+      diningbookings,
+      pagination: {
+        totalbookings,
+        totalPages,
+        currentpage: page,
+        limit,
+      },
+    });
+  } catch (error) {
+    console.log("failed to get bookings", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
 
-
-module.exports = { CreateRestaurant, getEachRestaurantDetails,GetOrganizerRestaurant,DeleteRestaurant,updateRestaurant,toggleEnableandDisableRestaurant,OrganizerDiningBookings};
+module.exports = {
+  CreateRestaurant,
+  getEachRestaurantDetails,
+  GetOrganizerRestaurant,
+  DeleteRestaurant,
+  updateRestaurant,
+  toggleEnableandDisableRestaurant,
+  OrganizerDiningBookings,
+};

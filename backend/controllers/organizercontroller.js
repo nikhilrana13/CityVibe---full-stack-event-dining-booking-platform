@@ -407,7 +407,7 @@ const ManageDiningStats = async (req, res) => {
         createdAt: { $gte: monthStart },
       }),
     ]);
-
+    // console.log("stats",totalbookings,confirmedbookings,cancelledbookings,todaysbookings,thisMonthbookings)
     return Response(res, 200, "Dining dashboard stats fetched", {
       totalbookings,
       confirmedbookings,
