@@ -31,7 +31,7 @@ const AddRestaurantEmptyState = () => {
 
         {/* CTA Button */}
         <NavLink
-          to="/organizer/create-restaurant"
+          to="/organizer/add-restaurant"
           className="inline-flex items-center gap-2 px-8 py-3 rounded-2xl text-white font-semibold text-sm bg-gradient-to-r from-[#6a4dff] to-[#8b5cf6] hover:scale-105 hover:shadow-purple-500/50 transition-all duration-300 shadow-lg shadow-purple-600/30"
         >
           + Add Your Restaurant

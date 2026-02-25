@@ -36,6 +36,7 @@ const CreateRestaurant = async (req, res) => {
       "averagePrice",
       "openingTime",
       "closingTime",
+      "contactnumbers",
       "description"
     ];
     for (let field of allowedFields) {

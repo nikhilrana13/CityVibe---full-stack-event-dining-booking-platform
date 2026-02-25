@@ -3,10 +3,12 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import ResBasicInfo from './ResBasicInfo';
 import AmenitiesAndContact from './AmenitiesAndContact';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import TimingAndSlots from './TimingAndSlots';
 import AddImages from './AddImages';
 import RestaurantReview from './RestaurantReview';
+import axios from 'axios';
+import { toast } from 'sonner';
 
 const steps = [
     "Basic Info",
@@ -30,9 +32,9 @@ const AddRestaurantform = () => {
             openingTime: "",
             closingTime: "",
             availablefacility: [],
-            contactnumbers: [],
+            contactnumbers: [""],
             images: [],
-            slotInterval:15,
+            slotInterval: 15,
             lunchStart: "",
             lunchEnd: "",
             dinnerStart: "",
@@ -41,13 +43,72 @@ const AddRestaurantform = () => {
     })
     const { handleSubmit, trigger, watch, getValues } = methods
     const [loading, setLoading] = useState(false)
-    const navigate = useNavigate() 
+    const navigate = useNavigate()
 
+    const NextStep = async () => {
+        // current step fields validation
+        let stepFields = [];
+        if (Step === 1) stepFields = ["name", "description", "location", "city", "address", "averagePrice"]
+        if (Step === 2) stepFields = ["contactnumbers"]
+        if (Step === 3) stepFields = [
+            "openingTime",
+            "closingTime",
+            "lunchStart",
+            "lunchEnd",
+            "dinnerStart",
+            "dinnerEnd"
+        ]
+        if (Step === 4) stepFields = ["images"]
+        const valid = await trigger(stepFields);
+        if (!valid) return;
+        SetStep((prev) => Math.min(prev + 1, 5));
+    }
+    const prevStep = async () => {
+        SetStep((prev) => Math.max(prev - 1, 1))
+    }
 
-
-
-
-
+    const onSubmit = async (data) => {
+        const formdata = new FormData()
+        formdata.append("name", data.name)
+        formdata.append("description", data.description)
+        formdata.append("location", data.location)
+        formdata.append("city", data.city)
+        formdata.append("address", data.address)
+        formdata.append("averagePrice", data.averagePrice)
+        formdata.append("openingTime", data.openingTime)
+        formdata.append("closingTime", data.closingTime)
+        formdata.append("lunchStart", data.lunchStart)
+        formdata.append("slotInterval", data.slotInterval)
+        formdata.append("lunchEnd", data.lunchEnd)
+        formdata.append("dinnerStart", data.dinnerStart)
+        formdata.append("dinnerEnd", data.dinnerEnd)
+        formdata.append("cuisine", JSON.stringify(data.cuisine))
+        formdata.append("availablefacility", JSON.stringify(data.availablefacility))
+        formdata.append("contactnumbers", JSON.stringify(data.contactnumbers))
+        data.images.forEach((file) => {
+            formdata.append("images", file)
+        })
+        // for(let pair of formdata.entries()){
+        //     console.log(pair[0] + " " + pair[1])
+        // }
+        try {
+            setLoading(true)
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/dining/restaurant/create`, formdata, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            if (response.data) {
+                toast.success(response?.data?.message)
+                navigate("/organizer/manage-dining")
+            }
+        } catch (error) {
+            console.error("failed to Add restaurant", error)
+            toast.error(error?.response?.data?.message || "Internal server error")
+        } finally {
+            setLoading(false)
+        }
+    }
 
     return (
         <div className='w-full px-4 py-3'>
@@ -91,7 +152,7 @@ const AddRestaurantform = () => {
                 </div>
                 {/* form */}
                 <FormProvider {...methods}>
-                    <form>
+                    <form onSubmit={handleSubmit(onSubmit)}>
                         {Step === 1 && <ResBasicInfo />}
                         {Step === 2 && <AmenitiesAndContact />}
                         {Step === 3 && <TimingAndSlots />}
@@ -99,15 +160,30 @@ const AddRestaurantform = () => {
                         {Step === 5 && <RestaurantReview />}
                         {/* footer */}
                         <div className="flex 2xl:px-14 flex-col gap-4 sm:flex-row sm:justify-between mt-10">
-                            <button className="px-6 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition">
-                                Back
-                            </button>
-
-                            <button className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/40">
-                                Continue
-                            </button>
+                            {
+                                Step > 1 && (
+                                    <button onClick={() => prevStep()} type='button' className="px-6 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition">
+                                        Back
+                                    </button>
+                                )
+                            }
+                            {
+                                Step < 5 && (
+                                    <button onClick={() => NextStep()} type='button' className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/40">
+                                        Continue
+                                    </button>
+                                )
+                            }
+                            {
+                                Step === 5 &&
+                                <button type='submit' disabled={loading} className={`px-8 py-3 rounded-xl transition shadow-lg shadow-indigo-500/40  ${loading ? "bg-gray-500 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"} `}>
+                                    {loading ? (
+                                        <span className="flex items-center gap-2">
+                                            <Loader2 className="animate-spin" size={16} />
+                                            Publishing...
+                                        </span>) : ("Publish")} </button>
+                            }
                         </div>
-
                     </form>
                 </FormProvider>
 
