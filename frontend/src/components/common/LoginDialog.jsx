@@ -22,7 +22,7 @@ const LoginDialog = () => {
             const result = await signInWithPopup(auth, GoogleProvider)
             const token = await result.user.getIdToken();
             // console.log(result.user)
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/test-google`, {}, {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/google-login`, {}, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

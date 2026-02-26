@@ -36,6 +36,16 @@ const OrganizerLayout = () => {
           className={`fixed top-0 left-0 h-screen w-[280px] bg-white z-[10000] transform transition-transform duration-300 
             ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:hidden`}
         >
+          <header className="fixed top-0 left-0 right-0 justify-between bg-white  min-h-[75px] flex items-center px-4">
+            <div className="flex flex-col leading-none">
+              <h1 className="text-[32px] font-black tracking-tight">
+                CITYVIBE
+              </h1>
+              <span className="text-[10px] tracking-[0.4em] font-semibold text-gray-500">
+                DISCOVER THE VIBE
+              </span>
+            </div>
+          </header>
           <div className="pt-[75px] h-full">
             <Sidebar />
           </div>

@@ -17,7 +17,12 @@ const OrganizerStatusGuard = () => {
     if (
       path.includes("pending") ||
       path.includes("rejected") ||
-      path.includes("dashboard")
+      path.includes("dashboard") || 
+      path.includes("manage-bookings") || 
+      path.includes("manage-events") || 
+      path.includes("manage-dining") ||
+      path.includes("verify-tickets") ||
+      path.includes("settings")
     ) {
       return <Navigate to="/organizer/onboarding" replace />;
     }

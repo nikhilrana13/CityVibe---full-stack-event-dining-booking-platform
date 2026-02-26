@@ -1,6 +1,6 @@
 import useFetchOrganizer from '../../hooks/useFetchOrganizer'
 import useLogout from '../../hooks/useLogout'
-import { Building2, LogOut, Plus, Settings2 } from 'lucide-react'
+import { Building2, ExternalLink, LogOut, Plus, Settings2 } from 'lucide-react'
 import React from 'react'
 import { BiBuilding } from 'react-icons/bi'
 import { FaTicketSimple } from 'react-icons/fa6'
@@ -19,7 +19,7 @@ const Sidebar = () => {
     const links = [
         { to: "dashboard", label: "Dashboard", icon: LuLayoutDashboard },
         { to: "manage-events", label: "Manage Events", icon: MdEventNote },
-         { to: "create-event", label: "Create Event", icon: Plus },
+        { to: "create-event", label: "Create Event", icon: Plus },
         { to: "manage-dining", label: "Manage Dining", icon: MdDining },
         { to: "manage-bookings", label: "Manage Bookings", icon: FaTicketSimple },
         { to: "settings", label: "Settings", icon: Settings2 },
@@ -37,13 +37,13 @@ const Sidebar = () => {
                     </div>
                 )
             }
-             {
+            {
                 showOnboarding && (
                     <div className='px-5 py-3 '>
-                 <NavLink to="onboarding" className={({ isActive }) => getNavClass(isActive)} > <div className="flex items-center gap-4"> <Building2 size={23} /> <span className="transition-opacity text-sm duration-500">OnBoarding</span> </div> </NavLink>
-              </div>
+                        <NavLink to="onboarding" className={({ isActive }) => getNavClass(isActive)} > <div className="flex items-center gap-4"> <Building2 size={23} /> <span className="transition-opacity text-sm duration-500">OnBoarding</span> </div> </NavLink>
+                    </div>
                 )
-             }
+            }
             {/* nav links */}
             {
                 isApprovedOrganizer && (
@@ -59,11 +59,26 @@ const Sidebar = () => {
                     </nav>
                 )
             }
-            <div onClick={handleLogout} className='mt-auto flex cursor-pointer items-center justify-between px-5 py-4 gap-3 border-t  transition hover:text-red-500 hover:bg-red-500/10 '>
-                <span>Logout</span>
-                <LogOut />
-            </div>
+            <div className="mt-auto border-t">
 
+                {/* View Website */}
+                <NavLink
+                    to="/"
+                    className="flex justify-between cursor-pointer items-center gap-3 px-5 py-3  text-black hover:text-indigo-600 hover:bg-indigo-50 transition"
+                >   
+                    <span>View Website</span>
+                    <ExternalLink size={18} />
+                </NavLink>
+
+                {/* Logout */}
+                <div
+                    onClick={handleLogout}
+                    className="flex cursor-pointer items-center justify-between px-5 py-4 gap-3  transition hover:text-red-500 hover:bg-red-500/10"
+                >
+                    <span>Logout</span>
+                    <LogOut size={18} />
+                </div>
+            </div>
         </aside>
     )
 }
