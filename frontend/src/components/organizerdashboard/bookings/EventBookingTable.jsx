@@ -1,6 +1,6 @@
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../../ui/select'
 import React, { useEffect, useState } from 'react'
-import { formatDateRange, formatIndianNumber } from "@/lib/utils";
+import { formatDateRange, formatIndianNumber } from "../../../lib/utils";
 import axios from 'axios';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../../ui/pagination';
 import EventBookingTableShimmer from './EventBookingTabelShimmer';
@@ -72,13 +72,13 @@ const EventBookingTable = () => {
                         <table className="w-full text-sm">
                             <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
                                 <tr>
-                                    <th className="px-6 py-4 text-left">Booking Id</th>
+                                    <th className="px-6 py-4 whitespace-nowrap   text-left">Booking Id</th>
                                     <th className="px-6 py-4 text-left">Event</th>
                                     <th className="px-6 py-4 text-left">User</th>
                                     <th className="px-6 py-4 text-left">Date</th>
                                     <th className="px-6 py-4 text-left">Tickets</th>
                                     <th className="px-6 py-4 text-left">Amount</th>
-                                    <th className="px-6 py-4 text-right">Booking Status</th>
+                                    <th className="px-6 py-4 whitespace-nowrap  text-right">Booking Status</th>
                                     <th className="px-6 py-4 text-right"> Payment Status</th>
                                 </tr>
                             </thead>
