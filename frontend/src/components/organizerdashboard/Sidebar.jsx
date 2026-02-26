@@ -1,6 +1,6 @@
 import useFetchOrganizer from '../../hooks/useFetchOrganizer'
 import useLogout from '../../hooks/useLogout'
-import { Building2, ExternalLink, LogOut, Plus, Settings2 } from 'lucide-react'
+import { Building2, ExternalLink, LogOut, Plus, Settings2, Ticket } from 'lucide-react'
 import React from 'react'
 import { BiBuilding } from 'react-icons/bi'
 import { FaTicketSimple } from 'react-icons/fa6'
@@ -22,6 +22,7 @@ const Sidebar = () => {
         { to: "create-event", label: "Create Event", icon: Plus },
         { to: "manage-dining", label: "Manage Dining", icon: MdDining },
         { to: "manage-bookings", label: "Manage Bookings", icon: FaTicketSimple },
+        {to:"verify-tickets",label:"Verification",icon:Ticket},
         { to: "settings", label: "Settings", icon: Settings2 },
     ];
     const getNavClass = (isActive) => isActive ? "bg-gradient-to-r from-[#6a4dff] to-[#8b5cf6] text-white px-3 py-3 rounded-md flex items-center gap-2 shadow-lg shadow-purple-500/30" : "px-3 py-3 mb-2 rounded-md hover:bg-[#6a4dff]/10 hover:text-[#6a4dff] transition-all duration-300";

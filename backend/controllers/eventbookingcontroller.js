@@ -400,8 +400,10 @@ const VerifyTicket = async(req,res)=>{
         if (!organizer) {
           return Response(res, 403, "Only approved organizers can verify ticket");
         }
-    // Find booking
-     const booking = await Eventbooking.findOne({ ticketCode }).populate({path:"event",select:"title organizer endDate startDate"});
+    // Find booking (populate event and user details)
+     const booking = await Eventbooking.findOne({ ticketCode })
+       .populate({ path: "event", select: "title organizer endDate startDate" })
+       .populate({ path: "user", select: "name email" });
       if (!booking) {
       return Response(res, 404, "Invalid ticket");
       }
@@ -428,7 +430,7 @@ const VerifyTicket = async(req,res)=>{
     await booking.save();
 
     return Response(res, 200, "Ticket verified successfully", {
-      user: booking.user,
+      user: booking.user, 
       event: booking.event.title,
       totalSeats: booking.totalSeats,
       scanTime: booking.scanTime
