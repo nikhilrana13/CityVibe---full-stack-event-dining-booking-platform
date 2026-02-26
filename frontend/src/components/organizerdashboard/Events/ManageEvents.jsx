@@ -138,6 +138,7 @@ const ManageEvents = () => {
         </div>
         {/* events table */}
         <EventsTable Search={debouncedSearch} isActive={isActive} />
+        
       </div>
     </div>
   )

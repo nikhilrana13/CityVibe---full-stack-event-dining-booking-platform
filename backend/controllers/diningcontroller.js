@@ -386,7 +386,7 @@ const OrganizerDiningBookings = async (req, res) => {
     const userId = req.user;
     let { page = 1, status } = req.query;
     page = parseInt(page);
-    const limit = 10;
+    const limit = 5;
     const skip = (page - 1) * limit;
     // check organiser is approved or exists
     const organizer = await Organizer.findOne({
