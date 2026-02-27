@@ -47,32 +47,112 @@ const Home = async (req, res) => {
           city: 1,
           minPrice: 1,
           venue: 1,
+          starttime:1,
           location: 1,
         },
       },
     ]);
     // music event
-    const music = await Event.find({ ...cityFilter, category: "music" })
-      .limit(10)
-      .select(
-        "title coverimage startDate endDate city minPrice venue location",
-      );
+    const music = await Event.aggregate([
+      { $match: { ...cityFilter, category: "music" } },
+      {
+        $lookup: {
+          from: "tickets",
+          localField: "_id",
+          foreignField: "event",
+          as: "ticket",
+        },
+      },
+      {
+        $addFields: {
+          minPrice: { $min: "$ticket.price" },
+        },
+      },
+      { $limit: 10 },
+      {
+        $project: {
+          title: 1,
+          coverimage: 1,
+          startDate: 1,
+          starttime: 1,
+          endDate: 1,
+          city: 1,
+          minPrice: 1,
+          venue: 1,
+          location: 1,
+        },
+      },
+    ]);
     // this week
     const today = new Date();
     const weekEnd = new Date();
     weekEnd.setDate(today.getDate() + 7);
-    const thisWeek = await Event.find({
-      ...cityFilter,
-      startDate: { $gte: today, $lte: weekEnd },
-    }).limit(10).select(
-        "title coverimage startDate endDate city minPrice venue location",
-      );
+    const thisWeek = await Event.aggregate([
+      {
+        $match: {
+          ...cityFilter,
+          startDate: { $gte: today, $lte: weekEnd },
+        },
+      },
+      {
+        $lookup: {
+          from: "tickets",
+          localField: "_id",
+          foreignField: "event",
+          as: "ticket",
+        },
+      },
+      {
+        $addFields: {
+          minPrice: { $min: "$ticket.price" },
+        },
+      },
+      { $limit: 10 },
+      {
+        $project: {
+          title: 1,
+          coverimage: 1,
+          startDate: 1,
+          starttime: 1,
+          endDate: 1,
+          city: 1,
+          minPrice: 1,
+          venue: 1,
+          location: 1,
+        },
+      },
+    ]);
     //  Comedy
-    const comedy = await Event.find({ ...cityFilter, category: "comedy" })
-      .limit(10)
-      .select(
-        "title coverimage startDate endDate city minPrice venue location",
-      );
+    const comedy = await Event.aggregate([
+      { $match: { ...cityFilter, category: "comedy" } },
+      {
+        $lookup: {
+          from: "tickets",
+          localField: "_id",
+          foreignField: "event",
+          as: "ticket",
+        },
+      },
+      {
+        $addFields: {
+          minPrice: { $min: "$ticket.price" },
+        },
+      },
+      { $limit: 10 },
+      {
+        $project: {
+          title: 1,
+          coverimage: 1,
+          startDate: 1,
+          starttime: 1,
+          endDate: 1,
+          city: 1,
+          minPrice: 1,
+          venue: 1,
+          location: 1,
+        },
+      },
+    ]);
     // india top's events
     const topCities = ["Delhi", "Mumbai", "Bangalore", "Chandigarh","Hyderabad","Kolkata","Pune","Gurgaon","Noida","Ahmedabad"];
     const indiasTopEvents = await Event.aggregate([
@@ -112,6 +192,7 @@ const Home = async (req, res) => {
           startDate: 1,
           endDate:1,
           venue: 1,
+          starttime:1,
           minPrice: 1,
           location:1
         },

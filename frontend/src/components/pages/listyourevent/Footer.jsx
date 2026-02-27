@@ -21,7 +21,7 @@ const Footer = () => {
                         <a href="#" className="hover:text-white transition">Terms & Conditions</a>
                         <a href="#" className="hover:text-white transition">Privacy Policy</a>
                         <a href="#" className="hover:text-white transition">Contact Us</a>
-                        <a href="#" className="hover:text-white transition">List your events</a>
+                        <a href="/events/list-your-events" className="hover:text-white transition">List your events</a>
                     </div>
                     {/* QR Section */}
                     <div className="flex flex-col items-center">

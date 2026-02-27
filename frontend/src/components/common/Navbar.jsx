@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import { IoIosCloseCircle } from "react-icons/io";
+import React, { forwardRef, useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { IoLocationOutline, IoSearch } from "react-icons/io5";
 import { CiUser } from "react-icons/ci";
@@ -7,7 +6,6 @@ import LoginDialog from './LoginDialog';
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import { MdDinnerDining } from "react-icons/md";
 import { LuFileSpreadsheet, LuGuitar, LuMessageCircleWarning } from "react-icons/lu";
-import { BsArrowRight } from 'react-icons/bs';
 import { GoArrowLeft } from 'react-icons/go';
 import { LiaClipboardListSolid } from 'react-icons/lia';
 import { BiLogOut } from 'react-icons/bi';
@@ -23,13 +21,23 @@ const Navbar = () => {
   const { handleLogout } = useLogout()
   const shouldfetch = user?.hasOrganizerAccount === true
   const { organizer, loading } = useFetchOrganizer(shouldfetch)
-  if (loading) return null
   // console.log("response",organizer)
+  // lock scroll on sidebar open
+  useEffect(() => {
+  if (isSidebarOpen) {
+    document.body.style.overflow = "hidden"
+  } else {
+    document.body.style.overflow = "auto"
+  }
+  return () => {
+    document.body.style.overflow = "auto"
+  }
+}, [isSidebarOpen])
+if (loading) return null
 
   return (
     <>
-      <header className='flex border w-full transition-all py-3 duration-300 ease-in-out px-2 sm:px-4 items-center z-[9999] 
-         fixed top-0 left-0 right-0  opacity-100  translate-y-0 min-h-[75px]'>
+      <header className='flex  bg-white w-full transition-all py-3 duration-300 ease-in-out px-2 sm:px-4 items-center z-[30] sticky top-0 left-0 right-0  opacity-100  translate-y-0 min-h-[75px]'>
         <nav className="flex  gap-3  flex-col  w-full">
           <div className='flex items-center justify-between w-full'>
             {/* left side*/}
@@ -101,8 +109,10 @@ const Navbar = () => {
 
           </div>
         </nav>
-        {/* Sidebar */}
-        <div className={` fixed fixed-sidebar top-0  rounded-none sm:rounded-l-2xl  right-0 h-screen w-full sm:w-[450px] md:w-[600px] z-[10000] bg-white shadow-lg  transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]  ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
+        
+      </header>
+      {/* Sidebar */}
+        <div className={` fixed fixed-sidebar top-0  rounded-none sm:rounded-l-2xl  right-0 h-screen w-full sm:w-[450px] md:w-[600px] z-[50] bg-white shadow-2xl  transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]  ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
           } overflow-y-auto scrollbar-hidden`}
         >
           <div className='w-full p-4 border-b bg-white border'>
@@ -118,7 +128,7 @@ const Navbar = () => {
                     e.target.onerror = null;
                     e.target.src = nouserimg;
                   }} className='w-[64px] rounded-full object-cover h-[64px]' />
-                  
+
                 </div>
                 <div className='flex flex-col gap-1'>
                   <span className='text-[1.2rem] font-[500]'>{user?.name || "User"}</span>
@@ -171,11 +181,10 @@ const Navbar = () => {
         {isSidebarOpen && (
           <div
             onClick={() => SetIsSidebarOpen(false)}
-            className="fixed fixed-overlay h-screen inset-0 bg-black/30 transition-opacity duration-500 ease-out  backdrop-blur-md backdrop-saturate-150 z-[10001]"
+            className="fixed fixed-overlay h-screen inset-0 bg-black/30 transition-opacity duration-500 ease-out  backdrop-blur-md backdrop-saturate-150 z-[40]"
           ></div>
 
         )}
-      </header>
     </>
   )
 }

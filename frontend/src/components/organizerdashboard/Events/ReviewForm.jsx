@@ -1,4 +1,4 @@
-import { formatDate,formatDuration} from '../../../lib/utils';
+import {formatDateRange,formatDuration} from '../../../lib/utils';
 import React from 'react'
 import { useFormContext } from 'react-hook-form';
 
@@ -20,7 +20,7 @@ const ReviewForm = () => {
                         </div>
 
                         <div className="text-sm text-gray-300">
-                            <p>📅{formatDate(data.startDate)} • {data.starttime}</p>
+                            <p>📅{formatDateRange(data.startDate)} • {data.starttime}</p>
                             <p>📍{data.venue},{data.city}</p>
                             <p>⏳ {formatDuration(Number(data.duration))}</p>
                         </div>
