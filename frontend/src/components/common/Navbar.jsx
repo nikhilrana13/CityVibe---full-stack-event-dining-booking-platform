@@ -19,13 +19,13 @@ import useFetchOrganizer from '../../hooks/useFetchOrganizer';
 
 const Navbar = () => {
   const [isSidebarOpen, SetIsSidebarOpen] = useState(false)
-  const user = useSelector((state)=>state.Auth.user)
-  const {handleLogout} = useLogout()
+  const user = useSelector((state) => state.Auth.user)
+  const { handleLogout } = useLogout()
   const shouldfetch = user?.hasOrganizerAccount === true
-  const {organizer,loading} = useFetchOrganizer(shouldfetch)
+  const { organizer, loading } = useFetchOrganizer(shouldfetch)
   if (loading) return null
   // console.log("response",organizer)
- 
+
   return (
     <>
       <header className='flex border w-full transition-all py-3 duration-300 ease-in-out px-2 sm:px-4 items-center z-[9999] 
@@ -70,11 +70,11 @@ const Navbar = () => {
               {/* login dialog open */}
               {
                 user ? (
-              <button onClick={() => SetIsSidebarOpen(true)} className='rounded-full cursor-pointer p-2 bg-[#D1D5DB]'>
-                        <CiUser size={25} className='text-white' />
-              </button>
-                ):(
-                   <LoginDialog />
+                  <button onClick={() => SetIsSidebarOpen(true)} className='rounded-full cursor-pointer p-2 bg-[#D1D5DB]'>
+                    <CiUser size={25} className='text-white' />
+                  </button>
+                ) : (
+                  <LoginDialog />
                 )
               }
             </div>
@@ -106,62 +106,66 @@ const Navbar = () => {
           } overflow-y-auto scrollbar-hidden`}
         >
           <div className='w-full p-4 border-b bg-white border'>
-            <div className="flex gap-4 font-[500] cursor-pointer text-[1.3rem] items-center"> <GoArrowLeft onClick={()=>SetIsSidebarOpen(false)} /> Profile</div>
+            <div className="flex gap-4 font-[500] cursor-pointer text-[1.3rem] items-center"> <GoArrowLeft onClick={() => SetIsSidebarOpen(false)} /> Profile</div>
           </div>
           {/* my details */}
           <div className='flex w-full bg-[#F1F1F2] flex-col flex-1 min-h-full'>
-               {/* profile */}
-               <div className='flex p-5 flex-col gap-8'>
-                <div className='flex  items-center gap-5'>
+            {/* profile */}
+            <div className='flex p-5 flex-col gap-8'>
+              <div className='flex  items-center gap-5'>
                 <div className='rounded-full border'>
-                <img src={user?.profilepic || nouserimg} alt="user pic" className='w-[64px] rounded-full object-cover h-[64px]' />
+                  <img src={user?.profilepic && user.profilepic.startsWith("http") ? user.profilepic : nouserimg} alt="user pic" onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = nouserimg;
+                  }} className='w-[64px] rounded-full object-cover h-[64px]' />
+                  
                 </div>
                 <div className='flex flex-col gap-1'>
-                  <span className='text-[1.2rem] font-[500]'>{user?.name|| "User"}</span>
+                  <span className='text-[1.2rem] font-[500]'>{user?.name || "User"}</span>
                   <span className='text-[#545459] text-[0.8rem]'>{user?.email || user?.phonenumber || "NA"}</span>
                 </div>
-               </div>
+              </div>
               <NavLink to="/" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
-              <LiaClipboardListSolid size={22} />
-              View all bookings</NavLink>
+                <LiaClipboardListSolid size={22} />
+                View all bookings</NavLink>
               {organizer?.verificationStatus === "approved" ? (
                 <NavLink to="/organizer/dashboard" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
-                <RxDashboard size={23} />
-               Dashboard</NavLink> 
-              ):organizer?.verificationStatus === "pending" ? (
-                 <NavLink to="/organizer/pending" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
-                <LuGuitar size={23} />
-                 List your events</NavLink> 
-              ):organizer?.verificationStatus === "rejected" ? (
-                  <NavLink to="/organizer/rejected" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
-                <LuGuitar size={23} />
-                 List your events</NavLink> 
-              ):(
-                  <NavLink to="/organizer/onboarding" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
-                <LuGuitar size={23} />
-                 List your events</NavLink> 
+                  <RxDashboard size={23} />
+                  Dashboard</NavLink>
+              ) : organizer?.verificationStatus === "pending" ? (
+                <NavLink to="/organizer/pending" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
+                  <LuGuitar size={23} />
+                  List your events</NavLink>
+              ) : organizer?.verificationStatus === "rejected" ? (
+                <NavLink to="/organizer/rejected" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
+                  <LuGuitar size={23} />
+                  List your events</NavLink>
+              ) : (
+                <NavLink to="/organizer/onboarding" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
+                  <LuGuitar size={23} />
+                  List your events</NavLink>
               )
-            }
-               </div>
-               {/* more */}
-                <div className='flex p-5 flex-col gap-8'>
-                 <h3 className='font-[500]'>More</h3>
-                  <div className='flex flex-col bg-white rounded-xl'>
-                  <NavLink to="/" className="flex gap-3 border-b items-center  py-4 px-4" >
-                <LuMessageCircleWarning size={22} />
-                Terms & Conditions</NavLink>
-                <NavLink to="/" className=" flex gap-3  items-center py-4 px-4" >
-                <LuFileSpreadsheet  size={22} />
-                Privacy Policy</NavLink>
-                  </div>
-                 
-               </div>
-               <div className='p-5'>
-                <button onClick={()=>{handleLogout(),SetIsSidebarOpen(false)}} className="bg-white w-full flex gap-3 border items-center rounded-xl py-4 px-4" >
-              <BiLogOut size={22} />
-              Logout</button>
-               </div>
+              }
             </div>
+            {/* more */}
+            <div className='flex p-5 flex-col gap-8'>
+              <h3 className='font-[500]'>More</h3>
+              <div className='flex flex-col bg-white rounded-xl'>
+                <NavLink to="/" className="flex gap-3 border-b items-center  py-4 px-4" >
+                  <LuMessageCircleWarning size={22} />
+                  Terms & Conditions</NavLink>
+                <NavLink to="/" className=" flex gap-3  items-center py-4 px-4" >
+                  <LuFileSpreadsheet size={22} />
+                  Privacy Policy</NavLink>
+              </div>
+
+            </div>
+            <div className='p-5'>
+              <button onClick={() => { handleLogout(), SetIsSidebarOpen(false) }} className="bg-white w-full flex gap-3 border items-center rounded-xl py-4 px-4" >
+                <BiLogOut size={22} />
+                Logout</button>
+            </div>
+          </div>
         </div>
         {/* overlay container only for Sidebar (not LoginDialog) */}
         {isSidebarOpen && (

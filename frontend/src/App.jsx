@@ -17,6 +17,7 @@ import ManageDining from "./components/organizerdashboard/dining/ManageDining"
 import Restaurantform from "./components/organizerdashboard/dining/AddAndEditRestaurant/RestaurantForm"
 import ManageBookings from "./components/organizerdashboard/bookings/ManageBookings"
 import VerifyTickets from "./components/organizerdashboard/VerifyTickets/VerifyTickets"
+import Settings from "./components/organizerdashboard/Settings/Settings"
 
 const App = () => {
   return (
@@ -48,6 +49,7 @@ const App = () => {
             <Route path="edit-restaurant/:id" element={<Restaurantform />} />
             <Route path="manage-bookings" element={<ManageBookings />} />
             <Route path="verify-tickets" element={<VerifyTickets />} />
+            <Route path="settings" element={<Settings />}  />
 
           </Route>
         </Route>
