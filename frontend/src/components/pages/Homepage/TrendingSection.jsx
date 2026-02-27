@@ -2,10 +2,10 @@ import EventCardShimmer from '../../common/EventCardShimmer'
 import EventCard from '../../common/EventCard'
 import React from 'react'
 
-const TrendingSection = ({ trending, loading }) => {
+const TrendingSection = ({ trending, loading,city}) => {
     return (
         <div className='mx-auto px-4 gap-4 py-4  max-w-[1200px]'>
-            <h3 className='text-[1.5rem] font-[500] mb-6'>Trending in Delhi</h3>
+            <h3 className='text-[1.5rem] font-[500] mb-6'>Trending in {city || "..."}</h3>
             {/* events card */}
             <div className='flex gap-6 overflow-x-auto scrollbar-hide'>
                 {
@@ -20,7 +20,7 @@ const TrendingSection = ({ trending, loading }) => {
                             )
                         })
                     ) : (
-                        <p className='text-sm text-center text-gray-500'>No Trending Events found</p>
+                        <p className='text-sm w-full text-center py-10 text-gray-500'>No Trending Events found</p>
                     )
                 }
             </div>

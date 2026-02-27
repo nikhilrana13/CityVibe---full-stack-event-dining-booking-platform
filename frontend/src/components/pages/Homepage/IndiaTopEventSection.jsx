@@ -20,7 +20,7 @@ const IndiaTopEventSection = ({indiatop,loading}) => {
                             )
                         })
                     ) : (
-                        <p className='text-sm text-center text-gray-500'>No India Top Events found</p>
+                        <p className='text-sm w-full text-center py-10 text-gray-500'>No India Top Events found</p>
                     )
                 }
         </div>

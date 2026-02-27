@@ -14,17 +14,21 @@ import { useSelector } from 'react-redux';
 import useLogout from '../../hooks/useLogout';
 import nouserimg from "../../assets/user.png"
 import useFetchOrganizer from '../../hooks/useFetchOrganizer';
-
+import LocationDialog from './LocationDialog';
+import { useLocationContext } from '../../context/useLocationContext';
 const Navbar = () => {
   const [isSidebarOpen, SetIsSidebarOpen] = useState(false)
+  const [isLocationOpen,setIsLocationOpen] = useState(false)
   const user = useSelector((state) => state.Auth.user)
   const { handleLogout } = useLogout()
   const shouldfetch = user?.hasOrganizerAccount === true
   const { organizer, loading } = useFetchOrganizer(shouldfetch)
+  const {location} = useLocationContext()
+  //  console.log("select city",location)
   // console.log("response",organizer)
   // lock scroll on sidebar open
   useEffect(() => {
-  if (isSidebarOpen) {
+  if (isSidebarOpen || isLocationOpen) {
     document.body.style.overflow = "hidden"
   } else {
     document.body.style.overflow = "auto"
@@ -32,7 +36,7 @@ const Navbar = () => {
   return () => {
     document.body.style.overflow = "auto"
   }
-}, [isSidebarOpen])
+}, [isSidebarOpen,isLocationOpen])
 if (loading) return null
 
   return (
@@ -53,11 +57,11 @@ if (loading) return null
               <div className='w-[1.4px] ml-2 hidden md:block bg-gray-300 h-[30px]'>
               </div>
               {/* location */}
-              <div className='flex items-center gap-2'>
+              <div onClick={()=>setIsLocationOpen(true)} className='flex cursor-pointer items-center gap-2'>
                 <IoLocationOutline size={23} className='text-[#6748E4]' />
                 <div className='flex flex-col'>
-                  <span className='text-[1rem] font-[500]'>Chandigarh</span>
-                  <span className='text-[0.8rem] font-[400] text-[#545459]'>chandigarh,chandigarh</span>
+                  <span className='text-[1rem] font-[500]'>{location?.city || "NA"}</span>
+                  <span className='text-[0.8rem] font-[400] text-[#545459]'>{location?.state || "NA"}</span>
                 </div>
               </div>
               {/* links */}
@@ -106,10 +110,8 @@ if (loading) return null
                 <LuGuitar size={23} className='block sm:hidden' />
                 Events</NavLink>
             </ul>
-
           </div>
         </nav>
-        
       </header>
       {/* Sidebar */}
         <div className={` fixed fixed-sidebar top-0  rounded-none sm:rounded-l-2xl  right-0 h-screen w-full sm:w-[450px] md:w-[600px] z-[50] bg-white shadow-2xl  transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]  ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
@@ -185,6 +187,11 @@ if (loading) return null
           ></div>
 
         )}
+        {/* location dialog */}
+        {isLocationOpen && (
+          <LocationDialog onClose={()=>setIsLocationOpen(false)} />
+        )}
+
     </>
   )
 }

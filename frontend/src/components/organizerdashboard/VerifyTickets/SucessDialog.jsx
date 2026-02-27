@@ -12,9 +12,9 @@ const SucessDialog = ({data,onClose}) => {
 }, [])
   return (
      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-gradient-to-br from-emerald-50 to-white border border-emerald-200 rounded-3xl p-8 shadow-2xl flex flex-col gap-6 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-emerald-50 to-white border border-emerald-200 rounded-3xl p-8 shadow-2xl flex flex-col gap-6 relative overflow-hidden">
   {/* Glow Effect */}
-  <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-300/20 rounded-full blur-3xl"></div>
+      <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-300/20 rounded-full blur-3xl"></div>
 
   {/* Header */}
   <div className="flex items-center gap-4">
@@ -75,7 +75,7 @@ const SucessDialog = ({data,onClose}) => {
   <button onClick={onClose} className="mt-6 bg-emerald-600 hover:bg-emerald-700 transition text-white py-3 rounded-2xl font-semibold shadow-lg shadow-emerald-500/30">
     Done
   </button>
-</div>
+        </div>
      </div>
   
   )
