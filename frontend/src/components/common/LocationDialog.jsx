@@ -69,8 +69,8 @@ const LocationDialog = ({ onClose }) => {
                                     )}
                                     {/* No result */}
                                     {!search.Loading && search.hasSearched && search.suggestions.length === 0 && (
-                                        <div className="absolute top-full left-0 w-full mt-1 bg-white md:w-[80%] rounded-lg px-4 py-2 text-sm text-gray-500 z-50">
-                                            No locations found
+                                        <div className="absolute top-full left-0 w-full mt-2 max-h-60 overflow-y-auto z-50 space-y-3 ">
+                                         <span className="text-gray-500 text-center">No Location found</span>
                                         </div>
                                     )}
                                 </>

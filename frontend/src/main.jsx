@@ -7,6 +7,7 @@ import { Persistor, Store } from './redux/Store'
 import { PersistGate } from 'redux-persist/es/integration/react'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import { LocationProvider } from './context/useLocationContext'
+import { SearchProvider } from './context/useSearchContext'
 
 createRoot(document.getElementById('root')).render(
   
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')).render(
         <BrowserRouter>
         <ErrorBoundary>
          <LocationProvider>
-             <App />
+            <SearchProvider>
+               <App />
+            </SearchProvider>     
          </LocationProvider>
         </ErrorBoundary>
         

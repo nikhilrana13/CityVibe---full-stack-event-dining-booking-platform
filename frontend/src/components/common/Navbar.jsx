@@ -16,9 +16,11 @@ import nouserimg from "../../assets/user.png"
 import useFetchOrganizer from '../../hooks/useFetchOrganizer';
 import LocationDialog from './LocationDialog';
 import { useLocationContext } from '../../context/useLocationContext';
+import EventAndDiningSuggestions from './EventAndDiningSuggestions';
 const Navbar = () => {
   const [isSidebarOpen, SetIsSidebarOpen] = useState(false)
   const [isLocationOpen,setIsLocationOpen] = useState(false)
+  const [isEventAndDiningOpen,setIsEventAndDiningOpen] = useState(false)
   const user = useSelector((state) => state.Auth.user)
   const { handleLogout } = useLogout()
   const shouldfetch = user?.hasOrganizerAccount === true
@@ -28,7 +30,7 @@ const Navbar = () => {
   // console.log("response",organizer)
   // lock scroll on sidebar open
   useEffect(() => {
-  if (isSidebarOpen || isLocationOpen) {
+  if (isSidebarOpen || isLocationOpen || isEventAndDiningOpen) {
     document.body.style.overflow = "hidden"
   } else {
     document.body.style.overflow = "auto"
@@ -36,7 +38,7 @@ const Navbar = () => {
   return () => {
     document.body.style.overflow = "auto"
   }
-}, [isSidebarOpen,isLocationOpen])
+}, [isSidebarOpen,isLocationOpen,isEventAndDiningOpen])
 if (loading) return null
 
   return (
@@ -75,7 +77,7 @@ if (loading) return null
             {/* right side */}
             <div className='flex items-center gap-5'>
               {/* search dialog */}
-              <div className='border hidden xl:flex cursor-pointer px-2 md:px-4 py-2 gap-3  items-center rounded-xl '>
+              <div  onClick={()=>setIsEventAndDiningOpen(true)} className='border hidden xl:flex cursor-pointer px-2 md:px-4 py-2 gap-3  items-center rounded-xl '>
                 <IoSearch size={20} className='text-[#6748E4]' />
                 <span className='text-gray-500 whitespace-wrap text-[1rem]'>Search for events and restaurants</span>
               </div>
@@ -94,7 +96,7 @@ if (loading) return null
           {/* for mobile */}
           <div className='xl:hidden flex  flex-col gap-2'>
             {/* search input */}
-            <div className='border flex cursor-pointer px-2 md:px-4 py-3 gap-3  items-center rounded-xl '>
+            <div onClick={()=>setIsEventAndDiningOpen(true)} className='border flex cursor-pointer px-2 md:px-4 py-3 gap-3  items-center rounded-xl '>
               <IoSearch size={20} className='flex-shrink-0 text-[#6748E4]' />
               <span className='text-gray-500 whitespace-wrap overflow-hidden text-ellipsis text-[0.8rem] sm:text-[1rem]'>Search for events and restaurants</span>
             </div>
@@ -190,6 +192,10 @@ if (loading) return null
         {/* location dialog */}
         {isLocationOpen && (
           <LocationDialog onClose={()=>setIsLocationOpen(false)} />
+        )}
+        {/* events and dining search dialog */}
+        {isEventAndDiningOpen && (
+          <EventAndDiningSuggestions onClose={()=>setIsEventAndDiningOpen(false)}  />
         )}
 
     </>

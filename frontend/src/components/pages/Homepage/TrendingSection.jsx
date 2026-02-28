@@ -1,6 +1,7 @@
 import EventCardShimmer from '../../common/EventCardShimmer'
 import EventCard from '../../common/EventCard'
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 
 const TrendingSection = ({ trending, loading,city}) => {
     return (
@@ -16,7 +17,7 @@ const TrendingSection = ({ trending, loading,city}) => {
                     ) : trending?.length > 0 ? (
                         trending.map((event) => {
                             return (
-                                <EventCard key={event?._id} event={event} />
+                                     <EventCard key={event?._id} event={event} />
                             )
                         })
                     ) : (

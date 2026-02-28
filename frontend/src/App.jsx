@@ -18,6 +18,8 @@ import Restaurantform from "./components/organizerdashboard/dining/AddAndEditRes
 import ManageBookings from "./components/organizerdashboard/bookings/ManageBookings"
 import VerifyTickets from "./components/organizerdashboard/VerifyTickets/VerifyTickets"
 import Settings from "./components/organizerdashboard/Settings/Settings"
+import EventDetailsPage from "./pages/EventDetailsPage"
+import RestaurantDetailsPage from "./pages/RestaurantDetailsPage"
 
 const App = () => {
   return (
@@ -26,6 +28,8 @@ const App = () => {
         <Route path="/" element={<Homepage />} />
         <Route path="/dining" element={<Diningpage />} />
         <Route path="/events" element={<Eventspage />} />
+        <Route path="/events/:id/:slug" element={<EventDetailsPage />} />
+        <Route path="/dining/:city/:id/:slug" element={<RestaurantDetailsPage />} />
         {/* for organizers */}
         <Route path="/events/list-your-events" element={<ListYourEvents />} />
         {/* onboarding flow */}

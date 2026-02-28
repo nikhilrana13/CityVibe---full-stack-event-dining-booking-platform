@@ -1,9 +1,14 @@
-import { formatDateRange, formatTime } from "@/lib/utils"
+import { formatDateRange, formatTime, generateSlug } from "../../lib/utils"
 import React from "react"
+import { useNavigate } from "react-router-dom"
 const EventCard = ({ event }) => {
     // console.log("event",event)
+     const navigate = useNavigate()
+    const handleClick = () => {
+     navigate(`/events/${event._id}/${generateSlug(event.title)}`)
+    }
   return (
-    <div className="min-w-[300px] max-w-[300px] bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group">
+    <div onClick={handleClick} className="min-w-[300px] max-w-[300px] bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group">
       {/* Image Section */}
       <div className="relative h-[420px] overflow-hidden">
         <img

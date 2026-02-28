@@ -1,5 +1,7 @@
+const normalizeCityKeyword = require("../helpers/normalizeCityKeyword.js");
 const Event = require("../models/eventmodel.js");
 const Restaurant = require("../models/restaurantmodel.js");
+const cityClusters = require("../utils/cityCluster.js");
 const Response = require("../utils/responsehandler.js");
 const moment = require("moment-timezone")
 
@@ -10,17 +12,22 @@ const Search = async (req, res) => {
     if (!type || !city) {
       return Response(res, 400, "Type and city is Required");
     }
+    const normalizedCity = normalizeCityKeyword(city)
+    const cluster = cityClusters[normalizedCity] || [normalizedCity]
+    // safer version
+    const escapeRegex = (text) =>text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    const cityRegexArray = cluster.map(c => new RegExp(`^${escapeRegex(c)}$`, "i"))
     const isTrending = !query; // if no query show trending
     const today = moment().tz("Asia/Kolkata").startOf("day").toDate();
     // event
     if (type === "event") {
       const filter = {
         eventIsActive: true,
-         $or: [
+        $or: [
         { endDate: { $ne: null, $gte: today } },
         { endDate: null, startDate: { $gte: today } }
           ],
-        city: { $regex: new RegExp(city, "i") },
+        city: {$in:cityRegexArray},
       };
       if (!isTrending) {
         filter.title = { $regex: new RegExp(query, "i") };
@@ -54,17 +61,17 @@ const Search = async (req, res) => {
           .limit(20)
           .select("title city coverimage startDate ticketsSold");
       }
-      return Response(res, 200, "Events found", events);
+      const formattedEvents = events.map((event) => ({
+        ...(event.toObject ? event.toObject() : event),
+        type: "event",
+      }));
+      return Response(res, 200, "Events found", formattedEvents);
     }
     // dining
     if (type === "dining") {
       const filter = {
       isActive: true,
-      $or: [
-    { endDate: { $ne: null, $gte: today } },
-    { endDate: null, startDate: { $gte: today } }
-   ],
-        city: { $regex: new RegExp(city, "i") },
+        city: {$in:cityRegexArray},
       };
 
       if (!isTrending) {
@@ -72,13 +79,17 @@ const Search = async (req, res) => {
       }
       const restaurants = await Restaurant.find(filter)
         .limit(20)
-        .select("name images")
+        .select("name images city")
         .slice("images", 1)
         .sort(isTrending ? { createdAt: -1 } : {});
       if (restaurants.length === 0) {
         return Response(res, 200, "No Restaurants found in Your location", []);
       }
-      return Response(res, 200, "Restaurant found", restaurants);
+      const formattedRestaurants = restaurants.map((res) => ({
+        ...(res.toObject ? res.toObject() : res),
+        type: "dining",
+      }));
+      return Response(res, 200, "Restaurant found", formattedRestaurants);
     }
     if (type === "all") {
       const eventFilter = {
@@ -87,11 +98,11 @@ const Search = async (req, res) => {
         { endDate: { $ne: null, $gte: today } },
         { endDate: null, startDate: { $gte: today } }
      ],
-        city: { $regex: new RegExp(city, "i") },
+        city: {$in:cityRegexArray},
       };
       const restaurantFilter = {
         isActive: true,
-        city: { $regex: new RegExp(city, "i") },
+        city: {$in:cityRegexArray},
       };
       if (!isTrending) {
         eventFilter.title = { $regex: new RegExp(query, "i") };
@@ -127,7 +138,7 @@ const Search = async (req, res) => {
               .sort({ startDate: 1 }),
         Restaurant.find(restaurantFilter)
           .limit(15)
-          .select("name images")
+          .select("name city images")
           .slice("images", 1)
           .sort(isTrending ? { createdAt: -1 } : {}),
       ]);
@@ -140,9 +151,8 @@ const Search = async (req, res) => {
         ...(res.toObject ? res.toObject() : res),
         type: "restaurant",
       }));
-      return Response(res, 200, "Results found", {
-        results: [...formattedEvents, ...formattedRestaurants],
-      });
+      const combinedResults = [...formattedEvents,...formattedRestaurants]
+      return Response(res, 200, "Results found", combinedResults)
     }
     return Response(res, 400, "No Results found");
   } catch (error) {
