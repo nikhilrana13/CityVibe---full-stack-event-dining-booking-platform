@@ -1,4 +1,6 @@
+const normalizeCityKeyword = require("../helpers/normalizeCityKeyword.js");
 const Event = require("../models/eventmodel.js");
+const cityClusters = require("../utils/cityCluster.js");
 const Response = require("../utils/responsehandler.js");
 const moment = require("moment-timezone")
 
@@ -8,6 +10,11 @@ const Home = async (req, res) => {
     if (!city) {
       return Response(res, 400, "City is required");
     }
+    const normalizedCity = normalizeCityKeyword(city)
+    const cluster = cityClusters[normalizedCity] || [normalizedCity]
+    // safer version
+    const escapeRegex = (text) =>text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    const cityRegexArray = cluster.map(c => new RegExp(`^${escapeRegex(c)}$`, "i"))
     const todaydate = moment().tz("Asia/Kolkata").startOf("day").toDate()
     const cityFilter = {
       eventIsActive: true,
@@ -15,7 +22,7 @@ const Home = async (req, res) => {
         { endDate: { $ne: null, $gte: todaydate } },
         { endDate: null, startDate: { $gte: todaydate } }
           ],
-      city: { $regex: new RegExp(city, "i") },
+      city: { $in:cityRegexArray},
     };
     // trending
     const trending = await Event.aggregate([
