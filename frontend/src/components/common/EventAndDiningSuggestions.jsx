@@ -35,7 +35,7 @@ const EventAndDiningSuggestions = ({ onClose }) => {
                     {/* location input */}
                         <div className='flex-shrink-0 space-y-5'>
                         {/* search input */}
-                        <input value={query} onChange={(e) => setQuery(e.target.value)} type="text" placeholder="Search for Events,dining" className="w-full px-4 border rounded-xl py-2  outline-none focus:ring-2 placeholder:text-[0.9rem] focus:ring-purple-500" />
+                        <input value={query} onChange={(e) => setQuery(e.target.value)} type="text" placeholder="Search for Events and restaurants" className="w-full px-4 border rounded-xl py-2  outline-none focus:ring-2 placeholder:text-[0.9rem] focus:ring-purple-500" />
                         {/* tabs */}
                         <div className='flex items-center space-x-4 md:space-x-8 overflow-y-auto'>
                             <span onClick={() => setType("all")} className={`font-[500] cursor-pointer text-sm  rounded-[18px] px-8 py-2 ${type === "all" ? "bg-[#775CFF] text-white" : "text-black"}`}>All</span>

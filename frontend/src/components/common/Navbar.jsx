@@ -43,7 +43,7 @@ if (loading) return null
 
   return (
     <>
-      <header className='flex  bg-white w-full transition-all py-3 duration-300 ease-in-out px-2 sm:px-4 items-center z-[30] sticky top-0 left-0 right-0  opacity-100  translate-y-0 min-h-[75px]'>
+      <header className='flex border bg-white w-full transition-all py-3 duration-300 ease-in-out px-2 sm:px-4 items-center z-[30] sticky top-0 left-0 right-0  opacity-100  translate-y-0 min-h-[75px]'>
         <nav className="flex  gap-3  flex-col  w-full">
           <div className='flex items-center justify-between w-full'>
             {/* left side*/}
