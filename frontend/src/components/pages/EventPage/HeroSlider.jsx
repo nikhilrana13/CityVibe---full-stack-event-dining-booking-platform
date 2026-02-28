@@ -6,8 +6,10 @@ import slugify from "slugify"
 
 const HeroSlider = ({ events = []}) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: "start"
+    loop: false,
+    align: "start",
+    skipSnaps:false,
+    dragFree:false
   })
 
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -35,11 +37,13 @@ const HeroSlider = ({ events = []}) => {
   // Auto slide
   useEffect(() => {
     if (!emblaApi) return
-
     const autoplay = setInterval(() => {
+    if (emblaApi.canScrollNext()) {
       emblaApi.scrollNext()
-    }, 4000)
-
+    } else {
+      emblaApi.scrollTo(0) // jump to first smoothly
+    }
+  }, 4000)
     return () => clearInterval(autoplay)
   }, [emblaApi])
 
@@ -48,12 +52,12 @@ const HeroSlider = ({ events = []}) => {
     <div className="relative w-full overflow-hidden">
     <div className="overflow-hidden" ref={emblaRef}>
       <div className="flex">
-        {events.map((event) => (
-          <div key={event._id} className="min-w-full transition-all duration-700 ease-out relative">
+        {events.map((event,index) => (
+          <div key={`${event._id}-${index}`} className="min-w-full  transition-all duration-700 ease-out relative">
             {/* for mobile*/}
             <div className="md:hidden relative h-[75vh] flex items-end px-5 pb-10">
               {/* Background Image */}
-              <img src={event?.coverimage} alt={event?.title} className="absolute inset-0 w-full h-full object-cover"/>
+              <img src={event?.coverimage} loading={index === 0 ? "eager" : "lazy"} decoding="async" alt={event?.title} className="absolute inset-0 w-full h-full object-cover"/>
               {/* Dark Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/20" />
               {/* Content */}
@@ -90,7 +94,7 @@ const HeroSlider = ({ events = []}) => {
 
               {/* Background Blur */}
               <div
-                className="absolute inset-0 bg-cover bg-center blur-3xl scale-110 opacity-30"
+                className="absolute inset-0 bg-cover bg-center blur-3xl scale-110 opacity-30 bg-gradient-to-t from-black/90 via-black/60 to-black/20"
                 style={{ backgroundImage: `url(${event?.coverimage})` }}
               />
 
