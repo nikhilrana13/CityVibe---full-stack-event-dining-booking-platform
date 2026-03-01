@@ -26,6 +26,7 @@ const Navbar = () => {
   const shouldfetch = user?.hasOrganizerAccount === true
   const { organizer, loading } = useFetchOrganizer(shouldfetch)
   const {location} = useLocationContext()
+  const routelocation = useLocation()
   //  console.log("select city",location)
   // console.log("response",organizer)
   // lock scroll on sidebar open
@@ -39,6 +40,7 @@ const Navbar = () => {
     document.body.style.overflow = "auto"
   }
 }, [isSidebarOpen,isLocationOpen,isEventAndDiningOpen])
+const showNavTabs = routelocation?.pathname === "/" || routelocation?.pathname.startsWith("/events") || routelocation?.pathname.startsWith("/dining")
 if (loading) return null
 
   return (
@@ -67,12 +69,15 @@ if (loading) return null
                 </div>
               </div>
               {/* links */}
-              <ul className='lg:flex hidden ml-7 p-2 gap-8 items-center '>
+              {showNavTabs&& (
+                 <ul className='lg:flex hidden ml-7 p-2 gap-8 items-center '>
                 <NavLink to="/" className={({ isActive }) => `${isActive ? "rounded-full bg-[#EAE5FF] text-[#231268]" : "text-[#545459]"} md:px-3 py-2 text-[0.9rem] font-[500] `}>
                   For you</NavLink>
                 <NavLink to="/dining" className={({ isActive }) => `${isActive ? "rounded-full bg-[#FFEBEF] text-[#F53F6F]" : "text-[#545459]"} md:px-3 py-2 text-[0.9rem] font-[500] `}>Dining</NavLink>
                 <NavLink to="/events" className={({ isActive }) => `${isActive ? "rounded-full bg-[#F9F4DC] text-[#585004]" : "text-[#545459]"} md:px-3 py-2 text-[0.9rem] font-[500] `}>Events</NavLink>
               </ul>
+              )}
+             
             </div>
             {/* right side */}
             <div className='flex items-center gap-5'>

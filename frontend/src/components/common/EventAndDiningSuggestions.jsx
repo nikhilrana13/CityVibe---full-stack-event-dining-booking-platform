@@ -14,7 +14,6 @@ const EventAndDiningSuggestions = ({ onClose }) => {
     }, [])
     const handleClose = () => {
         setQuery("")
-        setType("all")
         setIsVisible(false)
         setTimeout(() => {
             onClose()
@@ -26,7 +25,7 @@ const EventAndDiningSuggestions = ({ onClose }) => {
             <div className="fixed inset-0 z-50  flex items-center justify-center overflow-y-auto ">
                 {/* BACKDROP */}
                 <div
-                    className={`fixed inset-0 bg-black/40 backdrop-blur-xl transition-opacity duration-500 ease-out backdrop-saturate-150 ${isVisible ? "opacity-100" : "opacity-0"} `}
+                    className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-500 ease-out backdrop-saturate-150 ${isVisible ? "opacity-100" : "opacity-0"} `}
                     onClick={handleClose}
                 />
                 {/* dialog */}

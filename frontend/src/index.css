@@ -109,6 +109,22 @@ body{
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #b2b8d4;
 }
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #e5e7eb 25%,
+    #f3f4f6 37%,
+    #e5e7eb 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite linear;
+}
 @keyframes float {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-25px); }

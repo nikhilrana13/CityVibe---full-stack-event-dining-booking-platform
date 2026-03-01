@@ -20,6 +20,7 @@ import VerifyTickets from "./components/organizerdashboard/VerifyTickets/VerifyT
 import Settings from "./components/organizerdashboard/Settings/Settings"
 import EventDetailsPage from "./pages/EventDetailsPage"
 import RestaurantDetailsPage from "./pages/RestaurantDetailsPage"
+import CategoryDetailPage from "./pages/CategoryDetailPage"
 
 const App = () => {
   return (
@@ -28,8 +29,11 @@ const App = () => {
         <Route path="/" element={<Homepage />} />
         <Route path="/dining" element={<Diningpage />} />
         <Route path="/events" element={<Eventspage />} />
+
         <Route path="/events/:id/:slug" element={<EventDetailsPage />} />
+         <Route path="/events/category/:category" element={<CategoryDetailPage />} />
         <Route path="/dining/:city/:id/:slug" element={<RestaurantDetailsPage />} />
+
         {/* for organizers */}
         <Route path="/events/list-your-events" element={<ListYourEvents />} />
         {/* onboarding flow */}

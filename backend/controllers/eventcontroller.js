@@ -6,6 +6,8 @@ const Ticket = require("../models/ticketmodel.js");
 const Response = require("../utils/responsehandler.js");
 const Eventbooking = require("../models/bookings/eventbookingmodel.js");
 const moment = require("moment-timezone");
+const normalizeCityKeyword = require("../helpers/normalizeCityKeyword.js");
+const cityClusters = require("../utils/cityCluster.js");
 
 // create event
 const CreateEvent = async (req, res) => {
@@ -277,7 +279,7 @@ const GetAllEvents = async (req, res) => {
     let {
       page = 1,
       limit = 6,
-      city,
+      city = "delhi",
       category,
       startDate,
       sortby,
@@ -305,8 +307,13 @@ const GetAllEvents = async (req, res) => {
       }));
     }
     // city filter
+    const normalizedCity = normalizeCityKeyword(city)
+    const cluster = cityClusters[normalizedCity] || [normalizedCity]
+        // safer version
+    const escapeRegex = (text) =>text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    const cityRegexArray = cluster.map(c => new RegExp(`^${escapeRegex(c)}$`, "i"))
     if (city) {
-      filter.city = { $regex: new RegExp(city, "i") };
+      filter.city = { $in:cityRegexArray};
     }
     // date filter
     if (startDate) {

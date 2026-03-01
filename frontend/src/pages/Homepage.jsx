@@ -10,7 +10,7 @@ import ComedySection from '../components/pages/Homepage/ComedySection'
 import { useLocationContext } from '../context/useLocationContext'
 
 const Homepage = () => {
-  const [loading, setloading] = useState(false)
+  const [loading, setloading] = useState(true)
   const [trending, setTrending] = useState([])
   const [music, setMusic] = useState([])
   const [thisweek, setThisweek] = useState([])

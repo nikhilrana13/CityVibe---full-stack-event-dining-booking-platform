@@ -49,11 +49,11 @@ const HeroSlider = ({ events = []}) => {
 
   if (!events.length) return null
   return (
-    <div className="relative w-full overflow-hidden">
-    <div className="overflow-hidden" ref={emblaRef}>
+    <div className="relative w-full">
+      <div className="overflow-hidden" ref={emblaRef}>
       <div className="flex">
         {events.map((event,index) => (
-          <div key={`${event._id}-${index}`} className="min-w-full  transition-all duration-700 ease-out relative">
+          <div key={`${event?._id}-${index}`} className="min-w-full transition-all md:py-10 duration-700 ease-out relative">
             {/* for mobile*/}
             <div className="md:hidden relative h-[75vh] flex items-end px-5 pb-10">
               {/* Background Image */}
@@ -90,8 +90,7 @@ const HeroSlider = ({ events = []}) => {
               </div>
             </div>
             {/* for desktop */}
-            <div className="hidden  md:flex relative h-[80vh] items-center justify-between px-32">
-
+            <div className="hidden  md:flex relative h-[80vh] mx-auto max-w-[1200px] px-5 items-center justify-between ">
               {/* Background Blur */}
               <div
                 className="absolute inset-0 bg-cover bg-center blur-3xl scale-110 opacity-30 bg-gradient-to-t from-black/90 via-black/60 to-black/20"
@@ -132,7 +131,7 @@ const HeroSlider = ({ events = []}) => {
               </div>
 
               {/* Right Image Card */}
-              <div className="relative z-10 w-[320px] h-[450px] rounded-3xl overflow-hidden shadow-2xl">
+              <div className="relative z-10 w-[320px] h-[400px]  rounded-3xl overflow-hidden shadow-2xl">
                 <img
                   src={event?.coverimage}
                   alt={event?.title}
@@ -144,23 +143,8 @@ const HeroSlider = ({ events = []}) => {
           </div>
         ))}
       </div>
-    </div>
-    {/* Arrows */}
-      <button
-        onClick={scrollPrev}
-        className="absolute hidden md:block left-8 top-1/2 -translate-y-1/2  p-3 "
-      >
-         <ChevronLeft size={28} />
-       </button>
-
-       <button
-         onClick={scrollNext}
-        className="absolute hidden md:block right-8 top-1/2 -translate-y-1/2 p-3 "
-      >
-        <ChevronRight size={28} />
-       </button>
     {/*dots*/}
-    <div className="absolute bottom-6 md:pb-10 w-full flex justify-center gap-3">
+    <div className="absolute bottom-6  w-full flex justify-center gap-3">
       {events.map((_, index) => (
         <div
           key={index}
@@ -172,7 +156,27 @@ const HeroSlider = ({ events = []}) => {
         />
       ))}
     </div>
-  </div>
+      </div>
+      {/* arrow buttons */}
+     <div className="hidden min-[1400px]:block absolute inset-0 pointer-events-none">
+    <div className="max-w-[1200px] mx-auto w-full h-full px-6 relative ">
+      <button
+        onClick={scrollPrev}
+        className="absolute left-[-50px]  top-1/2 -translate-y-1/2 pointer-events-auto"
+      >
+        <ChevronLeft size={28} />
+      </button>
+
+      <button
+        onClick={scrollNext}
+        className="absolute right-[-50px]  top-1/2 -translate-y-1/2 pointer-events-auto"
+      >
+        <ChevronRight size={28} />
+      </button>
+
+    </div>
+    </div>
+    </div>
   )
 }
 
