@@ -86,7 +86,6 @@ const Eventspage = () => {
   return (
     <div className='w-full'>
       <Navbar />
-      {/* hero section slider */}
       <section className='bg-gradient-to-b from-[#F9F4DC] via-[#FDFBF2] to-white w-full'>
         {
           loading ? (
