@@ -16,7 +16,7 @@ const CategoriesSection = () => {
     const navigate = useNavigate()
 
     return (
-        <div className='px-4  py-4 w-full mx-auto max-w-[1200px]'>
+        <div className='px-4  py-4 w-full mx-auto max-w-[1300px]'>
             <h3 className='text-[1.8rem] font-[500] mb-6'>Explore Events</h3>
             {/* categories grid */}
             <div className="grid gap-8 grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">

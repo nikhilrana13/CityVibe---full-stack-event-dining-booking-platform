@@ -1,15 +1,14 @@
-import { useLocation } from 'react-router-dom';
-import EventCard from '../../../components/common/EventCard';
-import React from 'react';
+import EventCard from '@/components/common/EventCard';
 import { Loader2 } from 'lucide-react';
+import React from 'react';
 
-const AllEventsSection = ({ isFetchingMore, pagination, allevents, location, loaderRef,category}) => {
+const MainAllEventsSections = ({allevents,pagination,isFetchingMore,loaderRef}) => {
     if (!allevents) return null
-    return (
-        <div className='mx-auto px-4 gap-4 py-4 max-w-[1300px]'>
-            <h3 className='text-[1.5rem] font-[500] mb-6'>All {category || ""} Events in {location?.city || "..."}</h3>
+  return (
+     <div className='mx-auto px-4 gap-4 py-4  max-w-[1300px]'>
+            <h3 className='text-[1.5rem] font-[500] mb-6'>All Events</h3>
             {/* events card */}
-            <div className="grid  grid-cols-1 md:place-items-center xl:place-items-start sm:grid-cols-2 lg:grid-cols-3  xl:grid-cols-4 gap-2">
+            <div className="grid grid-cols-1 md:place-items-center xl:place-items-start sm:grid-cols-2 lg:grid-cols-3  xl:grid-cols-4 gap-2">
                 {
                     allevents?.length > 0 ? (
                         allevents.map((event) => (
@@ -36,7 +35,7 @@ const AllEventsSection = ({ isFetchingMore, pagination, allevents, location, loa
                 </div>
             )}
         </div>
-    );
+  );
 }
 
-export default AllEventsSection;
+export default MainAllEventsSections;

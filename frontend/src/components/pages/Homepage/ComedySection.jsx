@@ -4,7 +4,7 @@ import React from 'react'
 
 const ComedySection = ({comedy,loading}) => {
   return (
-   <div className='mx-auto px-4 gap-4 py-4  max-w-[1200px]'>
+   <div className='mx-auto px-4 gap-4 py-4  max-w-[1300px]'>
         <h3 className='text-[1.5rem] font-[500] mb-6'>Best in Comedy</h3>
         {/* events card */}
         <div className='flex gap-6 overflow-x-auto scrollbar-hide'>

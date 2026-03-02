@@ -16,7 +16,7 @@ const HeroSliderShimmer = () => {
         </div>
       </div>
       {/* DESKTOP SHIMMER */}
-      <div className="hidden md:flex relative h-[80vh] items-center">
+      <div className="hidden md:flex relative h-[100vh] items-center">
         {/* Background blur placeholder */}
         <div className="absolute inset-0 bg-gray-200 animate-pulse" />
         {/* Centered content wrapper  */}

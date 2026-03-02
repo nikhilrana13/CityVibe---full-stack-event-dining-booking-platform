@@ -8,7 +8,7 @@ const EventCard = ({ event }) => {
      navigate(`/events/${event._id}/${generateSlug(event.title)}`)
     }
   return (
-    <div onClick={handleClick} className="min-w-[300px] max-w-[300px] bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group">
+    <div onClick={handleClick} className="min-w-[300px] max-w-[300px] mx-auto sm:m-0  bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group">
       {/* Image Section */}
       <div className="relative h-[420px] overflow-hidden">
         <img

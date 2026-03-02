@@ -106,7 +106,7 @@ if (loading) return null
               <span className='text-gray-500 whitespace-wrap overflow-hidden text-ellipsis text-[0.8rem] sm:text-[1rem]'>Search for events and restaurants</span>
             </div>
             {/* links */}
-            <ul className='flex w-full mt-1 pb-3 overflow-y-auto gap-2 sm:gap-8 justify-between  lg:hidden   items-center '>
+            <ul className='flex w-full mt-1 pb-3  overflow-y-auto gap-2 sm:gap-8 justify-between  lg:hidden items-center '>
               <NavLink to="/" className={({ isActive }) => `${isActive ? "rounded-md sm:rounded-full bg-[#EAE5FF] text-[#231268]" : "text-[#545459]"} flex-1 px-4 md:px-3  whitespace-nowrap py-2 flex  flex-col items-center text-[0.9rem] font-[500] `}>
                 <FaWandMagicSparkles size={23} className='block sm:hidden' />
                 For you</NavLink>
