@@ -36,7 +36,6 @@ const CategoryDetailPage = () => {
                         page: page,
                         city: location?.city,
                         category: category,
-                        limit: 3
                     }
                 })
                 await delay(1200) // for fake delay testing

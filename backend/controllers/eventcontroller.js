@@ -278,7 +278,7 @@ const GetAllEvents = async (req, res) => {
   try {
     let {
       page = 1,
-      limit = 3,
+      limit = 4,
       city = "delhi",
       category,
       startDate,

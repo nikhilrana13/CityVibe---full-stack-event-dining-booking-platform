@@ -4,30 +4,28 @@ import HeroSlider from '../components/pages/EventPage/HeroSlider'
 import axios from 'axios'
 import { useLocationContext } from '../context/useLocationContext'
 import HeroSliderShimmer from '../components/pages/EventPage/HeroSliderShimmer'
-import HeroFallback from '../components/pages/EventPage/HeroSliderFallback'
-import CategoriesSection from '@/components/pages/EventPage/CategoriesSection'
-import AllEventsSection from '@/components/pages/EventPage/AllEventsSection'
-import MainAllEventsSections from '@/components/pages/EventPage/MainAllEventsSections'
-import EventEmptyState from '@/components/pages/EventPage/EventEmptyState'
+import CategoriesSection from '../components/pages/EventPage/CategoriesSection'
+import MainAllEventsSections from '../components/pages/EventPage/MainAllEventsSections'
+import EventEmptyState from '../components/pages/EventPage/EventEmptyState'
 
 const Eventspage = () => {
-  const [loading, setloading] = useState(true)
   const [allevents, setAllEvents] = useState([])
-  const [initialLoading, setInitialLoading] = useState(true)
-  const [isFetchingMore, setIsFetchingMore] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)  // Controls full-page shimmer on first load
+  const [isFetchingMore, setIsFetchingMore] = useState(false) // Controls bottom loader for infinite scroll
   const loaderRef = useRef(null)
   const [page, setPage] = useState(1)
   const [pagination, setPagination] = useState({})
   const [trending, setTrending] = useState([])
   const [indiaTopEvents, setIndiaTopEvents] = useState([])
   const { location } = useLocationContext()
-  // console.log("select city",location)
-  // fetch trending events
+  const [sortBy,setSortBy] = useState("")
+  const [startDate,setStartDate] = useState("")
+  const [isBaseEmpty,setIsBaseEmpty] = useState(false) // Detects if city has absolutely no events (no filters applied)
+  // fetch trending and india top events
   useEffect(() => {
     if (!location?.city) return
     const fetchHomeData = async () => {
       try {
-        setloading(true)
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/home`, {
           params: {
             city: location?.city
@@ -40,17 +38,16 @@ const Eventspage = () => {
         }
       } catch (error) {
         console.error("failed to fetch home data", error)
-      } finally {
-        setloading(false)
       }
     }
     fetchHomeData()
   }, [location?.city])
-  // fetch all events 
+  // fetch all events (Pagination + Filters)
   useEffect(() => {
     if (!location?.city) return
     const fetchAllevents = async () => {
       try {
+        // Show full shimmer only for first page
         if (page === 1) {
           setInitialLoading(true)
         } else {
@@ -61,12 +58,19 @@ const Eventspage = () => {
           params: {
             page: page,
             city: location?.city,
+            sortby:sortBy,
+            startDate:startDate
           }
         })
         await delay(1200) // for fake delay testing
         if (response.data) {
           const newEvents = response?.data?.data?.events || []
           const newPagination = response?.data?.data?.pagination || {}
+          // detect base empty (no filters applied)
+          if(!sortBy && !startDate && page === 1){
+            setIsBaseEmpty(newEvents.length === 0)
+          }
+           // Replace on first page, append on next pages
           setAllEvents(prev => page === 1 ? newEvents : [...prev, ...newEvents])
           setPagination(newPagination)
         }
@@ -78,15 +82,15 @@ const Eventspage = () => {
       }
     }
     fetchAllevents()
-  }, [location?.city, page])
-  //  redirect to page 1
+  }, [location?.city, page,sortBy,startDate])
+  // Reset Pagination When city or filters change,start again from page 1
   useEffect(() => {
     setAllEvents([])
     setPage(1)
-  }, [location?.city])
-  // infinite scroll observer block
+  }, [location?.city,sortBy,startDate])
+  // Infinite Scroll Observer Loads next page when bottom loader comes into viewport
   useEffect(() => {
-    const hasNextPage = pagination.currentPage < pagination?.totalPages
+    const hasNextPage = pagination?.currentPage && pagination?.totalPages && pagination.currentPage < pagination.totalPages
     if (!hasNextPage || isFetchingMore) return
     const observer = new IntersectionObserver(
       entries => {
@@ -103,7 +107,7 @@ const Eventspage = () => {
       observer.disconnect()
     }
   }, [pagination?.currentPage, pagination?.totalPages, isFetchingMore])
-  // scroll to top on city change
+  //  Scroll to Top on City Change
   useEffect(() => {
     if (location?.city) {
       window.scrollTo({
@@ -112,7 +116,7 @@ const Eventspage = () => {
       })
     }
   }, [location?.city])
-  const isEmpty = !initialLoading && Array.isArray(allevents) && allevents.length === 0
+  // combine hero events
   const heroEvents = [...(trending || []), ...(indiaTopEvents || [])].slice(0, 6)
   // console.log("hero events",heroEvents)
   return (
@@ -120,8 +124,8 @@ const Eventspage = () => {
       <Navbar />
       {
         initialLoading ? (
-          <HeroSliderShimmer />
-        ) : isEmpty ? (
+          <HeroSliderShimmer /> //  Show shimmer while first page loading
+        ) : isBaseEmpty ? ( //  Show full empty state only if city has no events
           <EventEmptyState
             title={`No events in ${location?.city}`}
             description={"We couldn’t find any upcoming events in your city right now. Try changing your city or explore other experiences."}
@@ -142,7 +146,7 @@ const Eventspage = () => {
             </section>
             {/* all events section */}
             <section className='w-full  py-8'>
-              <MainAllEventsSections isFetchingMore={isFetchingMore} pagination={pagination} allevents={allevents} loaderRef={loaderRef} />
+              <MainAllEventsSections sortBy={sortBy} setSortBy={setSortBy} isFetchingMore={isFetchingMore} pagination={pagination} allevents={allevents} loaderRef={loaderRef} startDate={startDate} setStartDate={setStartDate} />
             </section>
           </>
         )
