@@ -32,9 +32,7 @@ const EventDetailsPage = () => {
             setNotfound(true)
             console.error("failed to get event details",error)
           }finally{
-            setTimeout(() => {
-              setLoading(false) // for testing
-            }, 5000); 
+           setLoading(false)
           }
         }
         fetchEventDetails()

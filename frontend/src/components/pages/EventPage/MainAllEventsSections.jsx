@@ -29,7 +29,7 @@ const MainAllEventsSections = ({ allevents, pagination, isFetchingMore, loaderRe
             <div className='mx-auto px-4 gap-4 py-2  max-w-[1300px]'>
                 <h3 className='text-[1.5rem] font-[500] mb-6'>All Events</h3>
                 {/* filter section */}
-                <div className='flex sticky top-[211px] sm:top-[192px] lg:top-[75px] z-40 bg-white   items-center  gap-5'>
+                <div className='flex sticky top-[211px] sm:top-[192px] lg:top-[75px] z-40 bg-[#FFFFFF]   items-center  gap-5'>
                 <div className='flex py-4 items-center overflow-y-auto my-2 gap-5'>
                  <span onClick={() => setOpenFilter(true)} className={`border px-3 cursor-pointer flex gap-2 items-center py-1 text-[0.8rem] rounded-md ${sortBy ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>
                         Filters <MdKeyboardArrowDown /></span>
@@ -38,7 +38,6 @@ const MainAllEventsSections = ({ allevents, pagination, isFetchingMore, loaderRe
                     <span onClick={() => handleDateFilter("ThisWeek")} className={`border whitespace-nowrap px-3 cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "ThisWeek" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>This Week</span>
                     <span onClick={() => handleDateFilter("ThisMonth")} className={`border whitespace-nowrap px-3 cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "ThisMonth" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>This Month</span>
                 </div>
-
                 </div>
                 {/* events card */}
                 <div className="grid mt-3  grid-cols-1 md:place-items-center xl:place-items-start sm:grid-cols-2 lg:grid-cols-3  xl:grid-cols-4 gap-2">

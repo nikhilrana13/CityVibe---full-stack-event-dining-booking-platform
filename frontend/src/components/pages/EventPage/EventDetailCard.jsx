@@ -1,10 +1,15 @@
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/button';
-import { formatDateRange, formatDuration, formatIndianNumber, formatTime } from '../../../lib/utils';
+import { formatDateRange, formatDuration, formatIndianNumber, formatTime, generateSlug } from '../../../lib/utils';
 import { Calendar1Icon, Clock, Languages, MapPin, Ticket } from 'lucide-react';
 import React from 'react';
 
 const EventDetailCard = ({event}) => {
     // console.log("event",event)
+    const navigate = useNavigate()
+    const handleClick = ()=>{
+        navigate(`/events/${event?._id}/${generateSlug(event?.title)}/book`)
+    }
     return (
         <> 
             <div className='space-y-8 pb-15 lg:pb-0'>
@@ -69,7 +74,7 @@ const EventDetailCard = ({event}) => {
                                 <div className='flex flex-col'>
                                     <span className='font-[500]'>₹{formatIndianNumber(event?.minPrice)} <span className='text-[0.8rem] text-gray-400'>onwards</span></span>
                                 </div>
-                                <Button className="rounded-xl px-5 py-6">Book Tickets</Button>
+                                <Button onClick={handleClick} className="rounded-xl px-5 py-6">Book Tickets</Button>
                             </div>
 
                         </div>
@@ -134,7 +139,7 @@ const EventDetailCard = ({event}) => {
                             ₹{formatIndianNumber(event?.minPrice)} <span className="text-xs text-gray-400">onwards</span>
                         </span>
                     </div>
-                    <Button className="rounded-xl px-6 py-5">
+                    <Button onClick={handleClick} className="rounded-xl px-6 py-5">
                         Book Tickets
                     </Button>
                 </div>

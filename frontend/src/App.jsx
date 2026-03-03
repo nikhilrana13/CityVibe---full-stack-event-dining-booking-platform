@@ -21,6 +21,7 @@ import Settings from "./components/organizerdashboard/Settings/Settings"
 import EventDetailsPage from "./pages/EventDetailsPage"
 import RestaurantDetailsPage from "./pages/RestaurantDetailsPage"
 import CategoryDetailPage from "./pages/CategoryDetailPage"
+import BookEventTickets from "./components/pages/EventPage/BookEventTickets"
 
 const App = () => {
   return (
@@ -31,7 +32,8 @@ const App = () => {
         <Route path="/events" element={<Eventspage />} />
 
         <Route path="/events/:id/:slug" element={<EventDetailsPage />} />
-         <Route path="/events/category/:category" element={<CategoryDetailPage />} />
+        <Route path="/events/:id/:slug/book" element={<BookEventTickets />}/>
+        <Route path="/events/category/:category" element={<CategoryDetailPage />} />
         <Route path="/dining/:city/:id/:slug" element={<RestaurantDetailsPage />} />
 
         {/* for organizers */}

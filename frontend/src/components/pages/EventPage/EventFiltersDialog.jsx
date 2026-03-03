@@ -32,12 +32,12 @@ const EventFiltersDialog = ({ onClose,sortBy,setSortBy}) => {
                     onClick={handleClose}
                 />
                 {/* dialog */}
-                <div className={`relative z-[70]  max-w-2xl w-[80%] px-5 py-6 space-y-8 bg-white dark:bg-[#161a2d] rounded-2xl shadow-2xl overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${isVisible
+                <div className={`relative z-[70]  max-w-2xl w-[90%] px-5 py-6 space-y-8 bg-white dark:bg-[#161a2d] rounded-2xl shadow-2xl overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${isVisible
                     ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-4"}`}>
                     <h3 className='text-[1.2rem] font-[500]'>Filter By</h3>
                     <div className='flex w-full min-h-[60vh]'>
                         <div className='w-[20%]'>
-                            <div className='px-5 bg-gradient-to-r from-[#E1DCF8] to-[#EEECF4] py-4'>
+                            <div className='px-2 sm:px-5 bg-gradient-to-r from-[#E1DCF8] to-[#EEECF4] py-4'>
                                 <span className='text-sm font-[500]'>Sort By</span>
                             </div>
                         </div>
@@ -63,7 +63,7 @@ const EventFiltersDialog = ({ onClose,sortBy,setSortBy}) => {
                     </div>
 
                     {/* Footer Buttons */}
-                    <div className="flex justify-around items-center mt-8">
+                    <div className="flex  flex-col md:flex-row gap-4 justify-around items-center mt-8">
                         <button onClick={()=>{setSortBy(""),setTempsort("")}} className="text-[1rem] font-[400] border-b-2 border-dotted border-black">
                             Clear filters
                         </button>
