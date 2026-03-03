@@ -26,19 +26,22 @@ const MainAllEventsSections = ({ allevents, pagination, isFetchingMore, loaderRe
     }, [openFilter])
     return (
         <>
-            <div className='mx-auto px-4 gap-4 py-4  max-w-[1300px]'>
+            <div className='mx-auto px-4 gap-4 py-2  max-w-[1300px]'>
                 <h3 className='text-[1.5rem] font-[500] mb-6'>All Events</h3>
                 {/* filter section */}
-                <div className='flex my-8 items-center overflow-y-auto gap-5'>
-                    <span onClick={() => setOpenFilter(true)} className={`border px-3 cursor-pointer flex gap-2 items-center py-1 text-[0.8rem] rounded-md ${sortBy ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>
+                <div className='flex sticky top-[211px] sm:top-[192px] lg:top-[75px] z-40 bg-white   items-center  gap-5'>
+                <div className='flex py-4 items-center overflow-y-auto my-2 gap-5'>
+                 <span onClick={() => setOpenFilter(true)} className={`border px-3 cursor-pointer flex gap-2 items-center py-1 text-[0.8rem] rounded-md ${sortBy ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>
                         Filters <MdKeyboardArrowDown /></span>
                     <span onClick={() => handleDateFilter("Today")} className={`border px-3 whitespace-nowrap cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "Today" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>Today</span>
                     <span onClick={() => handleDateFilter("Tomorrow")} className={`border whitespace-nowrap px-3 cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "Tomorrow" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>Tomorrow</span>
                     <span onClick={() => handleDateFilter("ThisWeek")} className={`border whitespace-nowrap px-3 cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "ThisWeek" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>This Week</span>
                     <span onClick={() => handleDateFilter("ThisMonth")} className={`border whitespace-nowrap px-3 cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "ThisMonth" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>This Month</span>
                 </div>
+
+                </div>
                 {/* events card */}
-                <div className="grid grid-cols-1 md:place-items-center xl:place-items-start sm:grid-cols-2 lg:grid-cols-3  xl:grid-cols-4 gap-2">
+                <div className="grid mt-3  grid-cols-1 md:place-items-center xl:place-items-start sm:grid-cols-2 lg:grid-cols-3  xl:grid-cols-4 gap-2">
                     {
                         !isFetchingMore && allevents?.length === 0 ? (
                             <div className="col-span-full w-full flex flex-col items-center justify-center py-20 text-center">

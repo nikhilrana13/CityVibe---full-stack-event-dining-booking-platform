@@ -40,12 +40,11 @@ const Navbar = () => {
     document.body.style.overflow = "auto"
   }
 }, [isSidebarOpen,isLocationOpen,isEventAndDiningOpen])
-const showNavTabs = routelocation?.pathname === "/" || routelocation?.pathname.startsWith("/events") || routelocation?.pathname.startsWith("/dining")
+const showNavTabs = routelocation?.pathname === "/" || routelocation?.pathname === "/events" || routelocation?.pathname === "dining" 
 if (loading) return null
-
   return (
     <>
-      <header className='flex border bg-white w-full transition-all py-3 duration-300 ease-in-out px-2 sm:px-4 items-center z-[30] sticky top-0 left-0 right-0  opacity-100  translate-y-0 min-h-[75px]'>
+      <header className='flex border bg-white w-full transition-all py-3 duration-300 ease-in-out px-2 sm:px-4 items-center z-[42] sticky top-0 left-0 right-0  opacity-100  translate-y-0 min-h-[75px]'>
         <nav className="flex  gap-3  flex-col  w-full">
           <div className='flex items-center justify-between w-full'>
             {/* left side*/}
@@ -106,7 +105,8 @@ if (loading) return null
               <span className='text-gray-500 whitespace-wrap overflow-hidden text-ellipsis text-[0.8rem] sm:text-[1rem]'>Search for events and restaurants</span>
             </div>
             {/* links */}
-            <ul className='flex w-full mt-1 pb-3  overflow-y-auto gap-2 sm:gap-8 justify-between  lg:hidden items-center '>
+            {showNavTabs && (
+                <ul className='flex w-full mt-1 pb-3  overflow-y-auto gap-2 sm:gap-8 justify-between  lg:hidden items-center '>
               <NavLink to="/" className={({ isActive }) => `${isActive ? "rounded-md sm:rounded-full bg-[#EAE5FF] text-[#231268]" : "text-[#545459]"} flex-1 px-4 md:px-3  whitespace-nowrap py-2 flex  flex-col items-center text-[0.9rem] font-[500] `}>
                 <FaWandMagicSparkles size={23} className='block sm:hidden' />
                 For you</NavLink>
@@ -117,6 +117,8 @@ if (loading) return null
                 <LuGuitar size={23} className='block sm:hidden' />
                 Events</NavLink>
             </ul>
+            )}
+          
           </div>
         </nav>
       </header>

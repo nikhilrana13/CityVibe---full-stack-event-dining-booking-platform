@@ -122,7 +122,7 @@ const Eventspage = () => {
   return (
     <div className='w-full'>
       <Navbar />
-      {
+         {
         initialLoading ? (
           <HeroSliderShimmer /> //  Show shimmer while first page loading
         ) : isBaseEmpty ? ( //  Show full empty state only if city has no events
@@ -135,7 +135,7 @@ const Eventspage = () => {
         ) : (
           <>
             {/* hero slider */}
-            <section className='bg-gradient-to-b from-[#F9F4DC] via-[#FDFBF2] to-white w-full' >
+            <section className='bg-gradient-to-b  from-[#F9F4DC] via-[#FDFBF2] to-white w-full' >
               {heroEvents?.length > 0 && (
                 <HeroSlider events={heroEvents} />
               )}
@@ -145,14 +145,13 @@ const Eventspage = () => {
               <CategoriesSection />
             </section>
             {/* all events section */}
-            <section className='w-full  py-8'>
+            <section className='w-full py-8'>
               <MainAllEventsSections sortBy={sortBy} setSortBy={setSortBy} isFetchingMore={isFetchingMore} pagination={pagination} allevents={allevents} loaderRef={loaderRef} startDate={startDate} setStartDate={setStartDate} />
             </section>
           </>
         )
       }
-
-    </div>
+      </div>
   )
 }
 
