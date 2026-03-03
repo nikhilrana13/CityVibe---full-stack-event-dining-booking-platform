@@ -8,6 +8,7 @@ const Eventbooking = require("../models/bookings/eventbookingmodel.js");
 const moment = require("moment-timezone");
 const normalizeCityKeyword = require("../helpers/normalizeCityKeyword.js");
 const cityClusters = require("../utils/cityCluster.js");
+const mongoose = require("mongoose")
 
 // create event
 const CreateEvent = async (req, res) => {
@@ -161,11 +162,32 @@ const CreateEvent = async (req, res) => {
 const EachEventDetails = async (req, res) => {
   try {
     const eventId = req.params.id;
-    const event = await Event.findById(eventId);
-    if (!event) {
+    const event = await Event.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(eventId)
+        }
+      },
+      {
+        $lookup: {
+          from: "tickets",
+          localField: "_id",
+          foreignField: "event",
+          as: "ticket"
+        }
+      },
+      {
+        $addFields: {
+          minPrice: {
+              $ifNull: [{ $min: "$ticket.price" }, 0]
+           }
+        }
+      }
+    ]);
+    if (!event || event.length === 0) {
       return Response(res, 404, "Event not found");
     }
-    return Response(res, 200, "Event details found", { event });
+    return Response(res, 200, "Event details found", {event: event[0]});
   } catch (error) {
     console.log("failed to get event details", error);
     return Response(res, 500, "Internal server error");

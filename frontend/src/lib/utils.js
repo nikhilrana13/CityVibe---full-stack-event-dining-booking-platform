@@ -48,11 +48,45 @@ export const formatDateRange = (start, end) => {
   }
   return `${startFormatted} - ${endFormatted}`;
 };
- export const formatDuration = (minutes) => {
-    if (!minutes) return "";
-    const hrs = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return mins === 0 ? `${hrs} Hours` : `${hrs}h ${mins}m`;
+ export const formatDuration = (duration) => {
+  if (!duration) return "NA"
+
+  const value = duration.toString().toLowerCase().trim()
+  // If already contains hours → return clean capitalized version
+  if (value.includes("hour")) {
+    return value.replace(/\b\w/g, c => c.toUpperCase())
+  }
+  // If contains minutes
+  if (value.includes("min")) {
+    const minutes = parseInt(value)
+    if (isNaN(minutes)) return duration
+
+    const hours = Math.floor(minutes / 60)
+    const remainingMinutes = minutes % 60
+
+    if (hours && remainingMinutes) {
+      return `${hours}h ${remainingMinutes}m`
+    }
+    if (hours) {
+      return `${hours}h`
+    }
+    return `${remainingMinutes}m`
+  }
+  // If just number (like 180)
+  const numeric = parseInt(value)
+  if (!isNaN(numeric)) {
+    const hours = Math.floor(numeric / 60)
+    const remainingMinutes = numeric % 60
+
+    if (hours && remainingMinutes) {
+      return `${hours}h ${remainingMinutes}m`
+    }
+    if (hours) {
+      return `${hours}h`
+    }
+    return `${remainingMinutes}m`
+  }
+  return duration
   };
   /**
    * Convert a 24‑hour time string ("HH:mm" or "HH:mm:ss") to 12‑hour with am/pm
