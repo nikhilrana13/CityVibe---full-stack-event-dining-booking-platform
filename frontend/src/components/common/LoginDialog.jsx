@@ -9,9 +9,10 @@ import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { Setuser } from '../../redux/AuthSlice'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useDialog } from '../../context/useDialog'
 
 const LoginDialog = () => {
-    const [open, setOpen] = useState(false)
+    const {isLoginOpen,setIsLoginOpen} = useDialog()
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
@@ -62,30 +63,30 @@ const LoginDialog = () => {
         }
     }
     const handleClose = () => {
-        setOpen(false);
+        setIsLoginOpen(false);
     };
     return (
         <>
             {
                 location.pathname === "/events/list-your-events" ? (
-                    <button onClick={() => setOpen(true)} className="mt-10 px-10 py-4 rounded-2xl  text-white font-semibold text-lg bg-gradient-to-r  from-[#6a4dff] to-[#8b5cf6] hover:scale-105  hover:shadow-purple-500/50 transition-all duration-300 shadow-lg 
+                    <button onClick={() => setIsLoginOpen(true)} className="mt-10 px-10 py-4 rounded-2xl  text-white font-semibold text-lg bg-gradient-to-r  from-[#6a4dff] to-[#8b5cf6] hover:scale-105  hover:shadow-purple-500/50 transition-all duration-300 shadow-lg 
                  shadow-purple-600/30">
                         Get started
                     </button>
                 ) : (
-                    <button onClick={() => setOpen(true)} className='rounded-full cursor-pointer p-2 bg-[#D1D5DB]'>
+                    <button onClick={() => setIsLoginOpen(true)} className='rounded-full cursor-pointer p-2 bg-[#D1D5DB]'>
                         <CiUser size={25} className='text-white' />
                     </button>
                 )
             }
             {/* model */}
             {
-                open && (
+                isLoginOpen && (
                     <div className='fixed top-0 left-0 z-[100000] px-3  flex w-screen h-screen justify-center  items-center'>
                         {/* backdrop */}
                         <div className='absolute inset-0 bg-gray-900/60 backdrop-blur-sm' onClick={() => handleClose()} />
                         {/* content */}
-                        <div className={`w-full relative overflow-hidden transform transition-all duration-300 max-w-lg rounded-xl shadow-md bg-white ${open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-0 translaye-y-4"}`}>
+                        <div className={`w-full relative overflow-hidden transform transition-all duration-300 max-w-lg rounded-xl shadow-md bg-white ${isLoginOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-0 translaye-y-4"}`}>
                             <div className='flex flex-col'>
                                 {/* image */}
                                 <div className='w-full hidden lg:flex h-[250px] bg-cover bg-top relative  justify-center items-center ' style={{ backgroundImage: `url(${loginbg})` }}>
@@ -104,7 +105,7 @@ const LoginDialog = () => {
                                 {/* form */}
                                 <div className='relative flex flex-col px-3  py-4 gap-3'>
                                     <div className='flex lg:hidden justify-end'>
-                                        <button onClick={() => setOpen(false)} className="  text-black cursor-pointer">
+                                        <button onClick={() => setIsLoginOpen(false)} className="  text-black cursor-pointer">
                                             <IoMdClose size={20} />
                                         </button>
                                     </div>

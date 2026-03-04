@@ -22,6 +22,7 @@ import EventDetailsPage from "./pages/EventDetailsPage"
 import RestaurantDetailsPage from "./pages/RestaurantDetailsPage"
 import CategoryDetailPage from "./pages/CategoryDetailPage"
 import BookEventTickets from "./components/pages/EventPage/BookEventTickets"
+import UpdateEventBookingStatus from "./components/pages/EventPage/UpdateEventBookingStatus"
 
 const App = () => {
   return (
@@ -35,6 +36,9 @@ const App = () => {
         <Route path="/events/:id/:slug/book" element={<BookEventTickets />}/>
         <Route path="/events/category/:category" element={<CategoryDetailPage />} />
         <Route path="/dining/:city/:id/:slug" element={<RestaurantDetailsPage />} />
+
+        {/* for testing */}
+        <Route path="/payment-success" element={<UpdateEventBookingStatus />} />
 
         {/* for organizers */}
         <Route path="/events/list-your-events" element={<ListYourEvents />} />

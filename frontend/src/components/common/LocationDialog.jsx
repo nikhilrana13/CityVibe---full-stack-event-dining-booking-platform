@@ -4,10 +4,12 @@ import PopularCitiesGrid from './PopularCitiesGrid';
 import { useLocationContext } from '../../context/useLocationContext';
 import useLocationSearch from '../../hooks/useLocationSearch';
 import { IoLocationOutline } from 'react-icons/io5';
+import { useDialog } from '../../context/useDialog';
 
-const LocationDialog = ({ onClose }) => {
+const LocationDialog = () => {
     const [isVisible, setIsVisible] = useState(false)
     const search = useLocationSearch()
+    const {setIsLocationOpen} = useDialog()
     const { setLocation, handleUseCurrentLocation } = useLocationContext()
     // console.log("sugesstions",search.suggestions)
 
@@ -17,7 +19,7 @@ const LocationDialog = ({ onClose }) => {
     const handleClose = () => {
         setIsVisible(false)
         setTimeout(() => {
-            onClose()
+            setIsLocationOpen(false)
         }, 500)
     }
     return (

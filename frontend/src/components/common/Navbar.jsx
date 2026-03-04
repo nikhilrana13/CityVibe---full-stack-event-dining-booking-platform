@@ -17,9 +17,9 @@ import useFetchOrganizer from '../../hooks/useFetchOrganizer';
 import LocationDialog from './LocationDialog';
 import { useLocationContext } from '../../context/useLocationContext';
 import EventAndDiningSuggestions from './EventAndDiningSuggestions';
+import { useDialog } from '../../context/useDialog';
 const Navbar = () => {
   const [isSidebarOpen, SetIsSidebarOpen] = useState(false)
-  const [isLocationOpen,setIsLocationOpen] = useState(false)
   const [isEventAndDiningOpen,setIsEventAndDiningOpen] = useState(false)
   const user = useSelector((state) => state.Auth.user)
   const { handleLogout } = useLogout()
@@ -27,6 +27,7 @@ const Navbar = () => {
   const { organizer, loading } = useFetchOrganizer(shouldfetch)
   const {location} = useLocationContext()
   const routelocation = useLocation()
+  const {isLocationOpen,setIsLocationOpen} = useDialog()
   //  console.log("select city",location)
   // console.log("response",organizer)
   // lock scroll on sidebar open
@@ -40,7 +41,7 @@ const Navbar = () => {
     document.body.style.overflow = "auto"
   }
 }, [isSidebarOpen,isLocationOpen,isEventAndDiningOpen])
-const showNavTabs = routelocation?.pathname === "/" || routelocation?.pathname === "/events" || routelocation?.pathname === "dining" 
+const showNavTabs = routelocation?.pathname === "/" || routelocation?.pathname === "/events" || routelocation?.pathname === "/dining" 
 if (loading) return null
   return (
     <>
@@ -92,7 +93,7 @@ if (loading) return null
                     <CiUser size={25} className='text-white' />
                   </button>
                 ) : (
-                  <LoginDialog />
+                  <LoginDialog  />
                 )
               }
             </div>
@@ -118,7 +119,6 @@ if (loading) return null
                 Events</NavLink>
             </ul>
             )}
-          
           </div>
         </nav>
       </header>
@@ -198,13 +198,12 @@ if (loading) return null
         )}
         {/* location dialog */}
         {isLocationOpen && (
-          <LocationDialog onClose={()=>setIsLocationOpen(false)} />
+          <LocationDialog />
         )}
         {/* events and dining search dialog */}
         {isEventAndDiningOpen && (
           <EventAndDiningSuggestions onClose={()=>setIsEventAndDiningOpen(false)}  />
         )}
-
     </>
   )
 }
