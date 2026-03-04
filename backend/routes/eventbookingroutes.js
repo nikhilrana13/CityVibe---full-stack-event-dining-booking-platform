@@ -8,7 +8,7 @@ const router = express.Router()
 
 //user event book api's
 router.post("/event/create-booking",BookingLimiter,AuthMiddleware,CreateEventBooking)
-router.get("/event/bookings",AuthMiddleware,UserAllBookedEvents)
+router.get("/event/userbookings",AuthMiddleware,UserAllBookedEvents)
 router.put("/event/cancelbooking/:id",BookingLimiter,AuthMiddleware,CancelEventBooking)
 router.get("/event/booking/:id",AuthMiddleware,GetEventBookingDetail)
 // payment mark paid only for testing 

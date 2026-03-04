@@ -233,7 +233,7 @@ const UserallDiningbookings = async(req,res)=>{
        if(!user){
         return Response(res,404,"User not found")
        }
-       const bookings = await Restaurantbooking.find({user:userId}).populate("user","name phonenumber email").sort({createdAt:1}).skip(skip).limit(limit)
+       const bookings = await Restaurantbooking.find({user:userId}).populate("user","name phonenumber email").populate("restaurant","name location images").sort({createdAt:1}).skip(skip).limit(limit)
        const totalbookings = await Restaurantbooking.countDocuments({user:userId})
        const totalPages = Math.ceil(totalbookings / limit)
        if(bookings.length === 0){

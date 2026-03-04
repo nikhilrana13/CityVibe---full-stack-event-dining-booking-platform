@@ -27,7 +27,7 @@ const AuthLimiter = rateLimit({
 // booking limiter
 const BookingLimiter = rateLimit({
     windowMs: 5 * 60 * 1000,
-    max: 10,
+    max: 50,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
