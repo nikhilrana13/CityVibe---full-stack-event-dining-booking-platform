@@ -5,26 +5,18 @@ import { CiUser } from "react-icons/ci";
 import LoginDialog from './LoginDialog';
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import { MdDinnerDining } from "react-icons/md";
-import { LuFileSpreadsheet, LuGuitar, LuMessageCircleWarning } from "react-icons/lu";
-import { GoArrowLeft } from 'react-icons/go';
-import { LiaClipboardListSolid } from 'react-icons/lia';
-import { BiLogOut } from 'react-icons/bi';
-import { RxDashboard } from 'react-icons/rx';
+import {LuGuitar} from "react-icons/lu";
 import { useSelector } from 'react-redux';
-import useLogout from '../../hooks/useLogout';
-import nouserimg from "../../assets/user.png"
-import useFetchOrganizer from '../../hooks/useFetchOrganizer';
 import LocationDialog from './LocationDialog';
 import { useLocationContext } from '../../context/useLocationContext';
 import EventAndDiningSuggestions from './EventAndDiningSuggestions';
 import { useDialog } from '../../context/useDialog';
+import UserSidebar from './UserSidebar';
+
 const Navbar = () => {
   const [isSidebarOpen, SetIsSidebarOpen] = useState(false)
   const [isEventAndDiningOpen,setIsEventAndDiningOpen] = useState(false)
   const user = useSelector((state) => state.Auth.user)
-  const { handleLogout } = useLogout()
-  const shouldfetch = user?.hasOrganizerAccount === true
-  const { organizer, loading } = useFetchOrganizer(shouldfetch)
   const {location} = useLocationContext()
   const routelocation = useLocation()
   const {isLocationOpen,setIsLocationOpen} = useDialog()
@@ -42,7 +34,6 @@ const Navbar = () => {
   }
 }, [isSidebarOpen,isLocationOpen,isEventAndDiningOpen])
 const showNavTabs = routelocation?.pathname === "/" || routelocation?.pathname === "/events" || routelocation?.pathname === "/dining" 
-if (loading) return null
   return (
     <>
       <header className='flex border bg-white w-full transition-all py-3 duration-300 ease-in-out px-2 sm:px-4 items-center z-[42] sticky top-0 left-0 right-0  opacity-100  translate-y-0 min-h-[75px]'>
@@ -122,80 +113,9 @@ if (loading) return null
           </div>
         </nav>
       </header>
-      {/* Sidebar */}
-        <div className={` fixed fixed-sidebar top-0  rounded-none sm:rounded-l-2xl  right-0 h-screen w-full sm:w-[450px] md:w-[600px] z-[50] bg-white shadow-2xl  transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]  ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
-          } overflow-y-auto scrollbar-hidden`}
-        >
-          <div className='w-full p-4 border-b bg-white border'>
-            <div className="flex gap-4 font-[500] cursor-pointer text-[1.3rem] items-center"> <GoArrowLeft onClick={() => SetIsSidebarOpen(false)} /> Profile</div>
-          </div>
-          {/* my details */}
-          <div className='flex w-full bg-[#F1F1F2] flex-col flex-1 min-h-full'>
-            {/* profile */}
-            <div className='flex p-5 flex-col gap-8'>
-              <div className='flex  items-center gap-5'>
-                <div className='rounded-full border'>
-                  <img src={user?.profilepic && user.profilepic.startsWith("http") ? user.profilepic : nouserimg} alt="user pic" onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = nouserimg;
-                  }} className='w-[64px] rounded-full object-cover h-[64px]' />
-
-                </div>
-                <div className='flex flex-col gap-1'>
-                  <span className='text-[1.2rem] font-[500]'>{user?.name || "User"}</span>
-                  <span className='text-[#545459] text-[0.8rem]'>{user?.email || user?.phonenumber || "NA"}</span>
-                </div>
-              </div>
-              <NavLink to="/" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
-                <LiaClipboardListSolid size={22} />
-                View all bookings</NavLink>
-              {organizer?.verificationStatus === "approved" ? (
-                <NavLink to="/organizer/dashboard" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
-                  <RxDashboard size={23} />
-                  Dashboard</NavLink>
-              ) : organizer?.verificationStatus === "pending" ? (
-                <NavLink to="/organizer/pending" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
-                  <LuGuitar size={23} />
-                  List your events</NavLink>
-              ) : organizer?.verificationStatus === "rejected" ? (
-                <NavLink to="/organizer/rejected" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
-                  <LuGuitar size={23} />
-                  List your events</NavLink>
-              ) : (
-                <NavLink to="/organizer/onboarding" className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4" >
-                  <LuGuitar size={23} />
-                  List your events</NavLink>
-              )
-              }
-            </div>
-            {/* more */}
-            <div className='flex p-5 flex-col gap-8'>
-              <h3 className='font-[500]'>More</h3>
-              <div className='flex flex-col bg-white rounded-xl'>
-                <NavLink to="/" className="flex gap-3 border-b items-center  py-4 px-4" >
-                  <LuMessageCircleWarning size={22} />
-                  Terms & Conditions</NavLink>
-                <NavLink to="/" className=" flex gap-3  items-center py-4 px-4" >
-                  <LuFileSpreadsheet size={22} />
-                  Privacy Policy</NavLink>
-              </div>
-
-            </div>
-            <div className='p-5'>
-              <button onClick={() => { handleLogout(), SetIsSidebarOpen(false) }} className="bg-white w-full flex gap-3 border items-center rounded-xl py-4 px-4" >
-                <BiLogOut size={22} />
-                Logout</button>
-            </div>
-          </div>
-        </div>
-        {/* overlay container only for Sidebar (not LoginDialog) */}
-        {isSidebarOpen && (
-          <div
-            onClick={() => SetIsSidebarOpen(false)}
-            className="fixed fixed-overlay h-screen inset-0 bg-black/30 transition-opacity duration-500 ease-out  backdrop-blur-md backdrop-saturate-150 z-[40]"
-          ></div>
-
-        )}
+       {/* sidebar */}
+       <UserSidebar isOpen={isSidebarOpen} onClose={()=>SetIsSidebarOpen(false)} />
+      
         {/* location dialog */}
         {isLocationOpen && (
           <LocationDialog />

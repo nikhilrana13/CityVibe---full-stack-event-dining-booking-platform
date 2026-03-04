@@ -103,7 +103,7 @@ const BookEventTickets = () => {
           <EventNotFoundFallback />
         ) : (
           <>
-            <BookNavbar title={event?.title} startDate={event?.startDate} starttime={event?.starttime} handleBack={handleBack} city={event?.city} />
+            <BookNavbar title={event?.title} startDate={event?.startDate} starttime={event?.starttime} handleBack={handleBack} city={event?.city} showBack />
             <section className='bg-[#F9F9FA] min-h-[100vh] w-full pb-24'>
               <div className='flex flex-col w-full  md:max-w-2xl  mx-auto p-5 justify-center items-center  space-y-3'>
                 <div className='flex w-full gap-3 items-center'>

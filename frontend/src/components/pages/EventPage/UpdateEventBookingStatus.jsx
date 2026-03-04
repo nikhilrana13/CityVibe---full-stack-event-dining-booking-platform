@@ -25,7 +25,7 @@ const UpdateEventBookingStatus = () => {
                         toast.success(response?.data?.message)
                         SetStatus("success")
                         setTimeout(() => {
-                            navigate("/my-bookings")
+                            navigate("/bookings")
                         }, 1000);
                     }
                 } catch (error) {

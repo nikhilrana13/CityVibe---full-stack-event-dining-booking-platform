@@ -17,12 +17,6 @@ body{
   display: none; /* Chrome, Safari */
 }
 
-.fixed-sidebar {
-  z-index: 10000; /* sidebar should be above overlay */
-}
-.fixed-overlay {
-  z-index: 9999;  /* overlay below sidebar */
-}
 /* login phone input css */
 /* container */
 .react-tel-input {

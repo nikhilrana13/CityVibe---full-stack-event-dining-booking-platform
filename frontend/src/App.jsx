@@ -23,6 +23,7 @@ import RestaurantDetailsPage from "./pages/RestaurantDetailsPage"
 import CategoryDetailPage from "./pages/CategoryDetailPage"
 import BookEventTickets from "./components/pages/EventPage/BookEventTickets"
 import UpdateEventBookingStatus from "./components/pages/EventPage/UpdateEventBookingStatus"
+import Bookings from "./pages/Bookings"
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
         <Route path="/" element={<Homepage />} />
         <Route path="/dining" element={<Diningpage />} />
         <Route path="/events" element={<Eventspage />} />
+        <Route path="/bookings" element={<Bookings />} />
 
         <Route path="/events/:id/:slug" element={<EventDetailsPage />} />
         <Route path="/events/:id/:slug/book" element={<BookEventTickets />}/>
