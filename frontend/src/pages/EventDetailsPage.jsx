@@ -42,7 +42,7 @@ const EventDetailsPage = () => {
     <div className='w-full'>
         <Navbar />
         <section className='w-full py-10'>
-          <div className='mx-auto px-4 gap-4 py-4  max-w-[1300px]'>
+          <div className='mx-auto px-4 gap-4 py-4 max-w-[1300px]'>
             {
               loading ? (
                 <EventDetailShimmerCard />
