@@ -5,6 +5,7 @@ const DialogContext = createContext()
 export const DialogProvider = ({ children }) => {
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [isLocationOpen, setIsLocationOpen] = useState(false)
+   const [isEventAndDiningOpen,setIsEventAndDiningOpen] = useState(false)
 
   return (
     <DialogContext.Provider
@@ -12,7 +13,9 @@ export const DialogProvider = ({ children }) => {
         isLoginOpen,
         setIsLoginOpen,
         isLocationOpen,
-        setIsLocationOpen
+        setIsLocationOpen,
+        isEventAndDiningOpen,
+        setIsEventAndDiningOpen
       }}
     >
       {children}

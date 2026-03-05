@@ -15,11 +15,10 @@ import UserSidebar from './UserSidebar';
 
 const Navbar = () => {
   const [isSidebarOpen, SetIsSidebarOpen] = useState(false)
-  const [isEventAndDiningOpen,setIsEventAndDiningOpen] = useState(false)
   const user = useSelector((state) => state.Auth.user)
   const {location} = useLocationContext()
   const routelocation = useLocation()
-  const {isLocationOpen,setIsLocationOpen} = useDialog()
+  const {isLocationOpen,setIsLocationOpen,isEventAndDiningOpen,setIsEventAndDiningOpen} = useDialog()
   //  console.log("select city",location)
   // console.log("response",organizer)
   // lock scroll on sidebar open
@@ -122,7 +121,7 @@ const showNavTabs = routelocation?.pathname === "/" || routelocation?.pathname =
         )}
         {/* events and dining search dialog */}
         {isEventAndDiningOpen && (
-          <EventAndDiningSuggestions onClose={()=>setIsEventAndDiningOpen(false)}  />
+          <EventAndDiningSuggestions  />
         )}
     </>
   )

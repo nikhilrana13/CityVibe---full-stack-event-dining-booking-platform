@@ -3,11 +3,13 @@ import React, { useEffect, useState } from 'react';
 import SearchResultCard from './SearchResultCard';
 import { useLocationContext } from '../../context/useLocationContext';
 import SearchResultCardShimmer from './SearchResultCardShimmer';
+import { useDialog } from '../../context/useDialog';
 
-const EventAndDiningSuggestions = ({ onClose }) => {
+const EventAndDiningSuggestions = () => {
     const [isVisible, setIsVisible] = useState(false)
     const { results, loading, type, query, setType, setQuery } = useSearchContext()
     const { location } = useLocationContext()
+    const {setIsEventAndDiningOpen} = useDialog()
 
     useEffect(() => {
         setTimeout(() => setIsVisible(true), 10)
@@ -16,7 +18,7 @@ const EventAndDiningSuggestions = ({ onClose }) => {
         setQuery("")
         setIsVisible(false)
         setTimeout(() => {
-            onClose()
+            setIsEventAndDiningOpen(false)
         }, 500)
     }
     // console.log("results", results)
