@@ -79,7 +79,6 @@ const EventAndDiningSuggestions = () => {
                         )
                         }
                         </div>
-                       
                     </div>
                 </div>
         </>
