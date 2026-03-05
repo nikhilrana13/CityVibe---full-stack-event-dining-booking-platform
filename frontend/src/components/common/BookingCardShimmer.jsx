@@ -1,7 +1,7 @@
 import React from 'react';
 
 const BookingCardShimmer = () => {
-  return (
+  return ( 
      <div className="bg-white border w-full md:max-w-[500px] border-gray-200 rounded-xl p-5 flex flex-col gap-4 animate-pulse">
 
       {/* top */}

@@ -6,7 +6,7 @@ import { formatDateRange, formatTime } from '../lib/utils';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import BookingCardShimmer from '../components/common/BookingCardShimmer';
-import NoBookingFallback from '../components/organizerdashboard/bookings/NoBookingFallback';
+import NoBookingFallback from '../components/common/NoBookingFallback';
 
 const Bookings = () => {
     const navigate = useNavigate()
@@ -98,7 +98,6 @@ const Bookings = () => {
                                 Array.from({ length: 3 }).map((_, i) => (
                                     <BookingCardShimmer key={i} />
                                 ))
-
                             ) : bookings?.length > 0 ? (
                                 bookings?.map((booking) => {
                                     return (
@@ -110,7 +109,7 @@ const Bookings = () => {
                                             location={(booking?.event?.location) || booking?.restaurant?.location}
                                             image={(booking?.event?.coverimage) || booking?.restaurant?.images?.[0]}
                                             status={booking?.bookingStatus}
-                                            onClick={() => navigate(`/booking/${booking?._id}`)}
+                                            onClick={() => navigate(`/booking/${type}/${booking?._id}`)}
                                         />
                                     )
                                 })

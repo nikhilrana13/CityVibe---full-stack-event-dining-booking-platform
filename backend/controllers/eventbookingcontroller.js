@@ -325,7 +325,7 @@ const GetEventBookingDetail = async(req,res)=>{
       if(!user){
         return Response(res,404,"User not found")
       }
-      const booking = await Eventbooking.findById(bookingId).populate("tickets.ticket","name paxCount price")
+      const booking = await Eventbooking.findById(bookingId).populate("tickets.ticket","name paxCount price").populate("event","title startDate starttime title location coverimage ")
       if (!booking) {
         return Response(res, 404, "booking not found");
       }

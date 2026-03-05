@@ -24,6 +24,7 @@ import CategoryDetailPage from "./pages/CategoryDetailPage"
 import BookEventTickets from "./components/pages/EventPage/BookEventTickets"
 import UpdateEventBookingStatus from "./components/pages/EventPage/UpdateEventBookingStatus"
 import Bookings from "./pages/Bookings"
+import BookingDetails from "./components/common/BookingDetails"
 
 const App = () => {
   return (
@@ -33,6 +34,7 @@ const App = () => {
         <Route path="/dining" element={<Diningpage />} />
         <Route path="/events" element={<Eventspage />} />
         <Route path="/bookings" element={<Bookings />} />
+        <Route path="/booking/:type/:id" element={<BookingDetails />} />
 
         <Route path="/events/:id/:slug" element={<EventDetailsPage />} />
         <Route path="/events/:id/:slug/book" element={<BookEventTickets />}/>

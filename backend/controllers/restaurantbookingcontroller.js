@@ -257,7 +257,7 @@ const GetDiningBookingDetail = async(req,res)=>{
       if(!user){
         return Response(res,404,"User not found")
       }
-      const booking = await Restaurantbooking.findById(bookingId).populate("user","name email phonenumber")
+      const booking = await Restaurantbooking.findById(bookingId).populate("user","name email phonenumber").populate("restaurant","name location images")
       if (!booking) {
         return Response(res, 404, "booking not found");
       }
