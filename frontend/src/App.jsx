@@ -26,6 +26,7 @@ import UpdateEventBookingStatus from "./components/pages/EventPage/UpdateEventBo
 import Bookings from "./pages/Bookings"
 import BookingDetails from "./components/common/BookingDetails"
 import DiningBooking from "./components/pages/diningPage/DiningBooking"
+import LoginDialog from "./components/common/LoginDialog"
 
 const App = () => {
   return (
@@ -76,6 +77,8 @@ const App = () => {
           </Route>
         </Route>
       </Routes>
+      {/* login dialog */}
+      <LoginDialog />
       <Toaster />
     </div>
   )

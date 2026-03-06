@@ -5,8 +5,7 @@ import confetti from "canvas-confetti"
 import { useNavigate } from "react-router-dom"
 import { formatDateRange, formatTime } from "../../../lib/utils"
 
-const BookingSuccessDialog = ({open,restaurant,date,time,guests,bookingId,autoRedirect = true}) => {
-  const navigate = useNavigate()
+const BookingSuccessDialog = ({open,restaurant,date,time,guests,bookingId,autoRedirect = true,onClose}) => {
 
   useEffect(() => {
     if (!open) return
@@ -17,11 +16,11 @@ const BookingSuccessDialog = ({open,restaurant,date,time,guests,bookingId,autoRe
     })
     if (autoRedirect) {
       const t = setTimeout(() => {
-        navigate("/bookings")
+      onClose()
       }, 5000)
       return () => clearTimeout(t)
     }
-  }, [open, autoRedirect, navigate])
+  }, [open, autoRedirect,onClose])
 
   if (!open) return null
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import BookNavbar from './BookNavbar';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { formatIndianNumber } from '../../../lib/utils';
 import { Loader2, Minus, Plus } from 'lucide-react';
 import Loader from '../../../components/common/Loader';
@@ -18,7 +18,8 @@ const BookEventTickets = () => {
   const [cart, setCart] = useState({})
   const navigate = useNavigate()
   const { id } = useParams()
-  const {setIsLoginOpen} = useDialog()
+  const {setIsLoginOpen,setLoginRedirect} = useDialog()
+  const location = useLocation()
 
   // fetch event details
   useEffect(() => {
@@ -66,6 +67,7 @@ const BookEventTickets = () => {
   // handle checkout 
   const handleCheckout = async()=>{
      if(!user){
+      setLoginRedirect(location.pathname + location.search)
       setIsLoginOpen(true)
       return
      }

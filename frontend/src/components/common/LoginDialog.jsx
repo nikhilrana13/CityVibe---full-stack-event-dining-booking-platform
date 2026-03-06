@@ -12,7 +12,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useDialog } from '../../context/useDialog'
 
 const LoginDialog = () => {
-    const {isLoginOpen,setIsLoginOpen} = useDialog()
+    const { isLoginOpen, setIsLoginOpen, setLoginRedirect, loginRedirect } = useDialog()
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
@@ -34,6 +34,14 @@ const LoginDialog = () => {
                 localStorage.setItem("token", response?.data?.data?.token)
                 const user = response?.data?.data?.user
                 dispatch(Setuser(user))
+                // redirect priority
+                if (loginRedirect) {
+                    const path = loginRedirect
+                    setLoginRedirect(null)
+                    handleClose()
+                    navigate(path)
+                    return
+                }
                 if (user?.hasOrganizerAccount === true) {
                     try {
                         const orgRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/organizer/profile`, {
@@ -53,7 +61,7 @@ const LoginDialog = () => {
                         navigate("/")
                     }
                 } else {
-                    navigate("/");
+                    navigate("/")
                 }
                 handleClose()
             }
@@ -67,18 +75,6 @@ const LoginDialog = () => {
     };
     return (
         <>
-            {
-                location.pathname === "/events/list-your-events" ? (
-                    <button onClick={() => setIsLoginOpen(true)} className="mt-10 px-10 py-4 rounded-2xl  text-white font-semibold text-lg bg-gradient-to-r  from-[#6a4dff] to-[#8b5cf6] hover:scale-105  hover:shadow-purple-500/50 transition-all duration-300 shadow-lg 
-                 shadow-purple-600/30">
-                        Get started
-                    </button>
-                ) : (
-                    <button onClick={() => setIsLoginOpen(true)} className='rounded-full cursor-pointer p-2 bg-[#D1D5DB]'>
-                        <CiUser size={25} className='text-white' />
-                    </button>
-                )
-            }
             {/* model */}
             {
                 isLoginOpen && (

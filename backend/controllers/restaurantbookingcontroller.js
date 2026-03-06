@@ -116,7 +116,6 @@ const CreateRestaurantBooking = async (req, res) => {
       "bookingdate",
       "timeSlot",
       "numberofguests",
-      "reservationType",
     ];
     for (let field of allowedFields) {
       if (!req.body[field]) {
@@ -189,7 +188,7 @@ const CreateRestaurantBooking = async (req, res) => {
       specialrequests: specialrequests || "",
       bookingStatus: "confirmed",
     });
-    return Response(res, 200, "Booking confirmed", booking);
+    return Response(res, 200, "Booking confirmed", {booking});
   } catch (error) {
     console.log("failed to book restaurant", error);
     return Response(res, 500, "Internal server error");

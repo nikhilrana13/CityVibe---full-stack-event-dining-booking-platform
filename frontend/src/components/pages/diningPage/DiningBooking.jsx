@@ -1,11 +1,14 @@
 import axios from 'axios';
 import { ArrowLeft } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import RestaurantBookHeader from './RestaurantBookHeader';
 import slugify from 'slugify';
 import RestaurantShimmerHeader from './RestaurantShimmerHeader';
 import BookingSuccessDialog from './BookingSuccessDialog';
+import { toast } from 'sonner';
+import { useDialog } from '../../../context/useDialog';
+import { useSelector } from 'react-redux';
 
 // generate next 17 days
 const getNext17Days = () => {
@@ -33,6 +36,7 @@ const getNext17Days = () => {
 }
 
 const DiningBooking = () => {
+    const user = useSelector((state)=>state.Auth.user)
     const navigate = useNavigate()
     const [loadSlots, setLoadSlots] = useState(true)
     const [restaurant, setRestaurant] = useState({})
@@ -47,6 +51,10 @@ const DiningBooking = () => {
     const [selectedDate, setSelectedDate] = useState(date || dates[0].value)
     const [guests, setGuests] = useState(1)
     const [showSuccess, setShowSuccess] = useState(false)
+    const [booking, setBooking] = useState({})
+    const [bookloading, setBookLoading] = useState(false)
+    const {setIsLoginOpen,setLoginRedirect} = useDialog()
+    const location = useLocation()
     // console.log("restaurant", restaurant)
     const safeSlug = (value) => slugify(value || "", { lower: true, strict: true })
 
@@ -111,7 +119,37 @@ const DiningBooking = () => {
         if (!restaurant?._id) return
         navigate(`/dining/${safeSlug(restaurant?.city)}/${restaurant?._id}/${safeSlug(restaurant?.name)}`)
     }
-
+    // handle create booking
+    const CreateDiningBooking = async () => {
+        if(!user){
+            //  console.log("setting redirect:", location.pathname + location.search)
+            setLoginRedirect(location.pathname + location.search)
+            setIsLoginOpen(true)
+            return
+        }
+        try {
+            setBookLoading(true)
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/restaurant/create-booking`, {
+                bookingdate: selectedDate,
+                restaurantId: restaurant?._id,
+                timeSlot: selectedSlot,
+                numberofguests: guests,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            if (response.data) {
+                setBooking(response?.data?.data?.booking)
+                setShowSuccess(true)
+            }
+        } catch (error) {
+            console.error("failed to booking dining", error)
+             toast.error(error?.response?.data?.message)
+        } finally {
+            setBookLoading(false)
+        }
+    }
 
     return (
         <div className='w-full'>
@@ -220,22 +258,26 @@ const DiningBooking = () => {
                 {/* proceed */}
                 <div className="flex justify-end mt-8">
                     <button
-                        disabled={!selectedSlot}
-                        onClick={() => setShowSuccess(true)}
+                        disabled={!selectedSlot ||bookloading}
+                        onClick={CreateDiningBooking}
                         className="bg-black text-white px-8 py-3 rounded-lg disabled:bg-gray-300"
                     >
-                        Proceed to book
+                        {bookloading ? "Booking..." : "Proceed to book"}
                     </button>
                 </div>
             </div>
             {/* success dialog */}
             <BookingSuccessDialog
                 open={showSuccess}
+                onClose={() => {
+                    setShowSuccess(false)
+                    navigate("/bookings")
+                }}
                 restaurant={restaurant?.name}
-                date={selectedDate}
-                time={selectedSlot}
-                guests={guests}
-                bookingId={"124"}
+                date={booking?.bookingdate}
+                time={booking?.timeSlot}
+                guests={booking?.numberofguests}
+                bookingId={booking?._id?.slice(0, 6)}
             />
         </div>
     );

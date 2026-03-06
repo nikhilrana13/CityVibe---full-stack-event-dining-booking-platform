@@ -19,6 +19,7 @@ const Navbar = () => {
   const {location} = useLocationContext()
   const routelocation = useLocation()
   const {isLocationOpen,setIsLocationOpen,isEventAndDiningOpen,setIsEventAndDiningOpen} = useDialog()
+  const {setIsLoginOpen} = useDialog()
   //  console.log("select city",location)
   // console.log("response",organizer)
   // lock scroll on sidebar open
@@ -83,7 +84,9 @@ const showNavTabs = routelocation?.pathname === "/" || routelocation?.pathname =
                     <CiUser size={25} className='text-white' />
                   </button>
                 ) : (
-                  <LoginDialog  />
+                  <button onClick={() => setIsLoginOpen(true)} className='rounded-full cursor-pointer p-2 bg-[#D1D5DB]'>
+                            <CiUser size={25} className='text-white' />
+                  </button>
                 )
               }
             </div>
