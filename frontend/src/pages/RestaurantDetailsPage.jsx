@@ -13,7 +13,7 @@ const RestaurantDetailsPage = () => {
      const [notFound,setNotfound] = useState(false)
      const {id} = useParams()
 
-    //fetch event details 
+    //fetch restaurant details 
     useEffect(()=>{
         const fetchRestaurantDetails = async()=>{
           try {
