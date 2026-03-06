@@ -4,6 +4,8 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Footer from '../components/pages/listyourevent/Footer';
+import RestaurantDetailShimmer from '../components/pages/diningPage/RestaurantDetailShimmer';
+import RestaurantNotfoundFallback from '../components/pages/diningPage/RestaurantNotfoundFallback';
 
 const RestaurantDetailsPage = () => {
    const [restaurant,setRestaurant] = useState({})
@@ -43,9 +45,9 @@ const RestaurantDetailsPage = () => {
           <div className='mx-auto px-4 gap-4 py-4  max-w-[1200px]'>
             {
               loading ? (
-                <div>...</div>
+                <RestaurantDetailShimmer />
               ):notFound ? (
-                 <div>...</div>
+                 <RestaurantNotfoundFallback />
               ):(
                 <RestaurantDetailCard restaurant={restaurant} /> 
               )
