@@ -28,6 +28,10 @@ import BookingDetails from "./components/common/BookingDetails"
 import DiningBooking from "./components/pages/diningPage/DiningBooking"
 import LoginDialog from "./components/common/LoginDialog"
 import ScrollToTop from "./components/common/ScrollToTop"
+import AdminLayout from "./components/admindashboard/AdminLayout"
+import AdminDashboard from "./components/admindashboard/AdminDashboard"
+import AdminGuard from "./middlewares/AdminGuard"
+import AdminLogin from "./components/admindashboard/AdminLogin"
 
 const App = () => {
   return (
@@ -39,12 +43,12 @@ const App = () => {
         <Route path="/events" element={<Eventspage />} />
         <Route path="/bookings" element={<Bookings />} />
         <Route path="/booking/:type/:id" element={<BookingDetails />} />
-
+        {/* events */}
         <Route path="/events/:id/:slug" element={<EventDetailsPage />} />
-        <Route path="/events/:id/:slug/book" element={<BookEventTickets />}/>
+        <Route path="/events/:id/:slug/book" element={<BookEventTickets />} />
         <Route path="/events/category/:category" element={<CategoryDetailPage />} />
 
-    
+        {/* dining */}
         <Route path="/dining/:city/:id/:slug" element={<RestaurantDetailsPage />} />
         <Route path="/dining/:city/:id/:slug/book" element={<DiningBooking />} />
 
@@ -53,12 +57,12 @@ const App = () => {
 
         {/* for organizers */}
         <Route path="/events/list-your-events" element={<ListYourEvents />} />
-        {/* onboarding flow */}
+        {/* organizer routes*/}
         <Route path="/organizer" element={<OrganizerLayout />}>
           <Route element={<OrganizerStatusGuard />}>
-          
-           <Route index element={<Navigate to="dashboard" replace />} />
-          {/* onboarding */}
+
+            <Route index element={<Navigate to="dashboard" replace />} />
+            {/* onboarding */}
             <Route path="onboarding">
               <Route index element={<OnBoarding />} />
               <Route path="form" element={<OnBoardingForm />} />
@@ -74,10 +78,19 @@ const App = () => {
             <Route path="edit-restaurant/:id" element={<Restaurantform />} />
             <Route path="manage-bookings" element={<ManageBookings />} />
             <Route path="verify-tickets" element={<VerifyTickets />} />
-            <Route path="settings" element={<Settings />}  />
+            <Route path="settings" element={<Settings />} />
 
           </Route>
         </Route>
+        {/* admin routes */}
+        <Route path="/cityvibe-admin-panel/login" element={<AdminLogin />} />
+        <Route element={<AdminGuard />}>
+          <Route path="/cityvibe-admin-panel" element={<AdminLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+          </Route>
+        </Route>
+
       </Routes>
       {/* login dialog */}
       <LoginDialog />

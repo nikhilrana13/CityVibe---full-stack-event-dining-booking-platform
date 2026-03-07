@@ -1,11 +1,19 @@
+import { useDialog } from '../../../context/useDialog'
 import LoginDialog from '../../../components/common/LoginDialog'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 
 const HeroSection = () => {
     const user = useSelector((state)=>state.Auth.user) 
-   
+     const {setIsLoginOpen} = useDialog()
+
+    useEffect(()=>{
+        if(!user){
+            setIsLoginOpen(true)
+            return
+        }
+    },[user])
 
 
   return (
@@ -35,7 +43,9 @@ const HeroSection = () => {
                         thousands discover and book exciting events every day.
                     </p>
                     {/* CTA */}
-                    <LoginDialog />
+                    <button onClick={() => setIsLoginOpen(true)} className="mt-10 px-10 py-4 rounded-2xl text-white font-semibold text-lg bg-gradient-to-r from-[#6a4dff] to-[#8b5cf6] hover:scale-105 hover:shadow-purple-500/50 transition-all duration-300 shadow-lg shadow-purple-600/30"> Get started </button>
+
+                    
                 </div>
             </section>
             
