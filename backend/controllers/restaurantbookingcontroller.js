@@ -213,7 +213,7 @@ const CancelBooking = async(req,res)=>{
         }
         booking.bookingStatus = "cancelled",
         await booking.save()
-        return Response(res,200,"Booking cancelled successfully")
+        return Response(res,200,"Booking cancelled successfully",{booking})
    } catch (error) {
      console.error("Failed to cancel booking",error)
      return Response(res,500,"Internal server error")

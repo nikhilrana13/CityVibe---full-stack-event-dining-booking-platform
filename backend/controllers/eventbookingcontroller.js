@@ -377,7 +377,7 @@ const GetEventBookingDetail = async(req,res)=>{
     }
     booking.bookingStatus = "cancelled";
     await booking.save();
-    return Response(res, 200, "Booking cancelled successfully", booking);
+    return Response(res, 200, "Booking cancelled successfully",{booking});
 
   } catch (error) {
     console.log("Cancel booking error", error);

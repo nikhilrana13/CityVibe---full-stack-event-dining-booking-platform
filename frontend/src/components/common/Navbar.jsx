@@ -33,7 +33,7 @@ const Navbar = () => {
     document.body.style.overflow = "auto"
   }
 }, [isSidebarOpen,isLocationOpen,isEventAndDiningOpen])
-const showNavTabs = routelocation?.pathname === "/" || routelocation?.pathname === "/events" || routelocation?.pathname === "/dining" 
+const showNavTabs = routelocation?.pathname === "/" || routelocation?.pathname.startsWith("/events") || routelocation?.pathname.startsWith("dining") 
   return (
     <>
       <header className='flex border bg-white w-full transition-all py-3 duration-300 ease-in-out px-2 sm:px-4 items-center z-[42] sticky top-0 left-0 right-0  opacity-100  translate-y-0 min-h-[75px]'>

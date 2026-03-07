@@ -3,8 +3,10 @@ import TicketDivider from './TicketDivider';
 import TicketPill from './TicketCountPill';
 import QRCode from 'react-qr-code';
 import { formatDateRange, formatTime } from '../../lib/utils';
+import { Loader2 } from 'lucide-react';
 
-const EventBookingDetails = ({ booking }) => {
+
+const EventBookingDetails = ({ booking, CancelBooking, iscancelbook }) => {
     return (
         <div className="max-w-xl mx-auto p-4">
             {/* Premium Glass Card */}
@@ -39,7 +41,7 @@ const EventBookingDetails = ({ booking }) => {
                                 </p>
                             </div>
                             <div className="relative bg-white p-2 border rounded-xl">
-                                 <div className="absolute inset-0 border-2 border-purple-500 rounded-xl animate-pulse opacity-40"></div>
+                                <div className="absolute inset-0 border-2 border-purple-500 rounded-xl animate-pulse opacity-40"></div>
                                 {booking?.ticketCode && (
                                     <QRCode
                                         value={booking?.ticketCode}
@@ -51,15 +53,37 @@ const EventBookingDetails = ({ booking }) => {
                     )}
                     <TicketDivider />
                     {/* Entry Instructions */}
-                    <div className="space-y-2">
-                        <h3 className="font-semibold text-sm">
-                            Entry Instructions
-                        </h3>
-                        <ul className="text-xs text-gray-500 space-y-1">
-                            <li>• Reach venue 30 minutes before event</li>
-                            <li>• Carry valid ID proof</li>
-                            <li>• Outside food not allowed</li>
-                        </ul>
+                    <div className='flex items-center  justify-between'>
+                        <div className="space-y-2">
+                            <h3 className="font-semibold text-sm">
+                                Entry Instructions
+                            </h3>
+                            <ul className="text-xs text-gray-500 space-y-1">
+                                <li>• Reach venue 30 minutes before event</li>
+                                <li>• Carry valid ID proof</li>
+                                <li>• Outside food not allowed</li>
+                            </ul>
+                        </div>
+                        <div>
+                            {booking?.bookingStatus === "cancelled" ? (
+                                <button className="bg-red-100 text-red-600 rounded-xl px-7 py-2">
+                                    Cancelled
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={CancelBooking}
+                                    disabled={iscancelbook}
+                                    className="bg-red-100 text-red-600 rounded-xl px-7 py-2 flex items-center justify-center"
+                                >
+                                    {iscancelbook ? (
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                    ) : (
+                                        "Cancel"
+                                    )}
+                                </button>
+                            )}
+                        </div>
+
                     </div>
                 </div>
             </div>

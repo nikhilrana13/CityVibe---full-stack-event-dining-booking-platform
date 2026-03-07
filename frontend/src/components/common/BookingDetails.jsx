@@ -5,10 +5,12 @@ import EventBookingDetails from './EventBookingDetails';
 import DiningBookingDetails from './DiningBookingDetails';
 import BookingTicketShimmer from './BookingTicketShimmer';
 import BookingNotFound from './BookingNotFound';
+import { toast } from 'sonner';
 
 const BookingDetails = () => {
      const [loading,setLoading] = useState(true)
      const [booking,setBooking] = useState({})
+     const [iscancelbook,setIsCancelBook] = useState(false)
      const {id,type} = useParams()
     //  fetch booking details
     useEffect(()=>{
@@ -33,6 +35,32 @@ const BookingDetails = () => {
           if(type) fetchBookingDetails()
     },[id,type])
 
+    const handleCancelBooking = async(id)=>{
+        try {
+           setIsCancelBook(true)
+           const url = type === "events" ? "/api/event/cancelbooking" : "/api/restaurant/cancelbooking"
+           const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}${url}/${id}`,{},{
+            headers:{
+              Authorization:`Bearer ${localStorage.getItem("token")}`
+            }
+           })
+           console.log("response",response?.data)
+           if(response.data){
+            toast.success(response?.data?.message)
+            const updatedBooking = response?.data?.data?.booking
+            setBooking((prev)=>({...prev,bookingStatus:updatedBooking?.bookingStatus}))
+           }
+        } catch (error) {
+          toast.error(error?.response?.data?.message || "Internal server error")
+          console.error("failed to cancel booking",error)
+        }finally{
+          setTimeout(() => {
+            setIsCancelBook(false)
+          }, 5000);
+          // setIsCancelBook(false)
+        }
+    }
+
   
    const notFound = (!booking || Object.keys(booking).length === 0)
   return (
@@ -43,9 +71,9 @@ const BookingDetails = () => {
         ):notFound ? (
           <BookingNotFound />
         ):type === "events" ? (
-           <EventBookingDetails booking={booking} />
+           <EventBookingDetails booking={booking} CancelBooking={()=>handleCancelBooking(id)} iscancelbook={iscancelbook} />
         ):(
-          <DiningBookingDetails booking={booking} />
+          <DiningBookingDetails booking={booking} CancelBooking={()=>handleCancelBooking(id)} iscancelbook={iscancelbook}  />
         )
       }     
     </div>
