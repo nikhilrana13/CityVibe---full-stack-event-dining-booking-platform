@@ -27,10 +27,12 @@ import Bookings from "./pages/Bookings"
 import BookingDetails from "./components/common/BookingDetails"
 import DiningBooking from "./components/pages/diningPage/DiningBooking"
 import LoginDialog from "./components/common/LoginDialog"
+import ScrollToTop from "./components/common/ScrollToTop"
 
 const App = () => {
   return (
     <div className="w-full">
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/dining" element={<Diningpage />} />
