@@ -1,4 +1,8 @@
+const Eventbooking = require("../models/bookings/eventbookingmodel.js")
+const Restaurantbooking = require("../models/bookings/restaurantbookingmodel.js")
+const Event = require("../models/eventmodel.js")
 const Organizer = require("../models/organizermodel.js")
+const Restaurant = require("../models/restaurantmodel.js")
 const User = require("../models/usermodel.js")
 const Response = require("../utils/responsehandler.js")
 
@@ -90,8 +94,78 @@ const ApproveandRejectorganizer = async(req,res)=>{
         return Response(res,500,"Internal server error")
     }
 } 
+const AdminDashboardStats = async (req, res) => {
+  try {
+    const adminId = req.user;
+    const admin = await User.findOne({
+      _id: adminId,
+      role: "admin"
+    });
+
+    if (!admin) {
+      return Response(res, 403, "Access denied Admin only");
+    }
+    const [
+      totalUsers,
+      totalOrganizers,
+      pendingOrganizers,
+      totalEvents,
+      totalRestaurants,
+      totalEventBookings,
+      totalRestaurantBookings,
+      revenueAgg
+    ] = await Promise.all([
+      User.countDocuments({ role: "user" }),
+      Organizer.countDocuments(),
+      Organizer.countDocuments({ isApproved: false }),
+      Event.countDocuments(),
+      Restaurant.countDocuments(),
+      Eventbooking.countDocuments({
+        paymentStatus: "paid",
+        bookingStatus: "confirmed"
+      }),
+
+      Restaurantbooking.countDocuments({
+        bookingStatus: "confirmed"
+      }),
+
+      Eventbooking.aggregate([
+        {
+          $match: {
+            paymentStatus: "paid",
+            bookingStatus: "confirmed"
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            totalRevenue: { $sum: "$totalAmount" }
+          }
+        }
+      ])
+
+    ]);
+    const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
+    const totalBookings = totalEventBookings + totalRestaurantBookings;
+    return Response(res, 200, "Admin dashboard stats fetched successfully", {
+      totalUsers,
+      totalOrganizers,
+      pendingOrganizers,
+      totalEvents,
+      totalRestaurants,
+      totalEventBookings,
+      totalRestaurantBookings,
+      totalBookings,
+      totalRevenue
+    });
+  } catch (error) {
+    console.error("Failed to fetch admin dashboard stats", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
 
 
 
 
-module.exports = {GetOrganizers,ApproveandRejectorganizer}
+
+module.exports = {GetOrganizers,ApproveandRejectorganizer,AdminDashboardStats}

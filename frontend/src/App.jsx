@@ -32,6 +32,7 @@ import AdminLayout from "./components/admindashboard/AdminLayout"
 import AdminDashboard from "./components/admindashboard/AdminDashboard"
 import AdminGuard from "./middlewares/AdminGuard"
 import AdminLogin from "./components/admindashboard/AdminLogin"
+import Organizers from "./components/admindashboard/Organizers"
 
 const App = () => {
   return (
@@ -88,6 +89,7 @@ const App = () => {
           <Route path="/cityvibe-admin-panel" element={<AdminLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="organizers" element={<Organizers />} />
           </Route>
         </Route>
 

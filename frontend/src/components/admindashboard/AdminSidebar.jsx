@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { ExternalLink, LogOut, LucideLayoutDashboard } from 'lucide-react';
+import { VscOrganization } from "react-icons/vsc";
 import React from 'react';
 import { LuLayoutDashboard } from 'react-icons/lu';
 import { useDispatch } from 'react-redux';
@@ -10,6 +11,7 @@ const AdminSidebar = () => {
     const navigate = useNavigate()
      const links = [
         { to: "dashboard", label: "Dashboard", icon: LucideLayoutDashboard },  
+        { to: "organizers", label: "Organizers", icon: VscOrganization   }, 
     ];
     const getNavClass = (isActive) => isActive ? "bg-gradient-to-r from-[#6a4dff] to-[#8b5cf6] text-white px-3 py-3 rounded-md flex items-center gap-2 shadow-lg shadow-purple-500/30" : "px-3 py-3 mb-2 rounded-md hover:bg-[#6a4dff]/10 hover:text-[#6a4dff] transition-all duration-300";
     
