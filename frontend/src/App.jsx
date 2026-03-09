@@ -33,6 +33,7 @@ import AdminDashboard from "./components/admindashboard/AdminDashboard"
 import AdminGuard from "./middlewares/AdminGuard"
 import AdminLogin from "./components/admindashboard/AdminLogin"
 import Organizers from "./components/admindashboard/Organizers"
+import PaymentFailed from "./components/pages/EventPage/PaymentFailed"
 
 const App = () => {
   return (
@@ -53,8 +54,9 @@ const App = () => {
         <Route path="/dining/:city/:id/:slug" element={<RestaurantDetailsPage />} />
         <Route path="/dining/:city/:id/:slug/book" element={<DiningBooking />} />
 
-        {/* for testing */}
+        {/* payments success and failed */}
         <Route path="/payment-success" element={<UpdateEventBookingStatus />} />
+        <Route path="/payment-failed" element={<PaymentFailed />} />
 
         {/* for organizers */}
         <Route path="/events/list-your-events" element={<ListYourEvents />} />

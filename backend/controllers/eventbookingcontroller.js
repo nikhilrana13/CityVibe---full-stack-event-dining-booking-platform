@@ -187,11 +187,12 @@ const StripeWebhookHandler = async (req, res) => {
     console.log("Webhook signature verification failed", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
+   console.log("Stripe Event:", event.type);
   // Handle event types
   // payment success
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
-    const bookingId = session.metadata.bookingId;
+    const bookingId = session.metadata?.bookingId;
     const booking = await Eventbooking.findById(bookingId);
     if (!booking) return res.json({ received: true });
     // Prevent double processing
@@ -217,14 +218,24 @@ const StripeWebhookHandler = async (req, res) => {
       await eventDoc.save();
     }
   }
-  //payment failed or expired
-  if (
-    event.type === "checkout.session.expired" ||
-    event.type === "payment_intent.payment_failed"
-  ) {
+  //payment expired
+  if (event.type === "checkout.session.expired" ) {
     const session = event.data.object;
     const bookingId = session.metadata?.bookingId;
     const booking = await Eventbooking.findById(bookingId);
+    if (booking) {
+      booking.paymentStatus = "failed";
+      booking.bookingStatus = "cancelled";
+      await booking.save();
+    }
+  }
+  // payment failed
+  if (event.type === "payment_intent.payment_failed") {
+    const paymentIntent = event.data.object;
+    const bookingId = paymentIntent.metadata?.bookingId;
+
+    const booking = await Eventbooking.findById(bookingId);
+
     if (booking) {
       booking.paymentStatus = "failed";
       booking.bookingStatus = "cancelled";
