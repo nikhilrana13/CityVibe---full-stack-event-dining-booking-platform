@@ -187,7 +187,9 @@ const StripeWebhookHandler = async (req, res) => {
     console.log("Webhook signature verification failed", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-   console.log("Stripe Event:", event.type);
+  //  console.log("Stripe Event:", event.type);
+  // console.log("EVENT DATA:", event.data.object);
+// console.log("METADATA:", event.data.object.metadata);
   // Handle event types
   // payment success
   if (event.type === "checkout.session.completed") {
@@ -232,7 +234,12 @@ const StripeWebhookHandler = async (req, res) => {
   // payment failed
   if (event.type === "payment_intent.payment_failed") {
     const paymentIntent = event.data.object;
+    // console.log("FAILED PAYMENT INTENT:", paymentIntent);
     const bookingId = paymentIntent.metadata?.bookingId;
+    if (!bookingId) {
+    console.log("BookingId missing in metadata");
+    return res.json({ received: true });
+  }
     const booking = await Eventbooking.findById(bookingId);
     if (booking) {
       booking.paymentStatus = "failed";
