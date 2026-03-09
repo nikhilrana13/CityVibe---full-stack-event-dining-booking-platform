@@ -234,59 +234,59 @@ const StripeWebhookHandler = async (req, res) => {
   res.json({ received: true });
 }; 
 //test only - Manual payment confirmation
-const UpdatePaymentStatus = async (req, res) => {
-  try {
-    const userId = req.user;
-    const bookingId = req.params.id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return Response(res, 404, "User not found");
-    }
-    const booking = await Eventbooking.findById(bookingId);
-    if (!booking) {
-      return Response(res, 404, "Booking not found");
-    }
-     if (booking.user.toString() !== userId) {
-      return Response(res, 403, "Unauthorized");
-    }
-    // Prevent double processing
-    if (booking.paymentStatus === "paid") {
-      return Response(res, 400, "Booking already paid");
-    }
-    // Update booking status
-    booking.paymentStatus = "paid";
-    booking.bookingStatus = "confirmed";
-    booking.ticketCode = nanoid(10)
-    await booking.save();
-    // Deduct ticket quantities
-    for (let item of booking.tickets) {
-      const ticket = await Ticket.findById(item.ticket);
-      if (ticket) {
-        ticket.availableQuantity -= item.quantity;
-        await ticket.save();
-      }
-    }
-    // Deduct event seats
-    const event = await Event.findById(booking.event);
-     if (isNaN(booking.totalSeats)) {
-      return Response(res, 400, "Invalid booking seat data");
-    }
-  // console.log("Booking totalSeats:", booking.totalSeats);
-  // console.log("Event availableSeats before:", event.availableSeats);
-    if (event) {
-      event.availableSeats -= booking.totalSeats;
-      await event.save();
-    }
-    // // Optional: Send email
-    // if (event) {
-    //   await SendBookingDetails(user, booking, event);
-    // }
-    return Response(res, 200, "Payment marked as successful", booking);
-  } catch (error) {
-    console.log("failed to update payment status", error);
-    return Response(res, 500, "Internal server error");
-  }
-};
+// const UpdatePaymentStatus = async (req, res) => {
+//   try {
+//     const userId = req.user;
+//     const bookingId = req.params.id;
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return Response(res, 404, "User not found");
+//     }
+//     const booking = await Eventbooking.findById(bookingId);
+//     if (!booking) {
+//       return Response(res, 404, "Booking not found");
+//     }
+//      if (booking.user.toString() !== userId) {
+//       return Response(res, 403, "Unauthorized");
+//     }
+//     // Prevent double processing
+//     if (booking.paymentStatus === "paid") {
+//       return Response(res, 400, "Booking already paid");
+//     }
+//     // Update booking status
+//     booking.paymentStatus = "paid";
+//     booking.bookingStatus = "confirmed";
+//     booking.ticketCode = nanoid(10)
+//     await booking.save();
+//     // Deduct ticket quantities
+//     for (let item of booking.tickets) {
+//       const ticket = await Ticket.findById(item.ticket);
+//       if (ticket) {
+//         ticket.availableQuantity -= item.quantity;
+//         await ticket.save();
+//       }
+//     }
+//     // Deduct event seats
+//     const event = await Event.findById(booking.event);
+//      if (isNaN(booking.totalSeats)) {
+//       return Response(res, 400, "Invalid booking seat data");
+//     }
+//   // console.log("Booking totalSeats:", booking.totalSeats);
+//   // console.log("Event availableSeats before:", event.availableSeats);
+//     if (event) {
+//       event.availableSeats -= booking.totalSeats;
+//       await event.save();
+//     }
+//     // // Optional: Send email
+//     // if (event) {
+//     //   await SendBookingDetails(user, booking, event);
+//     // }
+//     return Response(res, 200, "Payment marked as successful", booking);
+//   } catch (error) {
+//     console.log("failed to update payment status", error);
+//     return Response(res, 500, "Internal server error");
+//   }
+// };
 // User all booked events
 const UserAllBookedEvents = async(req,res)=>{
   try {
@@ -441,4 +441,4 @@ const VerifyTicket = async(req,res)=>{
     return Response(res, 500, "Internal server error");
   }
 }
-module.exports = { CreateEventBooking, StripeWebhookHandler,UpdatePaymentStatus,UserAllBookedEvents,GetEventBookingDetail,CancelEventBooking,VerifyTicket}
+module.exports = { CreateEventBooking, StripeWebhookHandler,UserAllBookedEvents,GetEventBookingDetail,CancelEventBooking,VerifyTicket}
