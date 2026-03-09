@@ -54,7 +54,7 @@ app.use("/api",searchRoute)
 app.use("/api",HomeRoute)
 app.use("/api",RestaurantBookingRoute) 
 app.use("/api",EventBooking)
-app.use("/api/user",UserRoute)
+app.use("/api/user",UserRoute) 
 
 // connect to db  
 configure()

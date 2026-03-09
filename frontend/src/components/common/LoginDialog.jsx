@@ -17,13 +17,12 @@ const LoginDialog = () => {
     const navigate = useNavigate()
     const location = useLocation()
 
-
     const handleLoginWithgoogle = async () => {
         try {
             const result = await signInWithPopup(auth, GoogleProvider)
             const token = await result.user.getIdToken();
             // console.log(result.user)
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/google-login`, {}, {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/test-google`, {}, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

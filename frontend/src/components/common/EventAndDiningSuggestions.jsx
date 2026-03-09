@@ -18,8 +18,8 @@ const EventAndDiningSuggestions = () => {
         setQuery("")
         setIsVisible(false)
         setTimeout(() => {
-            setIsEventAndDiningOpen(false)
-        }, 500)
+             setIsEventAndDiningOpen(false)
+        }, 500);
     }
     // console.log("results", results)
     return (

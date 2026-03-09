@@ -44,7 +44,7 @@ const BookingDetails = () => {
               Authorization:`Bearer ${localStorage.getItem("token")}`
             }
            })
-           console.log("response",response?.data)
+          //  console.log("response",response?.data)
            if(response.data){
             toast.success(response?.data?.message)
             const updatedBooking = response?.data?.data?.booking
@@ -54,10 +54,7 @@ const BookingDetails = () => {
           toast.error(error?.response?.data?.message || "Internal server error")
           console.error("failed to cancel booking",error)
         }finally{
-          setTimeout(() => {
-            setIsCancelBook(false)
-          }, 5000);
-          // setIsCancelBook(false)
+          setIsCancelBook(false)
         }
     }
 
