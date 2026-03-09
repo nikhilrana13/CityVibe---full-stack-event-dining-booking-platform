@@ -8,7 +8,8 @@ The platform integrates secure authentication, Stripe payments, dynamic ticket i
 
 CityVibe simulates a real-world marketplace similar to BookMyShow + Zomato, combining event discovery and dining reservations in one platform.
 
-✨ Features
+✨ Features:
+
 👤 User Features
 
 🔥 Discover trending events in your city
@@ -24,6 +25,7 @@ CityVibe simulates a real-world marketplace similar to BookMyShow + Zomato, comb
 ❌ Cancel bookings
 
 🔐 Login using Google Authentication
+
 
 🎤 Organizer Features
 
@@ -50,6 +52,7 @@ CityVibe simulates a real-world marketplace similar to BookMyShow + Zomato, comb
 🪑 Table reservation functionality
 
 ⏰ Available dining time slot system
+
 
 👥 Guest management
 
@@ -79,11 +82,12 @@ Bank account details
 
 The admin account is created using a seed script to prevent public admin signup.
 
+
 💳 Payments
 
 CityVibe integrates Stripe Checkout for secure event ticket payments.
 
-Features
+Features:
 
 🔐 Secure payment processing using Stripe Checkout
 
@@ -122,7 +126,8 @@ User cancels booking
 Tickets restored
       │
 Available seat count increases
-🧰 Tech Stack
+
+🧰 Tech Stack:
 🎨 Frontend
 
 React (Vite)
