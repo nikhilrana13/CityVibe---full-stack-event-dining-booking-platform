@@ -1,12 +1,34 @@
 🌆 CityVibe – Urban Event & Dining Platform
 
-CityVibe is a full-stack event discovery and dining reservation platform where users can explore events, book tickets, and reserve restaurant tables in their city.
+CityVibe is a full-stack urban discovery platform where users can explore local events, book event tickets, and reserve restaurant tables in their city.
 
-Organizers can create and manage events or restaurant listings through a dedicated dashboard, while administrators verify organizers and maintain platform quality.
+Organizers can create and manage events or restaurant listings through a dedicated organizer dashboard, while administrators verify organizers and manage the platform through an admin dashboard.
 
-The platform integrates secure authentication, Stripe payments, dynamic ticket inventory management, and a scalable REST API fully documented using Swagger.
+The platform integrates secure authentication, Stripe payments, dynamic ticket inventory management, optimized APIs with pagination/filtering/sorting, and a scalable backend fully documented using Swagger.
 
-CityVibe simulates a real-world marketplace similar to BookMyShow + Zomato, combining event discovery and dining reservations in one platform.
+CityVibe simulates a real-world marketplace similar to a combination of BookMyShow + Zomato, bringing both event discovery and dining reservations into a single platform.
+
+🚀 Highlights
+
+🎟️ Event discovery and ticket booking platform
+
+🍽️ Restaurant reservation system
+
+🔐 Firebase authentication with Google login
+
+💳 Stripe payment integration (Test Mode)
+
+📚 Fully documented REST APIs using Swagger
+
+📊 Organizer analytics dashboard
+
+👑 Admin panel for organizer verification
+
+⚡ APIs with pagination, filtering, and sorting
+
+🔄 Infinite scroll for event and restaurant listings
+
+🎫 Dynamic ticket inventory management
 
 ✨ Features:
 
@@ -26,12 +48,11 @@ CityVibe simulates a real-world marketplace similar to BookMyShow + Zomato, comb
 
 🔐 Login using Google Authentication
 
-
 🎤 Organizer Features
 
 📝 Organizer onboarding with verification
 
-🪪 Upload PAN card & bank account details
+🪪 Upload PAN card and bank account details
 
 🎪 Event creation and management
 
@@ -53,12 +74,11 @@ CityVibe simulates a real-world marketplace similar to BookMyShow + Zomato, comb
 
 ⏰ Available dining time slot system
 
-
 👥 Guest management
 
 📊 Reservation analytics for restaurant owners
 
-🛠️ Admin Dashboard
+👑 Admin Dashboard
 
 CityVibe includes an Admin Panel to manage the platform and verify organizers.
 
@@ -82,12 +102,11 @@ Bank account details
 
 The admin account is created using a seed script to prevent public admin signup.
 
-
 💳 Payments
 
 CityVibe integrates Stripe Checkout for secure event ticket payments.
 
-Features:
+Features
 
 🔐 Secure payment processing using Stripe Checkout
 
@@ -99,7 +118,7 @@ Features:
 
 🛡️ Secure backend payment verification
 
-⚠️ Note:
+⚠️ Note
 This project currently uses Stripe test environment, so no real payments are processed.
 
 🎟️ Ticket Inventory Management
@@ -110,7 +129,7 @@ Key behavior
 
 📉 Available tickets decrease when a booking is made
 
-🔄 If a booking is cancelled, tickets are automatically restored
+🔄 When a booking is cancelled, tickets are automatically restored
 
 🚫 Prevents overbooking and maintains accurate seat availability
 
@@ -126,8 +145,40 @@ User cancels booking
 Tickets restored
       │
 Available seat count increases
+⚡ Performance & Query Optimization
 
-🧰 Tech Stack:
+CityVibe APIs are optimized for large datasets and smooth browsing.
+
+Backend API capabilities
+
+📄 Pagination support
+
+🔎 Filtering options
+
+🔃 Sorting functionality
+
+⚡ Optimized MongoDB queries
+
+Example API query:
+
+GET /api/events?page=1&limit=10&sort=latest&city=Delhi
+🔄 Infinite Scroll (Frontend)
+
+CityVibe implements infinite scrolling for event and restaurant listings.
+
+Benefits
+
+Loads more results automatically while scrolling
+
+Reduces initial page load time
+
+Improves browsing experience
+
+Uses backend pagination APIs
+
+This creates a browsing experience similar to Instagram, Airbnb, or Zomato.
+
+🧰 Tech Stack
 🎨 Frontend
 
 React (Vite)
