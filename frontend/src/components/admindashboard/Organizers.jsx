@@ -1,9 +1,21 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import OrganizerSkeleton from './OrganizerSkeleton';
+import OrganizerTable from './OrganizerTable';
 
 const Organizers = () => {
+  
   return (
-    <div>
-        organizers
+     <div className="p-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold">
+          Organizer Approvals
+        </h1>
+        <p className="text-gray-500 text-sm">
+          Review and approve organizer verification requests
+        </p>
+      </div>
+      <OrganizerTable/>
     </div>
   );
 }
