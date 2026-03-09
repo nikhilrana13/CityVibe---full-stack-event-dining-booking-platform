@@ -233,9 +233,7 @@ const StripeWebhookHandler = async (req, res) => {
   if (event.type === "payment_intent.payment_failed") {
     const paymentIntent = event.data.object;
     const bookingId = paymentIntent.metadata?.bookingId;
-
     const booking = await Eventbooking.findById(bookingId);
-
     if (booking) {
       booking.paymentStatus = "failed";
       booking.bookingStatus = "cancelled";
