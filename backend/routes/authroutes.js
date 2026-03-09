@@ -1,5 +1,5 @@
 const express = require("express") 
-const { verifyFirebaseToken, LoginWithGoogle, adminLogin, Logout } = require("../controllers/AuthController.js")
+const { verifyFirebaseToken, LoginWithGoogle, adminLogin, Logout } = require("../controllers/authcontroller.js")
 const IsGoogleAuth = require("../middleware/IsGoogleAuth.js") 
 const { AuthLimiter } = require("../middleware/ratelimiters.js")
 const router = express.Router()
