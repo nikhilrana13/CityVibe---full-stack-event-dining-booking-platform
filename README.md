@@ -342,3 +342,6 @@ This script inserts an admin user into the database with permissions required to
 📧 Email notifications for bookings
 
 📊 Advanced analytics dashboard
+
+Live Link:[https://cityvibe-full-stack-event-dining-booking-d2nc.onrender.com]
+
