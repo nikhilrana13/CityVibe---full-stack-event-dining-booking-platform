@@ -34,10 +34,19 @@ import AdminGuard from "./middlewares/AdminGuard"
 import AdminLogin from "./components/admindashboard/AdminLogin"
 import Organizers from "./components/admindashboard/Organizers"
 import PaymentFailed from "./components/pages/EventPage/PaymentFailed"
+import { Helmet } from "react-helmet-async"
 
 const App = () => {
   return (
-    <div className="w-full">
+    <>
+     <Helmet>
+        <title>CityVibe | Discover Events & Dining Near You</title>
+        <meta
+          name="description"
+          content="Discover the best events, concerts, nightlife and dining experiences in your city with CityVibe."
+        />
+      </Helmet>       
+        <div className="w-full">
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Homepage />} />
@@ -100,6 +109,8 @@ const App = () => {
       <LoginDialog />
       <Toaster />
     </div>
+    </>
+
   )
 }
 

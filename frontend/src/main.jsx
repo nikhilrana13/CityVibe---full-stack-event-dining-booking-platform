@@ -9,6 +9,7 @@ import ErrorBoundary from './components/common/ErrorBoundary'
 import { LocationProvider } from './context/useLocationContext'
 import { SearchProvider } from './context/useSearchContext'
 import { DialogProvider } from './context/useDialog'
+import { HelmetProvider } from 'react-helmet-async'
 
 createRoot(document.getElementById('root')).render(
   
@@ -19,13 +20,13 @@ createRoot(document.getElementById('root')).render(
          <LocationProvider>
             <SearchProvider>
                <DialogProvider>
-                  <App />
+                  <HelmetProvider>
+                     <App />
+                  </HelmetProvider>
                </DialogProvider>
-            
             </SearchProvider>     
          </LocationProvider>
         </ErrorBoundary>
-        
         </BrowserRouter>
      </PersistGate>
    </Provider>
