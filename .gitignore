@@ -5,6 +5,10 @@ backend/.env
 frontend/node_modules
 frontend/dist
 frontend/.env
+#for organizer
+organizer/node_modules
+organizer/dist
+organizer/.env
 # General
 .DS_Store
 .env

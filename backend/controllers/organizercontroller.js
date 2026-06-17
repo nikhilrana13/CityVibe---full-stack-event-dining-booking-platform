@@ -86,27 +86,26 @@ const OnBoardingOrganizer = async (req, res) => {
     });
     user.hasOrganizerAccount = true;
     await user.save();
-    return Response(res, 200, "OnBoarding successful", { organizer});
+    return Response(res, 200, "OnBoarding successful", { organizer });
   } catch (error) {
     console.log("failed to create organizer", error);
     return Response(res, 500, "Internal server error");
   }
 };
-// get organizer profile 
-const OrganizerProfile = async(req,res)=>{
+// get organizer profile
+const OrganizerProfile = async (req, res) => {
   try {
-      const userId = req.user 
-      const organizer = await Organizer.findOne({user:userId})
-      if(!organizer){
-        return Response(res,404,"Organizer not found")
-      }
-      return Response(res,200,"Organizer found",{organizer})
+    const userId = req.user;
+    const organizer = await Organizer.findOne({ user: userId });
+    if (!organizer) {
+      return Response(res, 404, "Organizer not found");
+    }
+    return Response(res, 200, "Organizer found", { organizer });
   } catch (error) {
-    console.log("failed to fetch organizer",error)
-    return Response(res,500,"Internal server error")
-    
+    console.log("failed to fetch organizer", error);
+    return Response(res, 500, "Internal server error");
   }
-}
+};
 // update Organizer business profile
 const UpdateBusinessProfile = async (req, res) => {
   try {
@@ -202,11 +201,13 @@ const OrganizerDashboardStats = async (req, res) => {
       totaldiningbookings = diningbookings?.length || 0;
     }
     return Response(res, 200, "dashboard stats fetched successfully", {
-      totalRevenue,
-      totalTicketsolds,
-      totaleventbookings,
-      totalEvents,
-      totaldiningbookings,
+      stats: {
+        totalRevenue,
+        totalTicketsolds,
+        totaleventbookings,
+        totalEvents,
+        totaldiningbookings,
+      },
     });
   } catch (error) {
     console.log("Failed to get dashboard stats", error);
@@ -263,8 +264,19 @@ const OrganizerRevenueAnalytics = async (req, res) => {
       },
     ]);
     const monthNames = [
-      "", "Jan", "Feb", "Mar", "Apr", "May",
-      "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      "",
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
     ];
     const formattedRevenue = monthlyRevenue.map((item) => ({
       month: monthNames[item._id.month],
@@ -281,7 +293,6 @@ const OrganizerRevenueAnalytics = async (req, res) => {
       monthlyRevenue: formattedRevenue,
       growth: Number(growth),
     });
-
   } catch (error) {
     console.error("Revenue analytics error", error);
     return Response(res, 500, "Internal server error");
@@ -313,9 +324,11 @@ const EventManagementStats = async (req, res) => {
       bookingStatus: "confirmed",
     }).select("totalAmount totalSeats");
     // total revenue
-    const totalRevenue = eventbookings.reduce((sum, booking) => sum + booking.totalAmount, 0) || 0;
+    const totalRevenue =
+      eventbookings.reduce((sum, booking) => sum + booking.totalAmount, 0) || 0;
     // total tickets sold
-    const totalTicketsolds = eventbookings.reduce((sum, booking) => sum + booking.totalSeats, 0) || 0;
+    const totalTicketsolds =
+      eventbookings.reduce((sum, booking) => sum + booking.totalSeats, 0) || 0;
     // current month revenue
     const startOfMonth = new Date();
     startOfMonth.setDate(1);
@@ -566,5 +579,5 @@ module.exports = {
   EventBookingPageStats,
   DiningBookingPageStats,
   OrganizerProfile,
-  OrganizerRevenueAnalytics
+  OrganizerRevenueAnalytics,
 };
