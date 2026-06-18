@@ -29,6 +29,15 @@ export const EventApi = createApi({
             },
             providesTags: ["Event"]
         }),
+        // create event 
+        CreateEvent:builder.mutation({
+            query:(formdata)=>({
+                url:"/api/event/create-event",
+                method:"POST",
+                body:formdata
+            }),
+            invalidatesTags:["Event"]
+        }),
         // handle Cancel Event 
         CancelEvent:builder.mutation({
             query:(id)=>({
@@ -44,9 +53,10 @@ export const EventApi = createApi({
                 method:"DELETE",
             }),
             invalidatesTags: ["Event"],
-        })
+        }),
+        
     })
 
 })
 
-export const { useGetEventStatsQuery, useGetOrganizerEventsQuery,useCancelEventMutation,useDeleteEventMutation} = EventApi
+export const { useGetEventStatsQuery, useGetOrganizerEventsQuery,useCreateEventMutation,useCancelEventMutation,useDeleteEventMutation,} = EventApi

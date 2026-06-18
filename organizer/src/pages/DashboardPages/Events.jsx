@@ -1,6 +1,6 @@
 import StatsCard from '@/components/dashboard/StatsCard';
 import StatsCardShimmer from '@/components/dashboard/StatsCardShimmer';
-import EventsTable from '@/components/events/EventsTable';
+import EventsTable from '@/components/event/EventsTable';
 import useDebounce from '@/hooks/useDebounce';
 import { useGetEventStatsQuery } from '@/redux/api/EventApi';
 import { formatIndianNumber } from '@/utils/Helpers';

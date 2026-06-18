@@ -11,6 +11,9 @@ import { ToastContainer } from 'react-toastify';
 import OrganizerRouteGuard from './middlewares/OrganizerRouteGuard';
 import Dashboard from './pages/DashboardPages/Dashboard';
 import Events from './pages/DashboardPages/Events';
+import Dining from './pages/DashboardPages/Dining';
+import Restaurantform from './components/dining/AddAndEditRestaurant/RestaurantForm';
+import CreateEventForm from './components/event/CreateEvent/CreateEventForm';
 
 const App = () => {
   return (
@@ -35,13 +38,16 @@ const App = () => {
             {/* organizer main routes */}
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="manage-events" element={<Events />} />
+            <Route path="create-event" element={<CreateEventForm />} />
+            <Route path="manage-dining" element={<Dining />} />
+            <Route path="add-restaurant" element={<Restaurantform />} />
+            <Route path="edit-restaurant/:id" element={<Restaurantform />} />
 
-            {/* <Route path="create-event" element={<CreateEvent />} />
-            <Route path="manage-dining" element={<ManageDining />} />
-            <Route path="manage-bookings" element={<ManageBookings />} />
+            {/* <Route path="manage-bookings" element={<ManageBookings />} />
             <Route path="verify-tickets" element={<VerifyTickets />} />
-            <Route path="settings" element={<Settings />} />  */}
-
+            <Route path="settings" element={<Settings />} />   */}
+            
+          
             </Route>
           </Route>
         </Route>
