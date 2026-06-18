@@ -7,6 +7,7 @@ import { OrganizerApi } from "./api/OrganizerApi";
 import { DashboardApi } from "./api/DashboardApi";
 import { EventApi } from "./api/EventApi";
 import { DiningApi } from "./api/DiningApi";
+import { BookingApi } from "./api/BookingApi";
 
 
 
@@ -21,10 +22,11 @@ const rootReducer = combineReducers({
     [OrganizerApi.reducerPath]:OrganizerApi.reducer,
     [DashboardApi.reducerPath]:DashboardApi.reducer,
     [EventApi.reducerPath]:EventApi.reducer,
-    [DiningApi.reducerPath]:DiningApi.reducer
+    [DiningApi.reducerPath]:DiningApi.reducer,
+    [BookingApi.reducerPath]:BookingApi.reducer
 })
 export const Store = configureStore({
     reducer:rootReducer,
-    middleware:(getDefaultMiddleware)=>getDefaultMiddleware({serializableCheck:false}).concat(OrganizerApi.middleware).concat(DashboardApi.middleware).concat(EventApi.middleware).concat(DiningApi.middleware)
+    middleware:(getDefaultMiddleware)=>getDefaultMiddleware({serializableCheck:false}).concat(OrganizerApi.middleware).concat(DashboardApi.middleware).concat(EventApi.middleware).concat(DiningApi.middleware).concat(BookingApi.middleware)
 })
 export const Persistor = persistStore(Store)

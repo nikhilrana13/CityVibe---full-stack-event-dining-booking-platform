@@ -173,7 +173,7 @@ const OrganizerDashboardStats = async (req, res) => {
       return Response(res, 403, "Only approved organizers can access");
     }
     // get organizer all events
-    const events = await Event.find({ organizer: organizer._id });
+    const events = await Event.find({ organizer: organizer._id});
     //find events id
     const eventIds = events.map((e) => e._id);
     // find payment status paid or booking status confirmed event bookings
@@ -313,7 +313,6 @@ const EventManagementStats = async (req, res) => {
     // get organizer all events
     const events = await Event.find({
       organizer: organizer._id,
-      eventIsActive: true,
     });
     //find events id
     const eventIds = events.map((e) => e._id);
@@ -346,10 +345,12 @@ const EventManagementStats = async (req, res) => {
     );
     const totalEvents = events.length || 0;
     return Response(res, 200, "event mangement stats fetched successfully", {
+      stats:{
       totalRevenue,
       totalTicketsolds,
       currentMonthRevenue,
       totalEvents,
+      }
     });
   } catch (error) {
     console.log("Failed to event management stats", error);
@@ -422,11 +423,14 @@ const ManageDiningStats = async (req, res) => {
     ]);
     // console.log("stats",totalbookings,confirmedbookings,cancelledbookings,todaysbookings,thisMonthbookings)
     return Response(res, 200, "Dining dashboard stats fetched", {
+      stats:{
       totalbookings,
       confirmedbookings,
       cancelledbookings,
       todaysbookings,
       thisMonthbookings,
+    }
+     
     });
   } catch (error) {
     console.log("Failed to fetch dining stats", error);
@@ -493,7 +497,9 @@ const EventBookingPageStats = async (req, res) => {
       pendingBookings: 0,
     };
 
-    return Response(res, 200, "Booking stats fetched", stats);
+    return Response(res, 200, "Booking stats fetched",{
+      stats
+    });
   } catch (error) {
     console.log("Failed to fetch booking stats", error);
     return Response(res, 500, "Internal server error");
@@ -520,10 +526,13 @@ const DiningBookingPageStats = async (req, res) => {
 
     if (!restaurant) {
       return Response(res, 200, "No restaurant found", {
+        stats:{
         totalBookings: 0,
         confirmedBookings: 0,
         cancelledBookings: 0,
         pendingBookings: 0,
+        }
+    
       });
     }
     // Aggregate booking stats
@@ -563,7 +572,7 @@ const DiningBookingPageStats = async (req, res) => {
       pendingBookings: 0,
     };
 
-    return Response(res, 200, "Dining booking stats fetched", stats);
+    return Response(res, 200, "Dining booking stats fetched",{stats});
   } catch (error) {
     console.log("Failed to fetch dining booking stats", error);
     return Response(res, 500, "Internal server error");

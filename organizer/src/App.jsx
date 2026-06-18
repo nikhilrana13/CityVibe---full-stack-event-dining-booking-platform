@@ -14,6 +14,7 @@ import Events from './pages/DashboardPages/Events';
 import Dining from './pages/DashboardPages/Dining';
 import Restaurantform from './components/dining/AddAndEditRestaurant/RestaurantForm';
 import CreateEventForm from './components/event/CreateEvent/CreateEventForm';
+import Bookings from './pages/DashboardPages/Bookings';
 
 const App = () => {
   return (
@@ -42,9 +43,9 @@ const App = () => {
             <Route path="manage-dining" element={<Dining />} />
             <Route path="add-restaurant" element={<Restaurantform />} />
             <Route path="edit-restaurant/:id" element={<Restaurantform />} />
-
-            {/* <Route path="manage-bookings" element={<ManageBookings />} />
-            <Route path="verify-tickets" element={<VerifyTickets />} />
+            <Route path="manage-bookings" element={<Bookings />} />
+            
+            {/* <Route path="verify-tickets" element={<VerifyTickets />} />
             <Route path="settings" element={<Settings />} />   */}
             
           

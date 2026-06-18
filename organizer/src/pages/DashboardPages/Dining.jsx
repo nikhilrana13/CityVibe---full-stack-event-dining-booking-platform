@@ -32,7 +32,7 @@ const Dining = () => {
         },
         {
             title: "Cancel Booking",
-            value:  statsQuery.isError ? "--" : stats?.cancelbookings ?? 0,
+            value:  statsQuery.isError ? "--" : stats?.cancelledbookings ?? 0,
             icon: MdOutlineCancel,
             gradient: "from-[#FF0000] to-[#FF0000]",
         },

@@ -28,7 +28,7 @@ const Events = () => {
         },
         {
             title: "Ticket solds",
-            value: statsQuery.isError ? "--" : stats?.totalEvents ?? 0,
+            value: statsQuery.isError ? "--" : stats?.totalTicketsolds ?? 0,
             icon: TiTicket,
             gradient: "from-[#0ea5e9] to-[#06b6d4]",
         },
