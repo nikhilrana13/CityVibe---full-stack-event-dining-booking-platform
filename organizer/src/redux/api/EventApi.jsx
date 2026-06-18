@@ -54,9 +54,18 @@ export const EventApi = createApi({
             }),
             invalidatesTags: ["Event"],
         }),
+        // verify ticket 
+        VerifyTicketDetails:builder.mutation({
+            query:(ticketCode)=>({
+                url:"/api/event/verify-ticket",
+                method:"PUT",
+                body:ticketCode
+            }),
+            invalidatesTags:["Event"]
+        })
         
     })
 
 })
 
-export const { useGetEventStatsQuery, useGetOrganizerEventsQuery,useCreateEventMutation,useCancelEventMutation,useDeleteEventMutation,} = EventApi
+export const { useGetEventStatsQuery, useGetOrganizerEventsQuery,useCreateEventMutation,useCancelEventMutation,useDeleteEventMutation,useVerifyTicketDetailsMutation} = EventApi
