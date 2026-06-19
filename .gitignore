@@ -9,6 +9,10 @@ frontend/.env
 organizer-frontend/node_modules
 organizer-frontend/dist
 organizer-frontend/.env
+# for admin 
+admin-frontend/node_modules
+admin-frontend/dist
+admin-frontend/.env
 # General
 .DS_Store
 .env
