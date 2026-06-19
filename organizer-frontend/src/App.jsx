@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import ListYourEvents from './pages/Home';
 import OrganizerGuard from './middlewares/OrganizerGuard';
@@ -17,10 +17,25 @@ import CreateEventForm from './components/event/CreateEvent/CreateEventForm';
 import Bookings from './pages/DashboardPages/Bookings';
 import VerifyTickets from './pages/DashboardPages/VerifyTickets';
 import Settings from './pages/DashboardPages/Settings';
+import { useDialog } from './context/useDialog';
+import LoginDialog from './components/common/LoginDialog';
 
 const App = () => {
+  const {isLoginDialogOpen,setIsLoginDialogOpen} = useDialog()
+  // open login dialog when token expire 
+  useEffect(()=>{
+     const handleAuthorized = ()=>{
+      // console.log("Unauthorized Event Fired");
+      setIsLoginDialogOpen(true)
+     };
+      window.addEventListener("unauthorized",handleAuthorized);
+     return ()=>{
+      window.removeEventListener("unauthorized",handleAuthorized);
+     }
+  },[setIsLoginDialogOpen])
   return (
-    <div className="w-full">
+    <>
+      <div className="w-full">
       {/* routes */}
       <Routes>
         <Route path="/" element={<ListYourEvents />} />
@@ -48,8 +63,6 @@ const App = () => {
             <Route path="manage-bookings" element={<Bookings />} />
             <Route path="verify-tickets" element={<VerifyTickets />} />
             <Route path="settings" element={<Settings />} />  
-            
-          
             </Route>
           </Route>
         </Route>
@@ -57,6 +70,10 @@ const App = () => {
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} style={{ zIndex: 200000 }} />
     </div>
+    {/* login dialog */}
+    {isLoginDialogOpen && <LoginDialog onClose={()=>setIsLoginDialogOpen(false)} />}
+    </>
+  
   );
 }
 

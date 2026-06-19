@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 const LoginDialog = ({ onClose }) => {
-    const { isLoginDialogOpen } = useDialog()
+    const { isLoginDialogOpen,setIsLoginDialogOpen} = useDialog()
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -30,6 +30,7 @@ const LoginDialog = ({ onClose }) => {
                 const token = response?.data?.token
                 localStorage.setItem("token", token)
                 dispatch(SetUser(user))
+                setIsLoginDialogOpen(false); 
                 if (user?.hasOrganizerAccount) {
                     navigate("/organizer");
                 } else {
@@ -43,7 +44,7 @@ const LoginDialog = ({ onClose }) => {
     }
 
     return (
-        <div className='fixed top-0 left-0 z-[100000] px-3  flex w-screen h-screen justify-center  items-center'>
+        <div className='fixed top-0 left-0 z-[1000000] px-3  flex w-screen h-screen justify-center  items-center'>
             {/* backdrop */}
             <div className='absolute inset-0 bg-gray-900/60 backdrop-blur-sm' onClick={() => handleClose()} />
             {/* content */}
