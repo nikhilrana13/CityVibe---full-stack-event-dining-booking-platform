@@ -148,6 +148,7 @@ const AdminDashboardStats = async (req, res) => {
     const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
     const totalBookings = totalEventBookings + totalRestaurantBookings;
     return Response(res, 200, "Admin dashboard stats fetched successfully", {
+      stats:{
       totalUsers,
       totalOrganizers,
       pendingOrganizers,
@@ -157,6 +158,8 @@ const AdminDashboardStats = async (req, res) => {
       totalRestaurantBookings,
       totalBookings,
       totalRevenue
+      }
+     
     });
   } catch (error) {
     console.error("Failed to fetch admin dashboard stats", error);
