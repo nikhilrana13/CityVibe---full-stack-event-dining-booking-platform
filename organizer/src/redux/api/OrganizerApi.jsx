@@ -21,9 +21,17 @@ export const OrganizerApi = createApi({
                 body:formData
             }),
             invalidatesTags: ["Organizer"],
-        })
+        }),
         // update organizer profile
+        UpdateOrganizerProfile:builder.mutation({
+            query:(formdata)=>({
+                url:"/api/organizer/updateprofile",
+                method:"PUT",
+                body:formdata
+            }),
+            invalidatesTags:["Organizer"]
+        })
     })
 })
 
-export const {useGetOrganizerProfileQuery,useCreateOrganizerAccountMutation} = OrganizerApi
+export const {useGetOrganizerProfileQuery,useCreateOrganizerAccountMutation,useUpdateOrganizerProfileMutation} = OrganizerApi
