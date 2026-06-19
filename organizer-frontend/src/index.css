@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
- {
+.no-scrollbar{
   box-sizing: border-box;
   -ms-overflow-style: none;   /* IE & Edge */
   scrollbar-width: none;      /* Firefox */
