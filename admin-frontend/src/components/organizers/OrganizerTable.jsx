@@ -16,16 +16,15 @@ const OrganizerTable = () => {
     const pagination = organizerQuery?.data?.data?.pagination ?? {}
     const [VerifyOrganizer] = useVerifyOrganizerMutation()
 
-
-
     const handleVerifyOrganizer = async (id, status) => {
         try {
             setActionLoading({ id: id, type: status })
-            const response = await VerifyOrganizer({id,status}).unwrap()
+            const response = await VerifyOrganizer({ id, status }).unwrap()
             toast.success(response?.message)
-            organizerQuery.refetch()
+            // console.log("mutation response", response);
+
         } catch (error) {
-            console.error("failed to verify organizer",error)
+            console.error("failed to verify organizer", error)
             toast.error(error?.data?.message || "Internal server error")
         } finally {
             setActionLoading({ id: null, type: null })
@@ -59,18 +58,25 @@ const OrganizerTable = () => {
                                     <td className="p-4">{org?.user?.email}</td>
                                     <td className="p-4">{org?.panNumber}</td>
                                     <td className="p-4">
-                                        {org.isApproved ? (
+                                        {org.verificationStatus === "approved" && (
                                             <span className="text-green-600 font-medium">
                                                 Approved
                                             </span>
-                                        ) : (
+                                        )}
+                                        {org.verificationStatus === "pending" && (
                                             <span className="text-yellow-600 font-medium">
                                                 Pending
                                             </span>
                                         )}
+                                        {org.verificationStatus === "rejected" && (
+                                            <span className="text-red-600 font-medium">
+                                                Rejected
+                                            </span>
+                                        )}
+
                                     </td>
                                     <td className="p-4 flex justify-end  gap-2">
-                                        {!org.isApproved && (
+                                        {org.verificationStatus === "pending" && (
                                             <>
                                                 <button
                                                     disabled={actionLoading.id === org._id}

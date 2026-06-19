@@ -31,7 +31,7 @@ const GetOrganizers = async(req,res)=>{
         if(admin.role !== "admin"){
             return Response(res,403,"Access denied Admin only")
         }
-        const organizers = await Organizer.find(query).sort({createdAt:1}).skip(skip).limit(limit).populate("user","name email")
+        const organizers = await Organizer.find(query).sort({createdAt:-1}).skip(skip).limit(limit).populate("user","name email")
         const totalorganizers = await Organizer.countDocuments(query)
         const totalPages = Math.ceil(totalorganizers / limit)
         if(organizers.length === 0 ){
