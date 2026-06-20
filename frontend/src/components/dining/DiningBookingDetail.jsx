@@ -1,9 +1,9 @@
 import React from 'react';
-import TicketDivider from './TicketDivider';
-import { formatDateRange, formatTime } from '../../lib/utils';
 import { Loader2 } from 'lucide-react';
+import { formatDateRange, formatTime } from '@/utils/Helpers';
+import TicketDivider from '../common/TicketDivider';
 
-const DiningBookingDetails = ({ booking, CancelBooking, iscancelbook }) => {
+const DiningBookingDetail = ({ booking, CancelBooking, iscancelbook }) => {
   return (
     <div className="max-w-xl mx-auto p-4">
       <div className="bg-white rounded-3xl shadow-lg border overflow-hidden">
@@ -62,4 +62,4 @@ const DiningBookingDetails = ({ booking, CancelBooking, iscancelbook }) => {
   );
 }
 
-export default DiningBookingDetails;
+export default DiningBookingDetail;

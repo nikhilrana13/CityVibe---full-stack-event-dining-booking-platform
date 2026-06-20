@@ -5,7 +5,8 @@ import BookingTicketShimmer from './BookingTicketShimmer';
 import BookingNotFound from './BookingNotFound';
 import { toast } from 'sonner';
 import EventBookingDetails from '../events/EventBookingDetails';
-import DiningBookingDetails from '../common/DiningBookingDetails';
+import DiningBookingDetail from '../dining/DiningBookingDetail';
+
 
 const BookingDetails = () => {
      const [loading,setLoading] = useState(true)
@@ -70,7 +71,7 @@ const BookingDetails = () => {
         ):type === "events" ? (
            <EventBookingDetails booking={booking} CancelBooking={()=>handleCancelBooking(id)} iscancelbook={iscancelbook} />
         ):(
-          <DiningBookingDetails booking={booking} CancelBooking={()=>handleCancelBooking(id)} iscancelbook={iscancelbook}  />
+          <DiningBookingDetail booking={booking} CancelBooking={()=>handleCancelBooking(id)} iscancelbook={iscancelbook}  />
         )
       }     
     </div>

@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react'
-import { CiUser } from 'react-icons/ci'
 import loginbg from "../../assets/loginbg.avif"
 import { IoMdClose } from 'react-icons/io'
 import { signInWithPopup, } from 'firebase/auth'
@@ -41,27 +40,8 @@ const LoginDialog = () => {
                     navigate(path)
                     return
                 }
-                if (user?.hasOrganizerAccount === true) {
-                    try {
-                        const orgRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/organizer/profile`, {
-                            headers: {
-                                Authorization: `Bearer ${response.data.data.token}`
-                            }
-                        })
-                        const status = orgRes?.data?.data?.organizer.verificationStatus
-                        if (status === "approved") {
-                            navigate("/organizer/dashboard")
-                        } else if (status === "pending") {
-                            navigate("/organizer/pending")
-                        } else {
-                            navigate("/organizer/rejected")
-                        }
-                    } catch (error) {
-                        navigate("/")
-                    }
-                } else {
-                    navigate("/")
-                }
+                navigate('/')
+                
                 handleClose()
             }
         } catch (error) {

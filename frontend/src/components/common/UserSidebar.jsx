@@ -1,20 +1,16 @@
 import { GoArrowLeft } from "react-icons/go"
 import { LiaClipboardListSolid } from "react-icons/lia"
 import { BiLogOut } from "react-icons/bi"
-import { RxDashboard } from "react-icons/rx"
 import { LuGuitar, LuFileSpreadsheet, LuMessageCircleWarning } from "react-icons/lu"
 import { NavLink } from "react-router-dom"
 import { useSelector } from "react-redux"
 import useLogout from "../../hooks/useLogout"
 import nouserimg from "../../assets/user.png"
-import useFetchOrganizer from "../../hooks/useFetchOrganizer"
+
 
 const UserSidebar = ({ isOpen, onClose }) => {
   const user = useSelector((state) => state.Auth.user)
   const { handleLogout } = useLogout()
-  const shouldfetch = user?.hasOrganizerAccount === true
-  const { organizer,loading} = useFetchOrganizer(shouldfetch)
-  if (loading) return null
   return (
     <>
     {/* overlay */}
@@ -55,23 +51,6 @@ const UserSidebar = ({ isOpen, onClose }) => {
               <LiaClipboardListSolid size={22} />
               View all bookings
             </NavLink>
-            {organizer?.verificationStatus === "approved" ? (
-              <NavLink
-                to="/organizer/dashboard"
-                className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4"
-              >
-                <RxDashboard size={23} />
-                Dashboard
-              </NavLink>
-            ) : (
-              <NavLink
-                to="/organizer/onboarding"
-                className="bg-white flex gap-3 border items-center rounded-xl py-4 px-4"
-              >
-                <LuGuitar size={23} />
-                List your events
-              </NavLink>
-            )}
           </div>
           {/* more */}
           <div className="p-5 flex flex-col gap-8">

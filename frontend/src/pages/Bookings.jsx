@@ -6,7 +6,7 @@ import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import BookingCardShimmer from '../components/bookings/BookingCardShimmer';
 import NoBookingFallback from '../components/bookings/NoBookingFallback';
-import { formatDateRange } from '@/utils/Helpers';
+import { formatDateRange, formatTime } from '@/utils/Helpers';
 
 const Bookings = () => {
     const navigate = useNavigate()

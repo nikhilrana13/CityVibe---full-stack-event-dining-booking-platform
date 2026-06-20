@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import BookNavbar from './BookNavbar';
 import axios from 'axios';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { formatIndianNumber } from '../../../lib/utils';
 import { Loader2, Minus, Plus } from 'lucide-react';
 import Loader from '../../../components/common/Loader';
 import EventNotFoundFallback from './EventNotFoundFallback';
 import { useSelector } from 'react-redux';
 import { useDialog } from '../../../context/useDialog';
 import { toast } from 'sonner';
+import { formatIndianNumber } from '@/utils/Helpers';
 
 const BookEventTickets = () => {
   const user = useSelector((state)=>state.Auth.user)

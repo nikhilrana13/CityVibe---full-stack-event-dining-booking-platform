@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { LuMapPin } from 'react-icons/lu';
 import ResImagesGallery from './ResImagesGallery';
-import { formatIndianNumber, formatTime, generateSlug } from '../../../lib/utils';
+
 import { useNavigate } from 'react-router-dom';
 import slugify from 'slugify';
+import { formatTime } from '@/utils/Helpers';
 
 
 

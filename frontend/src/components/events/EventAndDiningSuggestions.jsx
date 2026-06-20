@@ -1,9 +1,9 @@
 import { useSearchContext } from '../../context/useSearchContext';
-import React, { useEffect, useState } from 'react';
-import SearchResultCard from './SearchResultCard';
 import { useLocationContext } from '../../context/useLocationContext';
-import SearchResultCardShimmer from './SearchResultCardShimmer';
 import { useDialog } from '../../context/useDialog';
+import SearchResultCardShimmer from '../common/SearchResultCardShimmer';
+import SearchResultCard from '../common/SearchResultCard';
+import { useEffect, useState } from 'react';
 
 const EventAndDiningSuggestions = () => {
     const [isVisible, setIsVisible] = useState(false)
@@ -74,7 +74,7 @@ const EventAndDiningSuggestions = () => {
                             </div>
                         ) : (
                             <div className='flex justify-center items-center w-full py-10'>
-                                <span className="text-gray-500 text-center">Sorry! We do not have results for {query}</span>
+                                <span className="text-gray-500 text-center">Sorry! We do not have results for {query || "your query"}</span>
                             </div>
                         )
                         }

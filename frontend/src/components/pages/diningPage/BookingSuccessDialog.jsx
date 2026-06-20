@@ -3,7 +3,8 @@ import { Check } from "lucide-react"
 import { useEffect } from "react"
 import confetti from "canvas-confetti"
 import { useNavigate } from "react-router-dom"
-import { formatDateRange, formatTime } from "../../../lib/utils"
+import { formatDateRange, formatTime } from "@/utils/Helpers"
+
 
 const BookingSuccessDialog = ({open,restaurant,date,time,guests,bookingId,autoRedirect = true,onClose}) => {
 
