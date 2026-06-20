@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import BookNavbar from '../components/pages/EventPage/BookNavbar';
 import React, { useEffect, useRef, useState } from 'react';
-import BookingCard from '../components/common/BookingCard';
-import { formatDateRange, formatTime } from '../lib/utils';
+import BookingCard from '../components/bookings/BookingCard';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import BookingCardShimmer from '../components/common/BookingCardShimmer';
-import NoBookingFallback from '../components/common/NoBookingFallback';
+import BookingCardShimmer from '../components/bookings/BookingCardShimmer';
+import NoBookingFallback from '../components/bookings/NoBookingFallback';
+import { formatDateRange } from '@/utils/Helpers';
 
 const Bookings = () => {
     const navigate = useNavigate()
@@ -71,7 +71,7 @@ const Bookings = () => {
             observer.disconnect()
         }
     }, [pagination?.currentpage, pagination?.totalPages, isFetchingMore, loading])
-    // console.log("bookings", bookings)
+    // console.log("bookings", bookings) 
     // console.log("pagination", pagination)
     return (
         <div className='w-full'>
@@ -116,7 +116,7 @@ const Bookings = () => {
                             ) : (
                                <NoBookingFallback type={type} onExplore={() => 
                                 navigate(type === "events" ? "/events" : "/dining")} />
-                            )}
+                            )} 
                         {/* Infinite Scroll Loader */}
                         {pagination?.totalPages && pagination?.currentpage < pagination?.totalPages && (
                             <div ref={loaderRef} className="h-20 flex justify-center items-center">

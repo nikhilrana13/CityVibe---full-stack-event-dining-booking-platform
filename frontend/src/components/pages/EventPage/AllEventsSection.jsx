@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import EventCard from '../../../components/common/EventCard';
+import EventCard from '../../events/EventCard';
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 

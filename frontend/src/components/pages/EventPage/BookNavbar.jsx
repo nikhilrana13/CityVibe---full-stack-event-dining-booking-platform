@@ -3,9 +3,8 @@ import { HiArrowSmLeft } from "react-icons/hi";
 import React, { useEffect, useState } from 'react';
 import { CiUser } from 'react-icons/ci';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { formatDateRange, formatTime, generateSlug } from '../../../lib/utils';
 import UserSidebar from '@/components/common/UserSidebar';
+import { formatDateRange } from '@/utils/Helpers';
 
 const BookNavbar = ({ title, startDate, starttime, handleBack, city, showBack = false }) => {
     const user = useSelector((state) => state.Auth.user)

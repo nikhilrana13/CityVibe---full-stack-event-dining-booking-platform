@@ -1,5 +1,5 @@
-import EventCard from '../../common/EventCard'
-import EventCardShimmer from '../../common/EventCardShimmer'
+import EventCard from '../../events/EventCard'
+import EventCardShimmer from '../../events/EventCardShimmer'
 import React from 'react'
 
 const ComedySection = ({comedy,loading}) => {

@@ -1,5 +1,5 @@
-import EventCardShimmer from '../../common/EventCardShimmer'
-import EventCard from '../../common/EventCard'
+import EventCardShimmer from '../../events/EventCardShimmer'
+import EventCard from '../../events/EventCard'
 import React from 'react'
 
 const MusicSection = ({music,loading}) => {

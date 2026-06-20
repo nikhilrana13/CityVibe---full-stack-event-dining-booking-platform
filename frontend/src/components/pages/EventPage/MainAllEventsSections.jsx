@@ -1,4 +1,4 @@
-import EventCard from '@/components/common/EventCard';
+import EventCard from '@/components/events/EventCard';
 import { Loader2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { MdKeyboardArrowDown } from 'react-icons/md';
