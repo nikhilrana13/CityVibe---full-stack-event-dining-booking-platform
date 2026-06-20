@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 import EventFiltersDialog from './EventFiltersDialog';
 
-const MainAllEventsSections = ({ allevents, pagination, isFetchingMore, loaderRef, sortBy, setSortBy, setStartDate, startDate })=> {
+const MainAllEventsSections = ({ allevents, pagination, isFetchingMore, loaderRef, sortBy, setSortBy, setStartDate, startDate }) => {
     if (!allevents) return null
     const [openFilter, setOpenFilter] = useState(false)
     const handleDateFilter = (value) => {
@@ -14,15 +14,15 @@ const MainAllEventsSections = ({ allevents, pagination, isFetchingMore, loaderRe
             setStartDate(value)
         }
     }
-     useEffect(() => {
-      if (openFilter) {
-        document.body.style.overflow = "hidden"
-      } else {
-        document.body.style.overflow = "auto"
-      }
-      return () => {
-        document.body.style.overflow = "auto"
-      }
+    useEffect(() => {
+        if (openFilter) {
+            document.body.style.overflow = "hidden"
+        } else {
+            document.body.style.overflow = "auto"
+        }
+        return () => {
+            document.body.style.overflow = "auto"
+        }
     }, [openFilter])
     return (
         <>
@@ -30,14 +30,14 @@ const MainAllEventsSections = ({ allevents, pagination, isFetchingMore, loaderRe
                 <h3 className='text-[1.5rem] font-[500] mb-6'>All Events</h3>
                 {/* filter section */}
                 <div className='flex sticky top-[211px] sm:top-[192px] lg:top-[75px] z-40 bg-[#FFFFFF]   items-center  gap-5'>
-                <div className='flex py-4 items-center overflow-y-auto my-2 gap-5'>
-                 <span onClick={() => setOpenFilter(true)} className={`border px-3 cursor-pointer flex gap-2 items-center py-1 text-[0.8rem] rounded-md ${sortBy ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>
-                        Filters <MdKeyboardArrowDown /></span>
-                    <span onClick={() => handleDateFilter("Today")} className={`border px-3 whitespace-nowrap cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "Today" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>Today</span>
-                    <span onClick={() => handleDateFilter("Tomorrow")} className={`border whitespace-nowrap px-3 cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "Tomorrow" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>Tomorrow</span>
-                    <span onClick={() => handleDateFilter("ThisWeek")} className={`border whitespace-nowrap px-3 cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "ThisWeek" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>This Week</span>
-                    <span onClick={() => handleDateFilter("ThisMonth")} className={`border whitespace-nowrap px-3 cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "ThisMonth" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>This Month</span>
-                </div>
+                    <div className='flex py-4 items-center overflow-y-auto my-2 gap-5'>
+                        <span onClick={() => setOpenFilter(true)} className={`border px-3 cursor-pointer flex gap-2 items-center py-1 text-[0.8rem] rounded-md ${sortBy ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>
+                            Filters <MdKeyboardArrowDown /></span>
+                        <span onClick={() => handleDateFilter("Today")} className={`border px-3 whitespace-nowrap cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "Today" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>Today</span>
+                        <span onClick={() => handleDateFilter("Tomorrow")} className={`border whitespace-nowrap px-3 cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "Tomorrow" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>Tomorrow</span>
+                        <span onClick={() => handleDateFilter("ThisWeek")} className={`border whitespace-nowrap px-3 cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "ThisWeek" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>This Week</span>
+                        <span onClick={() => handleDateFilter("ThisMonth")} className={`border whitespace-nowrap px-3 cursor-pointer py-1 font-500 text-[0.8rem] rounded-md ${startDate === "ThisMonth" ? "bg-[#EAE5FF] border-[#8972FE]" : ""}`}>This Month</span>
+                    </div>
                 </div>
                 {/* events card */}
                 <div className="grid mt-3  grid-cols-1 md:place-items-center xl:place-items-start sm:grid-cols-2 lg:grid-cols-3  xl:grid-cols-4 gap-2">
@@ -57,8 +57,8 @@ const MainAllEventsSections = ({ allevents, pagination, isFetchingMore, loaderRe
                     }
                 </div>
                 {/* Infinite Scroll Loader */}
-                {pagination?.currentPage < pagination?.totalPages &&(
-                    <div ref={loaderRef} className="h-20 flex justify-center items-center">
+                {pagination?.currentPage < pagination?.totalPages && (
+                    <div ref={loaderRef} className="h-40 flex justify-center items-center">
                         {isFetchingMore ? (
                             <div className="flex gap-2">
                                 <Loader2 className='text-black w-8 h-8 animate-spin' />

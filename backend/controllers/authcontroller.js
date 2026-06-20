@@ -44,7 +44,7 @@ const LoginWithGoogle = async (req, res) => {
         uid,
         email: normalizedEmail,
         name,
-        profilePic: picture,
+        profilepic: picture,
         provider: "google",
         role: "user",
         isVerified: true

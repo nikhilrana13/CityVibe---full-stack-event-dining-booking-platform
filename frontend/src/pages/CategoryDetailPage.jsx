@@ -7,53 +7,55 @@ import HeroSliderShimmer from '../components/pages/EventPage/HeroSliderShimmer';
 import HeroSlider from '../components/pages/EventPage/HeroSlider';
 import AllEventsSection from '../components/pages/EventPage/AllEventsSection';
 import EventEmptyState from '../components/pages/EventPage/EventEmptyState';
-
+import { useGetEventsQuery } from '@/redux/api/EventApi';
 
 
 const CategoryDetailPage = () => {
     const { category } = useParams()
     const { location } = useLocationContext()
     const [allevents, setAllEvents] = useState([])
-    const [initialLoading, setInitialLoading] = useState(true)
-    const [isFetchingMore, setIsFetchingMore] = useState(false)
     const [page, setPage] = useState(1)
-    const [pagination, setPagination] = useState({})
+    const eventsQuery = useGetEventsQuery({
+        page: page,
+        city: location?.city,
+        category: category
+    }, {
+        skip: !location?.city,
+        refetchOnMountOrArgChange: false
+    })
+    const events = eventsQuery?.data?.data?.events || [];
+    const pagination = eventsQuery?.data?.data?.pagination;
+    const initialLoading = eventsQuery.isLoading && page === 1;
+    const isFetchingMore = eventsQuery.isFetching && page > 1;
     const navigate = useNavigate()
     const loaderRef = useRef(null)
-
+    const hasMounted = useRef(false)
+    // Append paginated events to local state
     useEffect(() => {
-        if (!location?.city) return
-        const fetchAllevents = async () => {
-            try {
-                if (page === 1) {
-                    setInitialLoading(true)
-                } else {
-                    setIsFetchingMore(true)
-                }
-                 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/event/search`, {
-                    params: {
-                        page: page,
-                        city: location?.city,
-                        category: category,
-                    }
-                })
-                await delay(1200) // for fake delay testing
-                if (response.data) {
-                    const newEvents = response?.data?.data?.events || []
-                    const newPagination = response?.data?.data?.pagination || {}
-                    setAllEvents(prev => page === 1 ? newEvents : [...prev, ...newEvents])
-                    setPagination(newPagination)
-                }
-            } catch (error) {
-                console.error("failed to fetch all events", error)
-            } finally {
-                    setInitialLoading(false)
-                    setIsFetchingMore(false)
-            }
+        if (!events.length) return;
+        setAllEvents(prev => {
+            // First page replaces existing events
+            if (page === 1) return events;
+            const merged = [...prev, ...events];
+            // Prevent duplicate events during pagination/refetches
+            return merged.filter(
+                (event, index, self) =>
+                    index === self.findIndex(
+                        e => e._id === event._id
+                    )
+            );
+        });
+    }, [events, page]);
+    // Reset pagination when category or city change
+    // Skip initial mount to avoid clearing first API response
+    useEffect(() => {
+        if (!hasMounted.current) {
+            hasMounted.current = true;
+            return;
         }
-        fetchAllevents()
-    }, [location?.city, page, category])
+        setPage(1);
+    }, [location?.city, category]);
+
     // scroll to top on city change
     useEffect(() => {
         if (location?.city) {
@@ -63,15 +65,11 @@ const CategoryDetailPage = () => {
             })
         }
     }, [location?.city, category])
-    //  redirect to page 1
-    useEffect(() => {
-        setAllEvents([])
-        setPage(1)
-    }, [category, location?.city])
+
     // infinite scroll observer block
     useEffect(() => {
-        const hasNextPage = pagination.currentPage < pagination?.totalPages
-        if (!hasNextPage || isFetchingMore) return
+        const hasNextPage = pagination?.currentPage < pagination?.totalPages
+        if (!pagination || !hasNextPage || isFetchingMore) return;
         const observer = new IntersectionObserver(
             entries => {
                 if (entries[0].isIntersecting && !isFetchingMore) {
@@ -79,17 +77,21 @@ const CategoryDetailPage = () => {
                     setPage(prev => prev + 1)
                 }
             },
-            { rootMargin: "100px" } // smoother trigger before reaching exact bottom
+            { rootMargin: "150px" } // smoother trigger before reaching exact bottom
         )
         const current = loaderRef.current
         if (current) observer.observe(current)
         return () => {
             observer.disconnect()
         }
-    }, [pagination?.currentPage, pagination?.totalPages,isFetchingMore])
-    const isEmpty = !initialLoading && Array.isArray(allevents) && allevents.length === 0
+    }, [pagination?.currentPage, pagination?.totalPages, allevents.length, isFetchingMore])
+
+    const isEmpty = eventsQuery.isSuccess && !eventsQuery.isFetching && events.length === 0
     const heroEvents = allevents?.slice(0, 6)
     const formattedCategory = CATEGORY_LABELS[category] || category
+
+
+
     return (
         <div className='w-full'>
             <Navbar />
@@ -114,6 +116,7 @@ const CategoryDetailPage = () => {
                     <section className='w-full py-10'>
                         <AllEventsSection
                             // loadEvents={loadEvents}
+                            initialLoading={initialLoading}
                             isFetchingMore={isFetchingMore}
                             pagination={pagination}
                             location={location}

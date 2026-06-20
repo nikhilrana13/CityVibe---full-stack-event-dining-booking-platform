@@ -8,7 +8,7 @@ import EventNotFoundFallback from './EventNotFoundFallback';
 import { useSelector } from 'react-redux';
 import { useDialog } from '../../../context/useDialog';
 import { toast } from 'sonner';
-import { formatIndianNumber } from '@/utils/Helpers';
+import { formatIndianNumber, } from '@/utils/Helpers';
 
 const BookEventTickets = () => {
   const user = useSelector((state)=>state.Auth.user)

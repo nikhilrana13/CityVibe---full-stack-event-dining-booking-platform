@@ -151,8 +151,8 @@ const CreateEventBooking = async (req, res) => {
       payment_method_types: ["card"],
       mode: "payment",
       line_items: lineItems,
-      success_url: `${process.env.FRONTEND_URL}/payment-success?bookingId=${booking._id}`,
-      cancel_url: `${process.env.FRONTEND_URL}/payment-failed?bookingId=${booking._id}`,
+      success_url: `${process.env.USER_FRONTEND_URL}/payment-success?bookingId=${booking._id}`,
+      cancel_url: `${process.env.USER_FRONTEND_URL}/payment-failed?bookingId=${booking._id}`,
       metadata: {
         bookingId: booking._id.toString(),
         userId: user._id.toString(),
@@ -316,7 +316,7 @@ const UserAllBookedEvents = async(req,res)=>{
        if(!user){
         return Response(res,404,"User not found")
        }
-       const bookings = await Eventbooking.find({user:userId}).populate("user","name phonenumber email").populate("event","startDate starttime title location coverimage").sort({createdAt:1}).skip(skip).limit(limit).populate("tickets.ticket",
+       const bookings = await Eventbooking.find({user:userId}).populate("user","name phonenumber email").populate("event","startDate starttime title location coverimage").sort({createdAt:-1}).skip(skip).limit(limit).populate("tickets.ticket",
       "name price paxCount",)
        const totalbookings = await Eventbooking.countDocuments({user:userId})
        const totalPages = Math.ceil(totalbookings / limit)

@@ -4,33 +4,27 @@ import { IoMdClose } from 'react-icons/io'
 import { signInWithPopup, } from 'firebase/auth'
 import { auth, GoogleProvider } from '../../config/firebase.js'
 import { toast } from 'sonner'
-import axios from 'axios'
 import { useDispatch } from 'react-redux'
-import { Setuser } from '../../redux/AuthSlice'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { useDialog } from '../../context/useDialog'
+import { api } from '@/services/api'
+import { Setuser } from '@/redux/AuthSlice'
+import { useNavigate } from 'react-router-dom'
 
 const LoginDialog = () => {
     const { isLoginOpen, setIsLoginOpen, setLoginRedirect, loginRedirect } = useDialog()
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const location = useLocation()
 
     const handleLoginWithgoogle = async () => {
         try {
-            const result = await signInWithPopup(auth, GoogleProvider)
-            const token = await result.user.getIdToken();
-            // console.log(result.user)
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/test-google`, {}, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-            // console.log("response",response?.data)
-            if (response.data) {
-                toast.success(response?.data?.message)
-                localStorage.setItem("token", response?.data?.data?.token)
-                const user = response?.data?.data?.user
+            await signInWithPopup(auth, GoogleProvider)
+            const response = await api.post("/api/auth/google-login", {})
+            // console.log("response", response?.data)
+            if (response) {
+                toast.success(response?.message)
+                const user = response?.data?.user
+                const token = response?.data?.token
+                localStorage.setItem("token", token)
                 dispatch(Setuser(user))
                 // redirect priority
                 if (loginRedirect) {
@@ -41,7 +35,6 @@ const LoginDialog = () => {
                     return
                 }
                 navigate('/')
-                
                 handleClose()
             }
         } catch (error) {

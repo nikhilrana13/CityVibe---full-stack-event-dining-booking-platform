@@ -6,17 +6,20 @@ import sessionStorage from "redux-persist/lib/storage/session";
 export const AuthSlice = createSlice({
     name:"Auth",
     initialState:{
-       user:null 
+       user:null,
     },
     reducers:{
         Setuser:(state,action)=>{
             state.user = action.payload
+        },
+        logout:(state)=>{
+            state.user = null
         }
     }
     
 })
 
-export const {Setuser} = AuthSlice.actions 
+export const {Setuser,logout} = AuthSlice.actions 
  const peristconfig = {
     key:'Auth',
     storage:sessionStorage

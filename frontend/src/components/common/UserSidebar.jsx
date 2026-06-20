@@ -34,7 +34,8 @@ const UserSidebar = ({ isOpen, onClose }) => {
           <div className="p-5 flex flex-col gap-8">
             <div className="flex items-center gap-5">
               <img
-                src={user?.profilepic?.startsWith("http") ? user.profilepic : nouserimg}
+                src={user?.profilePic?.startsWith("http") ? user.profilePic : nouserimg}
+                alt="profile"
                 className="w-[64px] h-[64px] rounded-full object-cover border"
               />
               <div>

@@ -1,4 +1,4 @@
-import { formatTime, generateSlug } from "@/utils/Helpers"
+import { formatDateRange, formatTime, generateSlug } from "@/utils/Helpers"
 import React from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -28,7 +28,7 @@ const EventCard = ({ event }) => {
           <span>{formatTime(event?.starttime) || "NA"}</span>
         </div>
         {/* Title */}
-        <h3 className="font-semibold text-gray-900 line-clamp-2 leading-snug">
+        <h3 className="font-semibold text-gray-900 line-clamp-2 leading-snug truncate">
           {event?.title || "NA"}
         </h3>
         {/* Location */}

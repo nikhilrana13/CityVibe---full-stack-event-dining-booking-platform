@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { CiUser } from 'react-icons/ci';
 import { useSelector } from 'react-redux';
 import UserSidebar from '@/components/common/UserSidebar';
-import { formatDateRange } from '@/utils/Helpers';
+import { formatDateRange,formatTime } from '@/utils/Helpers';
 
 const BookNavbar = ({ title, startDate, starttime, handleBack, city, showBack = false }) => {
     const user = useSelector((state) => state.Auth.user)
@@ -27,7 +27,7 @@ const BookNavbar = ({ title, startDate, starttime, handleBack, city, showBack = 
                 <nav className="flex  gap-3  flex-col  w-full">
                     <div className='relative flex items-center justify-between w-full'>
                         {/* left side*/}
-                        <div className='md:flex hidden items-center gap-2'>
+                        <div className='md:flex hidden  items-center gap-2'>
                             <div className="hidden md:flex flex-col leading-none">
                                 <h1 className="text-[32px] font-black tracking-tight">
                                     CITYVIBE

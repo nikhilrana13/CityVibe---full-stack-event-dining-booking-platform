@@ -8,106 +8,86 @@ import CategoriesSection from '../components/pages/EventPage/CategoriesSection'
 import MainAllEventsSections from '../components/pages/EventPage/MainAllEventsSections'
 import EventEmptyState from '../components/pages/EventPage/EventEmptyState'
 import { Helmet } from 'react-helmet-async'
+import { useGetHomePageDataQuery } from '@/redux/api/HomeApi'
+import { useGetEventsQuery } from '@/redux/api/EventApi'
 
 const Eventspage = () => {
   const [allevents, setAllEvents] = useState([])
-  const [initialLoading, setInitialLoading] = useState(true)  // Controls full-page shimmer on first load
-  const [isFetchingMore, setIsFetchingMore] = useState(false) // Controls bottom loader for infinite scroll
   const loaderRef = useRef(null)
-  const [page, setPage] = useState(1)
-  const [pagination, setPagination] = useState({})
-  const [trending, setTrending] = useState([])
-  const [indiaTopEvents, setIndiaTopEvents] = useState([])
   const { location } = useLocationContext()
   const [sortBy, setSortBy] = useState("")
   const [startDate, setStartDate] = useState("")
-  const [isBaseEmpty, setIsBaseEmpty] = useState(false) // Detects if city has absolutely no events (no filters applied)
-  // fetch trending and india top events
+  const homeQuery = useGetHomePageDataQuery(location?.city,{
+     skip:!location?.city
+  })
+  const indiaTopEvents  = homeQuery?.data?.data?.indiasTopEvents || []
+  const trending = homeQuery?.data?.data?.trending || []
+  const [page, setPage] = useState(1)
+  const eventsQuery = useGetEventsQuery({
+    page:page,
+    city: location?.city,
+    sortby: sortBy,
+    startDate: startDate
+},{
+  skip:!location?.city,
+  refetchOnMountOrArgChange: false
+})
+// Used to prevent filter reset effect from running on initial mount
+const hasMounted = useRef(false);
+const events = eventsQuery?.data?.data?.events || [];
+const pagination = eventsQuery?.data?.data?.pagination;
+const initialLoading = eventsQuery.isLoading && page === 1; // Controls full-page shimmer on first load
+const isFetchingMore = eventsQuery.isFetching && page > 1; // Controls bottom loader for infinite scroll
+ const isBaseEmpty = eventsQuery.isSuccess && events.length === 0 && pagination?.totalEvents === 0; // Detects if city has absolutely no events (no filters applied)
+ 
+// Append paginated events to local state
+useEffect(() => {
+  if (!events.length) return;
+  setAllEvents(prev => {
+    // First page replaces existing events
+  if (page === 1) return events;
+  const merged = [...prev, ...events];
+   // Prevent duplicate events during pagination/refetches
+  return merged.filter(
+    (event, index, self) =>
+      index === self.findIndex(
+        e => e._id === event._id
+      )
+  );
+});
+}, [events, page]);
+// Reset pagination when filters or city change
+// Skip initial mount to avoid clearing first API response
+useEffect(() => {
+  if (!hasMounted.current) {
+    hasMounted.current = true;
+    return;
+  }
+  setPage(1);
+}, [location?.city, sortBy, startDate]);
+
+    // Infinite Scroll Observer Loads next page when bottom loader comes into viewport
   useEffect(() => {
-    if (!location?.city) return
-    const fetchHomeData = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/home`, {
-          params: {
-            city: location?.city
-          }
-        })
-        // console.log('response',response.data)
-        if (response.data) {
-          setTrending(response?.data?.data?.trending)
-          setIndiaTopEvents(response?.data?.data?.indiasTopEvents)
-        }
-      } catch (error) {
-        console.error("failed to fetch home data", error)
-      }
-    }
-    fetchHomeData()
-  }, [location?.city])
-  // fetch all events (Pagination + Filters)
-  useEffect(() => {
-    if (!location?.city) return
-    const fetchAllevents = async () => {
-      try {
-        // Show full shimmer only for first page
-        if (page === 1) {
-          setInitialLoading(true)
-        } else {
-          setIsFetchingMore(true)
-        }
-        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/event/search`, {
-          params: {
-            page: page,
-            city: location?.city,
-            sortby: sortBy,
-            startDate: startDate
-          }
-        })
-        await delay(1200) // for fake delay testing
-        if (response.data) {
-          const newEvents = response?.data?.data?.events || []
-          const newPagination = response?.data?.data?.pagination || {}
-          // detect base empty (no filters applied)
-          if (!sortBy && !startDate && page === 1) {
-            setIsBaseEmpty(newEvents.length === 0)
-          }
-          // Replace on first page, append on next pages
-          setAllEvents(prev => page === 1 ? newEvents : [...prev, ...newEvents])
-          setPagination(newPagination)
-        }
-      } catch (error) {
-        console.error("failed to fetch all events", error)
-      } finally {
-        setInitialLoading(false)
-        setIsFetchingMore(false)
-      }
-    }
-    fetchAllevents()
-  }, [location?.city, page, sortBy, startDate])
-  // Reset Pagination When city or filters change,start again from page 1
-  useEffect(() => {
-    setAllEvents([])
-    setPage(1)
-  }, [location?.city, sortBy, startDate])
-  // Infinite Scroll Observer Loads next page when bottom loader comes into viewport
-  useEffect(() => {
-    const hasNextPage = pagination?.currentPage && pagination?.totalPages && pagination.currentPage < pagination.totalPages
+    const hasNextPage = pagination?.currentPage < pagination?.totalPages;
+    // console.log("hasNextPage", hasNextPage);
     if (!hasNextPage || isFetchingMore) return
     const observer = new IntersectionObserver(
       entries => {
+        //  console.log("Intersecting", entries[0].isIntersecting);
         if (entries[0].isIntersecting && !isFetchingMore) {
-          //   console.log("Loading next page...")
+            // console.log("Loading next page...")
           setPage(prev => prev + 1)
         }
       },
-      { rootMargin: "100px" } // smoother trigger before reaching exact bottom
+      { rootMargin: "150px" } // smoother trigger before reaching exact bottom
     )
     const current = loaderRef.current
+  //  console.log("loaderRef", current);
     if (current) observer.observe(current)
     return () => {
       observer.disconnect()
     }
-  }, [pagination?.currentPage, pagination?.totalPages, isFetchingMore])
+  }, [pagination?.currentPage,pagination?.totalPages,isFetchingMore,allevents.length ])
   //  Scroll to Top on City Change
   useEffect(() => {
     if (location?.city) {

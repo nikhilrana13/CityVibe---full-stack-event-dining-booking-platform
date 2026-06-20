@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/button';;
 import { Calendar1Icon, Clock, Languages, MapPin, Ticket } from 'lucide-react';
 import React from 'react';
-import { formatDateRange, formatDuration, formatIndianNumber, formatTime } from '@/utils/Helpers';
+import { formatDateRange, formatDuration, formatIndianNumber, formatTime, generateSlug } from '@/utils/Helpers';
 
 const EventDetailCard = ({event}) => {
     // console.log("event",event)

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Navbar from '../components/common/Navbar'
-import axios from 'axios'
 import TrendingSection from '../components/pages/Homepage/TrendingSection'
 import MusicSection from '../components/pages/Homepage/MusicSection'
 import ThisWeekEvent from '../components/pages/Homepage/ThisWeekEvent'
@@ -8,43 +7,21 @@ import IndiaTopEventSection from '../components/pages/Homepage/IndiaTopEventSect
 import Footer from '../components/pages/listyourevent/Footer'
 import ComedySection from '../components/pages/Homepage/ComedySection'
 import { useLocationContext } from '../context/useLocationContext'
+import { useGetHomePageDataQuery } from '@/redux/api/HomeApi'
+
 
 const Homepage = () => {
-  const [loading, setloading] = useState(true)
-  const [trending, setTrending] = useState([])
-  const [music, setMusic] = useState([])
-  const [thisweek, setThisweek] = useState([])
-  const [comedy, setComedy] = useState([])
-  const [indiaTopEvents, setIndiaTopEvents] = useState([])
   const {location} = useLocationContext()
-  // console.log("select city",location)
+  const homeQuery = useGetHomePageDataQuery(location?.city,{
+    skip:!location?.city
+  })
+  const loading = homeQuery?.isLoading
+  const trending = homeQuery?.data?.data?.trending || []
+  const music = homeQuery?.data?.data?.music || []
+  const thisweek = homeQuery?.data?.data?.thisweek || []
+  const comedy = homeQuery?.data?.data?.comedy || []
+  const indiatop = homeQuery?.data?.data?.indiasTopEvents || []
   
-  useEffect(() => {
-    const fetchHomeData = async () => {
-      try {
-        setloading(true)
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/home`, {
-          params: {
-            city: location?.city
-          }, headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
-          }
-        })
-        if (response.data) {
-          setTrending(response?.data?.data?.trending)
-          setMusic(response?.data?.data.music)
-          setThisweek(response?.data?.data?.thisWeek)
-          setComedy(response?.data?.data?.comedy)
-          setIndiaTopEvents(response?.data?.data?.indiasTopEvents)
-        }
-      } catch (error) {
-        console.error("failed to fetch home data", error)
-      } finally {
-       setloading(false)
-      }
-    }
-    fetchHomeData()
-  }, [location?.city])
   // scroll to top on city change
   useEffect(() => {
   if (location?.city) {
@@ -69,7 +46,7 @@ const Homepage = () => {
         {/* comedy */}
         <ComedySection comedy={comedy} loading={loading} />
         {/* india top events */}
-        <IndiaTopEventSection indiatop={indiaTopEvents} loading={loading} />
+        <IndiaTopEventSection indiatop={indiatop} loading={loading} />
       </section>
       <Footer />
     </div>
