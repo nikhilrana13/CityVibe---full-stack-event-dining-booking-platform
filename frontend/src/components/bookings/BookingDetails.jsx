@@ -1,11 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import EventBookingDetails from './EventBookingDetails';
-import DiningBookingDetails from './DiningBookingDetails';
+import { useParams } from 'react-router-dom';
 import BookingTicketShimmer from './BookingTicketShimmer';
 import BookingNotFound from './BookingNotFound';
 import { toast } from 'sonner';
+import EventBookingDetails from '../events/EventBookingDetails';
+import DiningBookingDetails from '../common/DiningBookingDetails';
 
 const BookingDetails = () => {
      const [loading,setLoading] = useState(true)

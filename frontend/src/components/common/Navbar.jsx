@@ -2,14 +2,13 @@ import React, { forwardRef, useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { IoLocationOutline, IoSearch } from "react-icons/io5";
 import { CiUser } from "react-icons/ci";
-import LoginDialog from './LoginDialog';
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import { MdDinnerDining } from "react-icons/md";
 import {LuGuitar} from "react-icons/lu";
 import { useSelector } from 'react-redux';
 import LocationDialog from './LocationDialog';
 import { useLocationContext } from '../../context/useLocationContext';
-import EventAndDiningSuggestions from './EventAndDiningSuggestions';
+import EventAndDiningSuggestions from '../events/EventAndDiningSuggestions';
 import { useDialog } from '../../context/useDialog';
 import UserSidebar from './UserSidebar';
 

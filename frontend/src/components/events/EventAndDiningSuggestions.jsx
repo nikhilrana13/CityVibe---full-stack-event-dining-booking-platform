@@ -12,7 +12,7 @@ const EventAndDiningSuggestions = () => {
     const {setIsEventAndDiningOpen} = useDialog()
 
     useEffect(() => {
-        setTimeout(() => setIsVisible(true), 10)
+        setTimeout(() => setIsVisible(true), 10) 
     }, [])
     const handleClose = () => {
         setQuery("")

@@ -1,9 +1,9 @@
 import React from 'react';
-import TicketDivider from './TicketDivider';
-import TicketPill from './TicketCountPill';
 import QRCode from 'react-qr-code';
-import { formatDateRange, formatTime } from '../../lib/utils';
 import { Loader2 } from 'lucide-react';
+import TicketPill from '../common/TicketCountPill';
+import TicketDivider from '../common/TicketDivider';
+import { formatDateRange, formatTime } from '@/utils/Helpers';
 
 
 const EventBookingDetails = ({ booking, CancelBooking, iscancelbook }) => {
