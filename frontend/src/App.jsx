@@ -10,12 +10,12 @@ import CategoryDetailPage from "./pages/CategoryDetailPage"
 import BookEventTickets from "./components/pages/EventPage/BookEventTickets"
 import UpdateEventBookingStatus from "./components/pages/EventPage/UpdateEventBookingStatus"
 import Bookings from "./pages/Bookings"
-import BookingDetails from "./components/common/BookingDetails"
 import DiningBooking from "./components/pages/diningPage/DiningBooking"
 import LoginDialog from "./components/common/LoginDialog"
 import ScrollToTop from "./components/common/ScrollToTop"
 import PaymentFailed from "./components/pages/EventPage/PaymentFailed"
 import { Helmet } from "react-helmet-async"
+import BookingDetails from "./components/bookings/BookingDetails"
 
 const App = () => {
   return (
