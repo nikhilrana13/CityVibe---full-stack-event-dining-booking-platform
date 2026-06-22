@@ -26,8 +26,16 @@ export const EventApi = createApi({
         // each event details
         GetEventDetails:builder.query({
             query:(id)=>`/api/event/details/${id}`
+        }),
+        // handle event checkout
+        CreateEventBooking:builder.mutation({
+            query:(body)=>({
+                url:"/api/event/create-booking",
+                method:"POST",
+                body
+            })
         })
     })
 })
 
-export const { useGetEventsQuery,useGetEventDetailsQuery} = EventApi
+export const { useGetEventsQuery,useGetEventDetailsQuery,useCreateEventBookingMutation} = EventApi

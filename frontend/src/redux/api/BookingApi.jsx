@@ -13,6 +13,7 @@ export const BookingApi = createApi({
             query:(id)=>`/api/event/booking/${id}`,
             providesTags:["Booking"]
         }),
+        
         // get each dining booking details
         GetDiningBookingDetail:builder.query({
             query:(id)=>`/api/restaurant/booking/${id}`,

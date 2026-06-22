@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import BookNavbar from './BookNavbar';
-import axios from 'axios';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Loader2, Minus, Plus } from 'lucide-react';
 import Loader from '../../../components/common/Loader';
@@ -9,38 +8,27 @@ import { useSelector } from 'react-redux';
 import { useDialog } from '../../../context/useDialog';
 import { toast } from 'sonner';
 import { formatIndianNumber, } from '@/utils/Helpers';
+import { useCreateEventBookingMutation, useGetEventDetailsQuery } from '@/redux/api/EventApi';
 
 const BookEventTickets = () => {
   const user = useSelector((state)=>state.Auth.user)
-  const [event, setEvent] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [bookloading,setBookLoading] = useState(false)
+  const { id } = useParams()
+  // fetch event details 
+  const eventQuery = useGetEventDetailsQuery(id,{
+    skip:!id
+  })
+  const event = eventQuery?.data?.data?.event
+  const eventloading = eventQuery?.isLoading 
+  const ticket = event?.ticket || []
+  // create booking 
+  const [CreateEventBooking,{isLoading}] = useCreateEventBookingMutation()
   const [cart, setCart] = useState({})
   const navigate = useNavigate()
-  const { id } = useParams()
+  
   const {setIsLoginOpen,setLoginRedirect} = useDialog()
   const location = useLocation()
 
-  // fetch event details
-  useEffect(() => {
-    const fetchEventDetails = async () => {
-      try {
-        setLoading(true)
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/event/details/${id}`)
-        // console.log("response", response.data)
-        if (response.data) {
-          const eventData = response?.data?.data?.event
-          setEvent(eventData)
-        }
-      } catch (error) {
-        console.error("failed to get event details", error)
-      } finally {
-       setLoading(false)
-      }
-    }
-    fetchEventDetails()
-  }, [id])
-  const ticket = event?.ticket || []
+ 
 
   const increaseQuantity = (ticketId) => {
     setCart((prev) => ({ ...prev, [ticketId]: (prev[ticketId] || 0) + 1 }))
@@ -61,6 +49,7 @@ const BookEventTickets = () => {
     const qty = cart[t._id] || 0
     return sum + qty * t.price
   }, 0)
+
   const handleBack = () => {
     navigate(`/events/${event?._id}/${generateSlug(event?.title)}`)
   }
@@ -76,30 +65,22 @@ const BookEventTickets = () => {
       quantity:qty
      }))
      try {
-      setBookLoading(true)
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/event/create-booking`,{
-        eventId:event?._id,
-        tickets
-      },{ headers:{
-          Authorization:`Bearer ${localStorage.getItem("token")}`
-      }})
-      if(response.data){
-         const checkOutUrl = response?.data?.data?.url 
-         window.location.href = checkOutUrl
+      const response = await CreateEventBooking({eventId:event?._id,tickets}).unwrap()
+      const checkOutUrl = response?.data?.url 
+      if(checkOutUrl){
+       window.location.href = checkOutUrl
       }
      } catch (error) {
        console.error("failed to booking event",error)
-       toast.error(error?.response?.data?.message || "Internal server error")
-     }finally{
-      setBookLoading(false)
+       toast.error(error?.data?.message || "Internal server error")
      }
   }
   // console.log("cart",cart)
-  const NoEventfound = !event
+  const NoEventfound = !eventloading && eventQuery.isSuccess && !event
   return (
     <div className='w-full'>
       {
-        loading ? (
+        eventloading ? (
           <Loader />
         ) : NoEventfound ? (
           <EventNotFoundFallback />
@@ -171,11 +152,11 @@ const BookEventTickets = () => {
                       </span>
                     </div>
                     <button
-                      disabled={bookloading}
+                      disabled={isLoading}
                       onClick={handleCheckout}
                       className="bg-[#0C172F] text-white px-7 py-3 rounded-xl font-medium disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      {bookloading ? <Loader2 className='w-5 h-5 mx-auto animate-spin' /> : `Proceed  • ₹ ${formatIndianNumber(totalPrice)}`}
+                      {isLoading ? <Loader2 className='w-5 h-5 mx-auto animate-spin' /> : `Proceed  • ₹ ${formatIndianNumber(totalPrice)}`}
                     </button>
                   </div>
                 </div>

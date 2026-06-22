@@ -8,7 +8,7 @@ import EventDetailsPage from "./pages/EventDetailsPage"
 import RestaurantDetailsPage from "./pages/RestaurantDetailsPage"
 import CategoryDetailPage from "./pages/CategoryDetailPage"
 import BookEventTickets from "./components/pages/EventPage/BookEventTickets"
-import UpdateEventBookingStatus from "./components/pages/EventPage/UpdateEventBookingStatus"
+import UpdateEventBookingStatus from "./components/pages/EventPage/PaymentSuccess"
 import Bookings from "./pages/Bookings"
 import DiningBooking from "./components/pages/diningPage/DiningBooking"
 import LoginDialog from "./components/common/LoginDialog"
@@ -43,6 +43,7 @@ const App = () => {
         <Route path="/dining/:city/:id/:slug" element={<RestaurantDetailsPage />} />
         <Route path="/dining/:city/:id/:slug/book" element={<DiningBooking />} />
         {/* payments success and failed */}
+
         <Route path="/payment-success" element={<UpdateEventBookingStatus />} />
         <Route path="/payment-failed" element={<PaymentFailed />} />
         {/* for organizers */}
