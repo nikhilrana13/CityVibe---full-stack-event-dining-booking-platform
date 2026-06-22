@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { ArrowLeft } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -9,6 +8,7 @@ import BookingSuccessDialog from './BookingSuccessDialog';
 import { toast } from 'sonner';
 import { useDialog } from '../../../context/useDialog';
 import { useSelector } from 'react-redux';
+import { useCreateDiningBookingMutation, useGetRestaurantDetailsQuery, useGetSlotsQuery } from '@/redux/api/DiningApi';
 
 // generate next 17 days
 const getNext17Days = () => {
@@ -36,75 +36,47 @@ const getNext17Days = () => {
 }
 
 const DiningBooking = () => {
-    const user = useSelector((state)=>state.Auth.user)
-    const navigate = useNavigate()
-    const [loadSlots, setLoadSlots] = useState(true)
-    const [restaurant, setRestaurant] = useState({})
-    const [loadres, setLoadres] = useState(true)
-    const [activeMeal, setActiveMeal] = useState("lunch");
-    const [slots, setSlots] = useState({})
-    const [selectedSlot, setSelectedSlot] = useState("")
     const { id } = useParams()
+    const user = useSelector((state) => state.Auth.user)
+    const navigate = useNavigate()
     const [searchParams] = useSearchParams()
     const date = searchParams.get("date")
     const dates = React.useMemo(() => getNext17Days(), [])
     const [selectedDate, setSelectedDate] = useState(date || dates[0].value)
-    const [guests, setGuests] = useState(1)
-    const [showSuccess, setShowSuccess] = useState(false)
-    const [booking, setBooking] = useState({})
-    const [bookloading, setBookLoading] = useState(false)
-    const {setIsLoginOpen,setLoginRedirect} = useDialog()
-    const location = useLocation()
-    // console.log("restaurant", restaurant)
-    const safeSlug = (value) => slugify(value || "", { lower: true, strict: true })
-
-    //fetch restaurant details
-    useEffect(() => {
-        const fetchRestaurantDetails = async () => {
-            try {
-                setLoadres(true)
-                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/dining/restaurant/details/${id}`)
-                if (response.data) {
-                    const resData = response?.data?.data?.restaurant
-                    setRestaurant(resData)
-                }
-            } catch (error) {
-                console.error("failed to get Restaurant details", error)
-            } finally {
-                setLoadres(false)
-            }
-        }
-        fetchRestaurantDetails()
-    }, [id])
-    //fetch slots
-    useEffect(() => {
-        const fetchSlots = async () => {
-            try {
-                setLoadSlots(true)
-                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/restaurant/slots`, {
-                    params: {
-                        restaurantId: id,
-                        date: selectedDate
-                    }, headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`
-                    }
-                })
-                if (response.data) {
-                    setSlots(response?.data?.data)
-                }
-            } catch (error) {
-                console.error("failed to get slots", error)
-            } finally {
-                setLoadSlots(false)
-            }
-        }
-        fetchSlots()
-    }, [id, selectedDate])
-    // console.log("slots", slots)
+    // fetch restaurant details
+    const resQuery = useGetRestaurantDetailsQuery(id, {
+        skip: !id
+    })
+    const restaurant = resQuery?.data?.data?.restaurant
+    const resloading = resQuery?.isLoading
+    // fetch slots 
+    const slotsQuery = useGetSlotsQuery({
+        restaurantId:id,
+        date:selectedDate
+    }, {
+        skip: !id || !selectedDate
+    })
+    const slots = slotsQuery?.data?.data
     const mealSlots = {
         lunch: slots?.lunchSlots || [],
         dinner: slots?.dinnerSlots || []
     }
+    const slotsloading = slotsQuery?.isLoading
+    const [activeMeal, setActiveMeal] = useState("lunch");
+    const [selectedSlot, setSelectedSlot] = useState("")
+    const [guests, setGuests] = useState(1)
+    const [showSuccess, setShowSuccess] = useState(false)
+    const { setIsLoginOpen, setLoginRedirect } = useDialog()
+    const location = useLocation()
+    // create booking 
+    const [CreateDiningBooking, { isLoading }] = useCreateDiningBookingMutation()
+    const [booking, setBooking] = useState({})
+
+
+    // console.log("restaurant", restaurant)
+    const safeSlug = (value) => slugify(value || "", { lower: true, strict: true })
+    // console.log("slots", slots)
+
     const isSlotPast = (time) => {
         if (selectedDate !== dates[0].value) return false
         const now = new Date()
@@ -114,48 +86,38 @@ const DiningBooking = () => {
 
         return slotTime < now
     }
-
     const handleBack = () => {
         if (!restaurant?._id) return
         navigate(`/dining/${safeSlug(restaurant?.city)}/${restaurant?._id}/${safeSlug(restaurant?.name)}`)
     }
     // handle create booking
-    const CreateDiningBooking = async () => {
-        if(!user){
+    const handleDiningBooking = async () => {
+        if (!user) {
             //  console.log("setting redirect:", location.pathname + location.search)
             setLoginRedirect(location.pathname + location.search)
             setIsLoginOpen(true)
             return
         }
         try {
-            setBookLoading(true)
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/restaurant/create-booking`, {
+            const response = await CreateDiningBooking({
                 bookingdate: selectedDate,
                 restaurantId: restaurant?._id,
                 timeSlot: selectedSlot,
                 numberofguests: guests,
-            }, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            if (response.data) {
-                setBooking(response?.data?.data?.booking)
-                setShowSuccess(true)
-            }
+            }).unwrap()
+            setBooking(response?.data?.booking) 
+            setShowSuccess(true) 
         } catch (error) {
             console.error("failed to booking dining", error)
-             toast.error(error?.response?.data?.message)
-        } finally {
-            setBookLoading(false)
-        }
+            toast.error(error?.data?.message)
+        } 
     }
 
     return (
         <div className='w-full'>
             {/* header */}
             {
-                loadres ? (
+                resloading ? (
                     <RestaurantShimmerHeader />
                 ) : restaurant?._id ? (
                     <RestaurantBookHeader restaurant={restaurant} />
@@ -216,7 +178,7 @@ const DiningBooking = () => {
                 </div>
                 {/* slot grid */}
                 {
-                    loadSlots ? (
+                    slotsloading ? (
                         <SlotShimmer />
                     ) : mealSlots[activeMeal]?.length > 0 ? (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -258,11 +220,11 @@ const DiningBooking = () => {
                 {/* proceed */}
                 <div className="flex justify-end mt-8">
                     <button
-                        disabled={!selectedSlot ||bookloading}
-                        onClick={CreateDiningBooking}
+                        disabled={!selectedSlot || isLoading}
+                        onClick={handleDiningBooking}
                         className="bg-black text-white px-8 py-3 rounded-lg disabled:bg-gray-300"
                     >
-                        {bookloading ? "Booking..." : "Proceed to book"}
+                        {isLoading ? "Booking..." : "Proceed to book"}
                     </button>
                 </div>
             </div>

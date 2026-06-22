@@ -6,6 +6,7 @@ import sessionStorage from "redux-persist/es/storage/session";
 import { HomeApi } from "./api/HomeApi";
 import { EventApi } from "./api/EventApi";
 import { BookingApi } from "./api/BookingApi";
+import { DiningApi } from "./api/DiningApi";
 
 
 const userpersistconfig={
@@ -18,10 +19,11 @@ const rootReducer = combineReducers({
     Auth:persistconfiguser,
     [HomeApi.reducerPath]:HomeApi.reducer,
     [EventApi.reducerPath]:EventApi.reducer,
-    [BookingApi.reducerPath]:BookingApi.reducer
+    [BookingApi.reducerPath]:BookingApi.reducer,
+    [DiningApi.reducerPath]:DiningApi.reducer
 })
 export const Store = configureStore({
     reducer:rootReducer,
-    middleware:(getDefaultMiddleware)=>getDefaultMiddleware({serializableCheck:false}).concat(HomeApi.middleware).concat(EventApi.middleware).concat(BookingApi.middleware)
+    middleware:(getDefaultMiddleware)=>getDefaultMiddleware({serializableCheck:false}).concat(HomeApi.middleware).concat(EventApi.middleware).concat(BookingApi.middleware).concat(DiningApi.middleware)
 })
 export const Persistor = persistStore(Store)

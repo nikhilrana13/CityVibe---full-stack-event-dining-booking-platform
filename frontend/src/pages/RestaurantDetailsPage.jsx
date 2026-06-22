@@ -7,38 +7,16 @@ import Footer from '../components/pages/listyourevent/Footer';
 import RestaurantDetailShimmer from '../components/pages/diningPage/RestaurantDetailShimmer';
 import RestaurantNotfoundFallback from '../components/pages/diningPage/RestaurantNotfoundFallback';
 import { Helmet } from 'react-helmet-async';
+import { useGetRestaurantDetailsQuery } from '@/redux/api/DiningApi';
 
 const RestaurantDetailsPage = () => {
-  const [restaurant, setRestaurant] = useState({})
-  const [loading, setLoading] = useState(true)
-  const [notFound, setNotfound] = useState(false)
   const { id } = useParams()
-
-  //fetch restaurant details 
-  useEffect(() => {
-    const fetchRestaurantDetails = async () => {
-      try {
-        setLoading(true)
-        setNotfound(false)
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/dining/restaurant/details/${id}`)
-        if (response.data) {
-          const resData = response?.data?.data?.restaurant
-          if (!resData) {
-            setNotfound(true)
-          } else {
-            setRestaurant(resData)
-          }
-        }
-      } catch (error) {
-        setNotfound(true)
-        console.error("failed to get Restaurant details", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchRestaurantDetails()
-  }, [id])
-  
+  const resQuery = useGetRestaurantDetailsQuery(id,{
+    skip: !id
+  })
+  const restaurant = resQuery?.data?.data?.restaurant
+  const loading = resQuery?.isLoading 
+  const notFound = !loading && resQuery.isSuccess && !restaurant 
   return (
     <>
       {
