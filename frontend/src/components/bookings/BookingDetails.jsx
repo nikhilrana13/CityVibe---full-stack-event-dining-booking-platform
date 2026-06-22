@@ -6,61 +6,37 @@ import BookingNotFound from './BookingNotFound';
 import { toast } from 'sonner';
 import EventBookingDetails from '../events/EventBookingDetails';
 import DiningBookingDetail from '../dining/DiningBookingDetail';
+import { useCancelDiningBookingMutation, useCancelEventBookingMutation, useGetDiningBookingDetailQuery, useGetEventBookingDetailQuery } from '@/redux/api/BookingApi';
 
 
 const BookingDetails = () => {
-     const [loading,setLoading] = useState(true)
-     const [booking,setBooking] = useState({})
-     const [iscancelbook,setIsCancelBook] = useState(false)
      const {id,type} = useParams()
-    //  fetch booking details
-    useEffect(()=>{
-          const fetchBookingDetails = async()=>{
-            try {
-                setLoading(true)
-                 const url = type === "events" ? "/api/event/booking" : "/api/restaurant/booking"
-                 const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}${url}/${id}`,{
-                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`
-                    }
-                 })
-                 if(response.data){
-                    setBooking(response?.data?.data?.booking)
-                 }  
-            } catch (error) {
-                console.error("failed to get booking details",error)
-            }finally{
-              setLoading(false)
-            }
-          }
-          if(type) fetchBookingDetails()
-    },[id,type])
+     const EventBookingDetailsQuery = useGetEventBookingDetailQuery(id,{
+      skip: type !== "events"
+     })
+     const DiningBookingDetailsQuery = useGetDiningBookingDetailQuery(id,{
+      skip: type !== "dining"
+     })
+     const BookingDetailsQuery = type === "events" ? EventBookingDetailsQuery : DiningBookingDetailsQuery
+     const booking = BookingDetailsQuery?.data?.data?.booking
+     const loading = BookingDetailsQuery?.isLoading 
+     const [CancelEventBooking,{isLoading:isCancellingEvent}] = useCancelEventBookingMutation()
+     const [CancelDiningBooking,{isLoading:isCancellingDining}] = useCancelDiningBookingMutation()
+     const isCancelBook = type === "events"  ? isCancellingEvent : isCancellingDining
+
+
 
     const handleCancelBooking = async(id)=>{
-        try {
-           setIsCancelBook(true)
-           const url = type === "events" ? "/api/event/cancelbooking" : "/api/restaurant/cancelbooking"
-           const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}${url}/${id}`,{},{
-            headers:{
-              Authorization:`Bearer ${localStorage.getItem("token")}`
-            }
-           })
-          //  console.log("response",response?.data)
-           if(response.data){
-            toast.success(response?.data?.message)
-            const updatedBooking = response?.data?.data?.booking
-            setBooking((prev)=>({...prev,bookingStatus:updatedBooking?.bookingStatus}))
+           try {
+               const response = type === "events" ? await CancelEventBooking(id).unwrap() : await CancelDiningBooking(id).unwrap()
+               toast.success(response?.message)
+           } catch (error) {
+             console.error("failed to cancel booking",error)
+             toast.error(error?.data?.message || "Internal server error")
            }
-        } catch (error) {
-          toast.error(error?.response?.data?.message || "Internal server error")
-          console.error("failed to cancel booking",error)
-        }finally{
-          setIsCancelBook(false)
-        }
     }
-
   
-   const notFound = (!booking || Object.keys(booking).length === 0)
+   const notFound = !loading && BookingDetailsQuery.isSuccess && !booking
   return (
     <div className='w-full'>
       {
@@ -69,9 +45,9 @@ const BookingDetails = () => {
         ):notFound ? (
           <BookingNotFound />
         ):type === "events" ? (
-           <EventBookingDetails booking={booking} CancelBooking={()=>handleCancelBooking(id)} iscancelbook={iscancelbook} />
+           <EventBookingDetails booking={booking} CancelBooking={()=>handleCancelBooking(id)} iscancelbook={isCancelBook} />
         ):(
-          <DiningBookingDetail booking={booking} CancelBooking={()=>handleCancelBooking(id)} iscancelbook={iscancelbook}  />
+          <DiningBookingDetail booking={booking} CancelBooking={()=>handleCancelBooking(id)} iscancelbook={isCancelBook}  />
         )
       }     
     </div>

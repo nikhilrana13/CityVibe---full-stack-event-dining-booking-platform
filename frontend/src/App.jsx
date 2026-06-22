@@ -48,7 +48,6 @@ const App = () => {
         {/* for organizers */}
         <Route path="/events/list-your-events" element={<ListYourEvents />} />
       </Routes>
-      
       {/* login dialog */}
       <LoginDialog />
       <Toaster />

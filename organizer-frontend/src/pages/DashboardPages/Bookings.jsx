@@ -21,8 +21,7 @@ const Bookings = () => {
     })
     const statsQuery = activeTab === "events" ? eventstatsQuery : diningstatsQuery
     const stats = statsQuery?.data?.data?.stats || {};
-    const isLoading = statsQuery?.isLoading
-
+    const isLoading = statsQuery?.isLoading 
   // stats data 
   const statsdata = [
     {

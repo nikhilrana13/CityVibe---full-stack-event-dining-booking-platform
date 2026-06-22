@@ -1,9 +1,11 @@
-import { Setuser } from '../redux/AuthSlice'
+import { resetAllApiCache } from '@/utils/resetApiCache'
+import { logout, Setuser } from '../redux/AuthSlice'
 import axios from 'axios'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { Persistor } from '@/redux/Store'
 
 const useLogout = () => {
     const navigate = useNavigate()
@@ -18,8 +20,11 @@ const useLogout = () => {
             })
             if(response.data){
                 toast.success(response?.data?.message)
-                dispatch(Setuser(null))
+                resetAllApiCache()
                 localStorage.removeItem("token")
+                dispatch(Setuser(null))
+                dispatch(logout())
+                await Persistor.purge();
                 navigate("/")
             }
         } catch (error) {

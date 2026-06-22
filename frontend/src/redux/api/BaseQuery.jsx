@@ -1,5 +1,6 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../AuthSlice";
+import { resetAllApiCache } from "@/utils/resetApiCache";
 
 
 const baseQuery = fetchBaseQuery({
@@ -22,9 +23,10 @@ const baseQueryWithAuth = async (args, api, extraOptions) => {
     // skip login api
     if (status === 401 && !isAuthApi) {
       localStorage.setItem("lastPath", window.location.pathname); // save current page pathname
-      window.dispatchEvent(new Event("unauthorized"));
+      resetAllApiCache()
       localStorage.removeItem("token");
       api.dispatch(logout()) 
+      window.dispatchEvent(new Event("unauthorized"));
       // console.log("Unauthorized Event Fired");
     }
   }

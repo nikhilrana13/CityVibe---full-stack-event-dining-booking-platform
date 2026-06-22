@@ -2,60 +2,64 @@ import { useNavigate } from 'react-router-dom';
 import BookNavbar from '../components/pages/EventPage/BookNavbar';
 import React, { useEffect, useRef, useState } from 'react';
 import BookingCard from '../components/bookings/BookingCard';
-import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import BookingCardShimmer from '../components/bookings/BookingCardShimmer';
 import NoBookingFallback from '../components/bookings/NoBookingFallback';
 import { formatDateRange, formatTime } from '@/utils/Helpers';
+import { useGetUserDiningBookingsQuery, useGetUserEventBookingsQuery } from '@/redux/api/BookingApi';
 
 const Bookings = () => {
     const navigate = useNavigate()
     const [type, setType] = useState("dining")
-    const [loading, setLoading] = useState(true)
-    const [bookings, setbookings] = useState([])
-    const [isFetchingMore, setIsFetchingMore] = useState(false)
+    const [allbookings, setAllBookings] = useState([])
     const [page, setPage] = useState(1)
-    const [pagination, setPagination] = useState({})
+    const EventBookingQuery = useGetUserEventBookingsQuery(page, {
+        skip: type !== "events"
+    })
+    const DiningBookingQuery = useGetUserDiningBookingsQuery(page, {
+        skip: type !== "dining"
+    })
+    const bookingQuery = type === "events" ? EventBookingQuery : DiningBookingQuery
+    const bookings = bookingQuery?.data?.data?.bookings || []
+    const pagination = bookingQuery?.data?.data?.pagination
+    const isFetchingMore = bookingQuery.isFetching && page > 1;
+    const initialLoading = !bookingQuery.data && (bookingQuery.isLoading || bookingQuery.isFetching) && page === 1;
+    const showNoBookings = bookingQuery.isSuccess && !bookingQuery.isFetching && !initialLoading && page === 1 && bookings.length === 0
+    const showShimmer = page === 1 && (bookingQuery.isLoading || bookingQuery.isFetching);
     const loaderRef = useRef()
     const scrollRef = useRef()
+    const displayedBookings = page === 1 ? bookings : allbookings;
 
-    // fetch bookings
+
+    // Append paginated bookings to local state
     useEffect(() => {
-        const fetchBookings = async () => {
-            try {
-                if (page === 1) {
-                    setLoading(true)
-                } else {
-                    setIsFetchingMore(true)
-                }
-                const url = type === "events" ? "/api/event/userbookings" : "/api/restaurant/userbookings"
-                const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}${url}?page=${page}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`
-                    }
-                })
-                await delay(1200) // for fake delay testing
-                if (response.data) {
-                    const newBookings = response?.data?.data?.bookings || []
-                    const newPagination = response?.data?.data?.pagination || {}
-                    // replace on first page and append on next pages 
-                    setbookings(prev => page === 1 ? newBookings : [...prev, ...newBookings])
-                    setPagination(newPagination)
-                }
-            } catch (error) {
-                console.error('failed to get bookings', error)
-            } finally {
-                setLoading(false)
-                setIsFetchingMore(false)
-            }
-        }
-        fetchBookings()
-    }, [type, page])
-    // Infinite Scroll Observer Loads next page when bottom loader comes into viewport
+        if (!bookings.length) return;
+        // if (page === 1) {
+        //     setAllBookings(bookings);
+        //     return;
+        // }
+        setAllBookings(prev => {
+            // First page replaces existing bookings
+            if (page === 1) return bookings;
+            const merged = [...prev, ...bookings];
+            // Prevent duplicate events during pagination/refetches
+            return merged.filter(
+                (booking, index, self) =>
+                    index === self.findIndex(
+                        b => b._id === booking._id
+                    )
+            );
+        });
+    }, [page, bookings]);
+
     useEffect(() => {
-        const hasNextPage = pagination?.currentpage && pagination?.totalPages && pagination.currentpage < pagination.totalPages
-        if (!hasNextPage || isFetchingMore || loading) return
+        setPage(1);
+    }, [type]);
+  
+  // Infinite Scroll Observer Loads next page when bottom loader comes into viewport
+    useEffect(() => {
+        const hasNextPage = pagination?.currentpage < pagination?.totalPages
+        if (!hasNextPage || isFetchingMore) return
         const observer = new IntersectionObserver(
             entries => {
                 if (entries[0].isIntersecting && !isFetchingMore) {
@@ -70,7 +74,7 @@ const Bookings = () => {
         return () => {
             observer.disconnect()
         }
-    }, [pagination?.currentpage, pagination?.totalPages, isFetchingMore, loading])
+    }, [pagination?.currentpage, pagination?.totalPages, isFetchingMore, allbookings.length])
     // console.log("bookings", bookings) 
     // console.log("pagination", pagination)
     return (
@@ -83,10 +87,10 @@ const Bookings = () => {
                         {/* sliding indicator */}
                         <div className={`absolute top-1 bottom-1 w-[50%] bg-black rounded-full transition-all duration-300 ease-out ${type === "dining" ? "left-1" : "left-[50%]"}`} />
                         <div className="relative flex items-center">
-                            <button onClick={() => { setType("dining"), setPage(1), setbookings([]) }} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${type === "dining" ? "text-white" : "text-gray-700"}`}>
+                            <button onClick={() => setType("dining")} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${type === "dining" ? "text-white" : "text-gray-700"}`}>
                                 Dining
                             </button>
-                            <button onClick={() => { setType("events"), setPage(1), setbookings([]) }} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${type === "events" ? "text-white" : "text-gray-700"}`}>
+                            <button onClick={() => setType("events")} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${type === "events" ? "text-white" : "text-gray-700"}`}>
                                 Events
                             </button>
                         </div>
@@ -94,12 +98,12 @@ const Bookings = () => {
                     {/* cards */}
                     <div ref={scrollRef} className='flex flex-col md:px-5 w-full place-items-center h-[90vh] overflow-y-auto space-y-5 '>
                         {
-                            loading ? (
+                            showShimmer ? (
                                 Array.from({ length: 3 }).map((_, i) => (
                                     <BookingCardShimmer key={i} />
                                 ))
-                            ) : bookings?.length > 0 ? (
-                                bookings?.map((booking) => {
+                            ) : displayedBookings?.length > 0 ? (
+                                displayedBookings?.map((booking) => {
                                     return (
                                         <BookingCard key={booking?._id}
                                             title={(booking?.event?.title || booking?.restaurant?.name)}
@@ -113,13 +117,14 @@ const Bookings = () => {
                                         />
                                     )
                                 })
-                            ) : (
-                               <NoBookingFallback type={type} onExplore={() => 
-                                navigate(type === "events" ? "/events" : "/dining")} />
-                            )} 
+                            ) : showNoBookings ? (
+                                <NoBookingFallback type={type} onExplore={() =>
+                                    navigate(type === "events" ? "/events" : "/dining")} />
+                            ) : null
+                        }
                         {/* Infinite Scroll Loader */}
                         {pagination?.totalPages && pagination?.currentpage < pagination?.totalPages && (
-                            <div ref={loaderRef} className="h-20 flex justify-center items-center">
+                            <div ref={loaderRef} className="h-40 flex justify-center items-center">
                                 {isFetchingMore ? (
                                     <div className="flex gap-2">
                                         <Loader2 className='text-black w-8 h-8 animate-spin' />

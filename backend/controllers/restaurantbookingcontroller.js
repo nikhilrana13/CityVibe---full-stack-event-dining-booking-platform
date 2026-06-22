@@ -223,6 +223,7 @@ const CancelBooking = async(req,res)=>{
 const UserallDiningbookings = async(req,res)=>{
    try {
        const userId = req.user
+      //  console.log("req.user", req.user);
        let {page=1} = req.query 
        const limit = 5 
        page = parseInt(page)
