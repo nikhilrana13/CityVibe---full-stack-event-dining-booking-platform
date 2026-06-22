@@ -1,6 +1,5 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logout } from "../AuthSlice";
-import { resetAllApiCache } from "@/utils/resetApiCache";
+
 
 
 const baseQuery = fetchBaseQuery({
@@ -17,15 +16,17 @@ const baseQuery = fetchBaseQuery({
 const baseQueryWithAuth = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions);
   if (result.error?.status === 401) {
-     const status = result.error.status;
+    const status = result.error.status;
     const url = typeof args === "string" ? args : args.url;
     const isAuthApi = url?.includes("/google-Login");
     // skip login api
     if (status === 401 && !isAuthApi) {
+      const { logout } = await import("../AuthSlice");
       localStorage.setItem("lastPath", window.location.pathname); // save current page pathname
-      resetAllApiCache()
+      const { resetAllApiCaches } = await import("@/utils/resetApiCache.js");
+      api.dispatch(resetAllApiCaches());
       localStorage.removeItem("token");
-      api.dispatch(logout()) 
+      api.dispatch(logout())
       window.dispatchEvent(new Event("unauthorized"));
       // console.log("Unauthorized Event Fired");
     }

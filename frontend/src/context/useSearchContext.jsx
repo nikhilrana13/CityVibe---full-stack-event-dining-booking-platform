@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useLocationContext } from "./useLocationContext";
-import axios from "axios";
 import useDebounce from "../hooks/useDebounce";
 import { useLocation } from "react-router-dom";
+import { useGetSearchResultsQuery } from "@/redux/api/SearchResultApi";
 
 
 
@@ -15,42 +15,19 @@ export const SearchProvider = ({children})=>{
   const routerLocation = useLocation()
   const [query, setQuery] = useState("")
   const [type, setType] = useState("all")
-  const [results, setResults] = useState([])
-  const [loading, setLoading] = useState(false)
   const debounceValue = useDebounce(query,500)
+  const city = location?.city?.trim()
+  const searchQuery = useGetSearchResultsQuery({
+    city:city,
+    type,
+    query:debounceValue
+  },{
+    skip:!location?.city
+  })
+  const results = searchQuery?.data?.data || []
+  const loading =  searchQuery.isLoading || searchQuery.isFetching
 
 
-     useEffect(() => {
-       // if user type fast cancel previous request
-    const controller = new AbortController()
-    const fetchSearch = async () => {
-        if (!location?.city) return
-      try {
-        setLoading(true)
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/search`, {
-          params: {
-            city: location?.city,
-            type,
-            query: debounceValue || ""
-          },
-         signal: controller.signal
-        })
-        // console.log("response",response.data)
-        if(response.data){
-         setResults(response?.data?.data)
-        }
-      } catch (error) {
-        if(error.name !== "AbortError"){
-         console.log("Search error", error)
-        }
-      } finally {
-        setLoading(false)
-      }
-    }
-     fetchSearch()
-     return () => controller.abort()
-  }, [debounceValue, type, location?.city])
-  
   useEffect(() => {
   const path = routerLocation.pathname
   if (path.startsWith("/events")) {

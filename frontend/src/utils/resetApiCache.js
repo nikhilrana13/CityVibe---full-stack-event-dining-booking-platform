@@ -1,11 +1,9 @@
-import { BookingApi } from "@/redux/api/BookingApi"
-import { EventApi } from "@/redux/api/EventApi"
-import { Store } from "@/redux/Store"
+import { BookingApi } from "@/redux/api/BookingApi";
+import { DiningApi } from "@/redux/api/DiningApi";
+import { EventApi } from "@/redux/api/EventApi";
 
-
-
-export const resetAllApiCache = ()=>{
-    Store.dispatch(
-        BookingApi.util.resetApiState(), 
-    )
-}
+export const resetAllApiCaches = () => (dispatch) => {
+  dispatch(BookingApi.util.resetApiState());
+  dispatch(DiningApi.util.resetApiState());
+  dispatch(EventApi.util.resetApiState());
+};
