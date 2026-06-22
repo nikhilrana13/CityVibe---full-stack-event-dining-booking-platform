@@ -8,7 +8,6 @@ import EventDetailsPage from "./pages/EventDetailsPage"
 import RestaurantDetailsPage from "./pages/RestaurantDetailsPage"
 import CategoryDetailPage from "./pages/CategoryDetailPage"
 import BookEventTickets from "./components/pages/EventPage/BookEventTickets"
-import UpdateEventBookingStatus from "./components/pages/EventPage/PaymentSuccess"
 import Bookings from "./pages/Bookings"
 import DiningBooking from "./components/pages/diningPage/DiningBooking"
 import LoginDialog from "./components/common/LoginDialog"
@@ -16,6 +15,7 @@ import ScrollToTop from "./components/common/ScrollToTop"
 import PaymentFailed from "./components/pages/EventPage/PaymentFailed"
 import { Helmet } from "react-helmet-async"
 import BookingDetails from "./components/bookings/BookingDetails"
+import PaymentSuccess from "./components/pages/EventPage/PaymentSuccess"
 
 const App = () => {
   return (
@@ -44,7 +44,7 @@ const App = () => {
         <Route path="/dining/:city/:id/:slug/book" element={<DiningBooking />} />
         {/* payments success and failed */}
 
-        <Route path="/payment-success" element={<UpdateEventBookingStatus />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-failed" element={<PaymentFailed />} />
         {/* for organizers */}
         <Route path="/events/list-your-events" element={<ListYourEvents />} />
