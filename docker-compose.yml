@@ -1,0 +1,50 @@
+services:
+  backend:
+    build: ./backend 
+    ports: 
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    volumes:
+       - ./backend:/backend
+       - /backend/node_modules 
+
+  user:
+    build: ./frontend 
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend 
+    env_file:
+      - ./frontend/.env
+    volumes: 
+       - ./frontend:/frontend
+       - /frontend/node_modules  
+  
+  organizer:
+    build: ./organizer-frontend 
+    ports:
+      - "5174:5173"
+    depends_on:
+      - backend
+    env_file:
+      - ./organizer-frontend/.env 
+    volumes: 
+       - ./organizer-frontend:/organizer-frontend
+       - /organizer-frontend/node_modules 
+
+  admin:
+    build: ./admin-frontend 
+    ports:
+      - "5175:5173" 
+    depends_on:
+      - backend
+    env_file:
+      - ./admin-frontend/.env 
+    volumes:
+       - ./admin-frontend:/admin-frontend 
+       - /admin-frontend/node_modules
+      
+
+  
+     

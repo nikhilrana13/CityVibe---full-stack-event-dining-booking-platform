@@ -3,7 +3,7 @@ import { logout } from "../AuthSlice";
 
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_BACKEND_URL,
+  baseUrl:import.meta.env.VITE_BACKEND_URL,
   prepareHeaders: (headers) => {
     const token = localStorage.getItem("token");
     if (token) {

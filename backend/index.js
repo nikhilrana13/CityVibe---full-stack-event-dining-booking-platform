@@ -28,7 +28,6 @@ app.use("/api",WebhookRoute)
 app.set("trust proxy", 1);
 
 
-
 // middlewares
 app.use(cors({
     origin:[

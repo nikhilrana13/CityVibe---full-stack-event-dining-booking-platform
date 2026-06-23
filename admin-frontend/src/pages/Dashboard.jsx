@@ -12,7 +12,7 @@ import { TiTicket } from 'react-icons/ti';
 const Dashboard = () => {
    const statsQuery = useGetDashboardStatsQuery()
    const stats = statsQuery?.data?.data?.stats
-   console.log("stats",stats)
+  //  console.log("stats",stats)
 
 
   // stats data
