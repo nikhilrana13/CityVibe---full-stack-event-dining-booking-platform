@@ -341,7 +341,85 @@ This script inserts an admin user into the database with permissions required to
 
 📧 Email notifications for bookings
 
-📊 Advanced analytics dashboard
+📊 Advanced analytics dashboard 
 
-Live Link:[https://cityvibe-full-stack-event-dining-booking-d2nc.onrender.com]
+🐳 Devops Section
+
+## 🐳 Docker Support
+
+CityVibe is fully containerized using Docker and Docker Compose, allowing developers to run the complete platform with a consistent development environment.
+
+### Services
+
+The application is split into multiple containers:
+
+* ⚙️ Backend API Server
+* 👤 User Frontend
+* 🎤 Organizer Dashboard
+* 👑 Admin Dashboard
+
+### Prerequisites
+
+Before running the project, make sure you have installed:
+
+* Docker
+* Docker Compose
+
+### Run with Docker
+
+Clone the repository:
+
+```bash
+git clone <repository-url>
+cd cityvibe
+```
+
+Create the required environment files:
+
+```bash
+backend/.env
+frontend/.env
+organizer-frontend/.env
+admin-frontend/.env
+```
+
+Start all services:
+
+```bash
+docker compose up --build
+```
+
+Run in detached mode:
+
+```bash
+docker compose up -d
+```
+
+Stop all services:
+
+```bash
+docker compose down
+```
+
+### Available Services
+
+| Service             | URL                   |
+| ------------------- | --------------------- |
+| Backend API         | http://localhost:3000 |
+| User Frontend       | http://localhost:5173 |
+| Organizer Dashboard | http://localhost:5174 |
+| Admin Dashboard     | http://localhost:5175 |
+
+### Benefits
+
+* Consistent development environment across all machines
+* No dependency or Node.js version conflicts
+* One-command project setup
+* Simplified onboarding for contributors
+* Isolated services using Docker containers
+
+ 
+
+Live Link For user:[https://cityvibe-full-stack-event-dining-booking-d2nc.onrender.com]
+For Organizer:[https://cityvibe-full-stack-event-dining-booking-ul1e.onrender.com]
 
