@@ -4,6 +4,8 @@ const redisClient = require("../config/redis.js");
 const router = express.Router() 
 
 // common search api
-router.get("/search",Search)
+router.get("/search",Search) 
+
+
 
 module.exports = router

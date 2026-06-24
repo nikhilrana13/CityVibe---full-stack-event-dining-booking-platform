@@ -3,8 +3,8 @@ const Event = require("../models/eventmodel.js");
 const Restaurant = require("../models/restaurantmodel.js");
 const cityClusters = require("../utils/cityCluster.js");
 const Response = require("../utils/responsehandler.js");
-const moment = require("moment-timezone")
-
+const moment = require("moment-timezone");
+const redisClient = require("../config/redis.js")
 // find result based on query trending mixed trending events trending restaurant search results
 const Search = async (req, res) => {
   try {
@@ -12,22 +12,34 @@ const Search = async (req, res) => {
     if (!type || !city) {
       return Response(res, 400, "Type and city is Required");
     }
-    const normalizedCity = normalizeCityKeyword(city)
-    const cluster = cityClusters[normalizedCity] || [normalizedCity]
+
+    const normalizedCity = normalizeCityKeyword(city);
+    const cluster = cityClusters[normalizedCity] || [normalizedCity];
     // safer version
-    const escapeRegex = (text) =>text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-    const cityRegexArray = cluster.map(c => new RegExp(`^${escapeRegex(c)}$`, "i"))
+    const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const cityRegexArray = cluster.map(
+      (c) => new RegExp(`^${escapeRegex(c)}$`, "i"),
+    );
     const isTrending = !query; // if no query show trending
     const today = moment().tz("Asia/Kolkata").startOf("day").toDate();
+    // get redis key
+    const cacheKey = `search:${type}:${normalizedCity}:${query || "trending"}`;
+    const cachedResults = await redisClient.get(cacheKey);
+    if (cachedResults) {
+      console.log(`Cache Hit: ${cacheKey}`);
+      return Response(res, 200, "Results found", JSON.parse(cachedResults));
+    }
+    console.log(`Cache miss: ${cacheKey}`);
+
     // event
     if (type === "event") {
       const filter = {
         eventIsActive: true,
         $or: [
-        { endDate: { $ne: null, $gte: today } },
-        { endDate: null, startDate: { $gte: today } }
-          ],
-        city: {$in:cityRegexArray},
+          { endDate: { $ne: null, $gte: today } },
+          { endDate: null, startDate: { $gte: today } },
+        ],
+        city: { $in: cityRegexArray },
       };
       if (!isTrending) {
         filter.title = { $regex: new RegExp(query, "i") };
@@ -65,13 +77,16 @@ const Search = async (req, res) => {
         ...(event.toObject ? event.toObject() : event),
         type: "event",
       }));
+      await redisClient.set(cacheKey, JSON.stringify(formattedEvents), {
+        EX: 120,
+      });
       return Response(res, 200, "Events found", formattedEvents);
     }
     // dining
     if (type === "dining") {
       const filter = {
-      isActive: true,
-        city: {$in:cityRegexArray},
+        isActive: true,
+        city: { $in: cityRegexArray },
       };
 
       if (!isTrending) {
@@ -89,20 +104,23 @@ const Search = async (req, res) => {
         ...(res.toObject ? res.toObject() : res),
         type: "dining",
       }));
+      await redisClient.set(cacheKey, JSON.stringify(formattedRestaurants), {
+        EX: 120,
+      });
       return Response(res, 200, "Restaurant found", formattedRestaurants);
     }
     if (type === "all") {
       const eventFilter = {
         eventIsActive: true,
         $or: [
-        { endDate: { $ne: null, $gte: today } },
-        { endDate: null, startDate: { $gte: today } }
-     ],
-        city: {$in:cityRegexArray},
+          { endDate: { $ne: null, $gte: today } },
+          { endDate: null, startDate: { $gte: today } },
+        ],
+        city: { $in: cityRegexArray },
       };
       const restaurantFilter = {
         isActive: true,
-        city: {$in:cityRegexArray},
+        city: { $in: cityRegexArray },
       };
       if (!isTrending) {
         eventFilter.title = { $regex: new RegExp(query, "i") };
@@ -151,8 +169,11 @@ const Search = async (req, res) => {
         ...(res.toObject ? res.toObject() : res),
         type: "restaurant",
       }));
-      const combinedResults = [...formattedEvents,...formattedRestaurants]
-      return Response(res, 200, "Results found", combinedResults)
+      const combinedResults = [...formattedEvents, ...formattedRestaurants];
+      await redisClient.set(cacheKey, JSON.stringify(combinedResults), {
+        EX: 120,
+      });
+      return Response(res, 200, "Results found", combinedResults);
     }
     return Response(res, 400, "No Results found");
   } catch (error) {
