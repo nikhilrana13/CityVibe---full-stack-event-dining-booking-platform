@@ -18,6 +18,7 @@ const EventStatusUpdater = require("./jobs/eventstatusupdater.js")
 const responseTimeLogger = require("./middleware/responsetimelogger.js")
 const { limiter} = require("./middleware/ratelimiters.js")
 const setupSwagger = require("./config/swagger.js")
+const redisClient = require("./config/redis.js")
 
 dotenv.config()
 
@@ -42,6 +43,7 @@ app.use(limiter)
 app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
+
 // middleware to find response time of requests
 app.use(responseTimeLogger)
 
@@ -59,13 +61,17 @@ app.use("/api",RestaurantBookingRoute)
 app.use("/api",EventBooking)
 app.use("/api/user",UserRoute) 
 
+
 // connect to db  
 configure()
 
-app.listen(PORT,()=>{
+app.listen(PORT,async()=>{
     console.log(`server is running on port ${PORT}`)
+     await redisClient.connect()
     EventStatusUpdater()
 })
+
+
 
 
 

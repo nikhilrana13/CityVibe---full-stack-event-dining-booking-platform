@@ -44,6 +44,12 @@ services:
     volumes:
        - ./admin-frontend:/admin-frontend 
        - /admin-frontend/node_modules
+  redis:
+       image: redis:latest 
+       container_name: cityvibe-redis 
+       ports: 
+         - "6379:6379" 
+       restart: unless-stopped
       
 
   
