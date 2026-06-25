@@ -1,3 +1,4 @@
+const redisClient = require("../config/redis.js");
 const normalizeCityKeyword = require("../helpers/normalizeCityKeyword.js");
 const Event = require("../models/eventmodel.js");
 const cityClusters = require("../utils/cityCluster.js");
@@ -12,6 +13,14 @@ const Home = async (req, res) => {
     }
     const normalizedCity = normalizeCityKeyword(city)
     const cluster = cityClusters[normalizedCity] || [normalizedCity]
+    // get redis key 
+    const cacheKey = `home:${normalizedCity}`
+    const cachedResults = await redisClient.get(cacheKey);
+    if(cachedResults){
+      console.log(`Cache Hit: ${cacheKey}`);
+      return Response(res, 200, "Homepage api's data", JSON.parse(cachedResults));
+    }
+    console.log(`Cache Miss: ${cacheKey}`);
     // safer version
     const escapeRegex = (text) =>text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
     const cityRegexArray = cluster.map(c => new RegExp(`^${escapeRegex(c)}$`, "i"))
@@ -205,6 +214,16 @@ const Home = async (req, res) => {
         },
       },
     ]);
+    // add data in redis cache 
+    await redisClient.set(cacheKey,JSON.stringify({
+      trending,
+      music,
+      thisWeek,
+      comedy,
+      indiasTopEvents 
+    }),{
+      EX: 300 // expire after 300 seconds
+    })
     return Response(res, 200, "Homepage api's data", {
       trending,
       music,

@@ -4,6 +4,7 @@ const Response = require("../utils/responsehandler.js");
 const cloudinary = require("../config/cloudinary.js");
 const sharp = require("sharp");
 const Restaurantbooking = require("../models/bookings/restaurantbookingmodel.js");
+const redisClient = require("../config/redis.js");
 
 // create restaurant
 const CreateRestaurant = async (req, res) => {
@@ -148,10 +149,22 @@ const CreateRestaurant = async (req, res) => {
 const getEachRestaurantDetails = async (req, res) => {
   try {
     const restaurantId = req.params.id;
+    // get cache key 
+    const cacheKey = `restaurant:${restaurantId}`
+    const cachedResults = await redisClient.get(cacheKey)
+    if(cachedResults){
+        console.log(`Cache Hit: ${cacheKey}`); 
+        return Response(res, 200, "Restaurant details found", JSON.parse(cachedResults));
+    }
+    console.log(`Cache Miss: ${cacheKey}`);
     const restaurant = await Restaurant.findById(restaurantId);
     if (!restaurant) {
       return Response(res, 404, "Restaurant not found");
     }
+    // add data to redis cache 
+    await redisClient.set(cacheKey,JSON.stringify({ restaurant}),{
+      EX:300
+    })
     return Response(res, 200, "Restaurant details found", { restaurant });
   } catch (error) {
     console.log("failed to get restaurant details", error);
@@ -212,6 +225,7 @@ const DeleteRestaurant = async (req, res) => {
       );
     }
     await Restaurant.findByIdAndDelete(restaurant);
+    await redisClient.del(`restaurant:${restaurantId}`);
     return Response(res, 200, "Restaurant Deleted Successfully");
   } catch (error) {
     console.error("Failed to delete restaurant", error);
@@ -340,6 +354,7 @@ const updateRestaurant = async (req, res) => {
       { $set: updateData },
       { new: true },
     );
+    await redisClient.del(`restaurant:${restaurantId}`);
     return Response(res, 200, "Restaurant details updated", {
       updatedRestaurant,
     });
@@ -370,6 +385,7 @@ const toggleEnableandDisableRestaurant = async (req, res) => {
     if (!updatedrestaurant) {
       return Response(res, 403, "restaurant not found or not authorized");
     }
+    await redisClient.del(`restaurant:${restaurantId}`);
     return Response(
       res,
       200,

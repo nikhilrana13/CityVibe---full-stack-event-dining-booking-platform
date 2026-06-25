@@ -8,7 +8,8 @@ const Eventbooking = require("../models/bookings/eventbookingmodel.js");
 const moment = require("moment-timezone");
 const normalizeCityKeyword = require("../helpers/normalizeCityKeyword.js");
 const cityClusters = require("../utils/cityCluster.js");
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
+const redisClient = require("../config/redis.js");
 
 // create event
 const CreateEvent = async (req, res) => {
@@ -162,6 +163,14 @@ const CreateEvent = async (req, res) => {
 const EachEventDetails = async (req, res) => {
   try {
     const eventId = req.params.id;
+    // get cache key 
+    const cacheKey = `event:${eventId}`
+    const cachedResults = await redisClient.get(cacheKey)
+    if(cachedResults){
+        console.log(`Cache Hit: ${cacheKey}`); 
+        return Response(res, 200, "Event details found", JSON.parse(cachedResults));
+    }
+     console.log(`Cache miss: ${cacheKey}`);
     const event = await Event.aggregate([
       {
         $match: {
@@ -187,6 +196,10 @@ const EachEventDetails = async (req, res) => {
     if (!event || event.length === 0) {
       return Response(res, 404, "Event not found");
     }
+     // add data to redis cache 
+    await redisClient.set(cacheKey,JSON.stringify({event: event[0]}),{
+      EX:300
+    })
     return Response(res, 200, "Event details found", {event: event[0]});
   } catch (error) {
     console.log("failed to get event details", error);
@@ -262,6 +275,8 @@ const DeleteEvent = async (req, res) => {
       return Response(res, 403, "You are not authorized to delete this event");
     }
     await Event.findByIdAndDelete(eventId);
+    // delete cache event 
+    await redisClient.del(`event:${eventId}`)
     return Response(res, 200, "Event Deleted Successfully");
   } catch (error) {
     console.error("Failed to delete event", error);
@@ -289,6 +304,8 @@ const CancelEvent = async (req, res) => {
     if (!updatedEvent) {
       return Response(res, 403, "Event not found or not authorized");
     }
+    // delete cache event
+    await redisClient.del(`event:${id}`);
     return Response(res, 200, "Event Cancelled successfully");
   } catch (error) {
     console.log("failed to cancel event", error);
@@ -476,7 +493,6 @@ const GetOrganizerEventBookings = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
-
 module.exports = {
   CreateEvent,
   EachEventDetails,
