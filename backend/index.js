@@ -29,7 +29,7 @@ const app = express()
 app.use("/api",WebhookRoute)
 app.set("trust proxy", 1);
 
-app.use(observixMiddleware(process.env.OBSERVIX_API_KEY))
+
 // middlewares
 app.use(cors({
     origin:[
@@ -44,6 +44,8 @@ app.use(limiter)
 app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
+app.use(observixMiddleware(process.env.OBSERVIX_API_KEY))
+
 
 // middleware to find response time of requests
 app.use(responseTimeLogger)
