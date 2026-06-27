@@ -1,407 +1,243 @@
-🌆 CityVibe – Urban Event & Dining Platform
+# 🌆 CityVibe – Urban Event & Dining Platform
 
-CityVibe is a full-stack urban discovery platform where users can explore local events, book event tickets, and reserve restaurant tables in their city.
+CityVibe is a full-stack urban discovery platform where users can discover local events, book event tickets, and reserve restaurant tables in their city. The platform provides dedicated dashboards for Users, Organizers, and Admins, creating a complete marketplace similar to **BookMyShow + Zomato**.
 
-Organizers can create and manage events or restaurant listings through a dedicated organizer dashboard, while administrators verify organizers and manage the platform through an admin dashboard.
+---
 
-The platform integrates secure authentication, Stripe payments, dynamic ticket inventory management, optimized APIs with pagination/filtering/sorting, and a scalable backend fully documented using Swagger.
+# 🚀 Highlights
 
-CityVibe simulates a real-world marketplace similar to a combination of BookMyShow + Zomato, bringing both event discovery and dining reservations into a single platform.
+* 🎟️ Event discovery & ticket booking
+* 🍽️ Restaurant reservation system
+* 🔐 Firebase Google Authentication
+* 💳 Stripe Checkout & Webhooks (Test Mode)
+* 📚 Swagger API Documentation
+* 📊 Organizer Analytics Dashboard
+* 👑 Admin Verification Panel
+* ⚡ Pagination, Filtering & Sorting
+* 🔄 Infinite Scroll
+* 🎫 Dynamic Ticket Inventory
+* 🐳 Docker & Docker Compose Support
+* 🚀 Redis Caching for High-Traffic APIs
 
-🚀 Highlights
+---
 
-🎟️ Event discovery and ticket booking platform
+# ✨ Features
 
-🍽️ Restaurant reservation system
+## 👤 User
 
-🔐 Firebase authentication with Google login
+* Browse trending events
+* Search events & restaurants
+* Book event tickets
+* Reserve restaurant tables
+* View & cancel bookings
+* Google Authentication
 
-💳 Stripe payment integration (Test Mode)
+---
 
-📚 Fully documented REST APIs using Swagger
+## 🎤 Organizer
 
-📊 Organizer analytics dashboard
+* Organizer onboarding & verification
+* Upload PAN & Bank details
+* Create & manage events
+* Restaurant management
+* Ticket pricing & inventory
+* QR / Code ticket verification
+* Revenue & booking analytics
 
-👑 Admin panel for organizer verification
+---
 
-⚡ APIs with pagination, filtering, and sorting
+## 👑 Admin
 
-🔄 Infinite scroll for event and restaurant listings
+* Verify organizer applications
+* Review uploaded documents
+* Approve / Reject organizers
+* Monitor platform activities
 
-🎫 Dynamic ticket inventory management
+---
 
-✨ Features:
+# 💳 Payments
 
-👤 User Features
+* Stripe Checkout Integration
+* Stripe Webhooks
+* Secure payment verification
+* Automatic booking confirmation
 
-🔥 Discover trending events in your city
+> **Note:** Stripe Test Mode is used. No real payments are processed.
 
-🔎 Search events and restaurants
+---
 
-🎟️ Book event tickets securely
+# 🎟️ Ticket Inventory
 
-🍽️ Reserve tables at restaurants
+* Available tickets decrease after booking
+* Tickets restore automatically after cancellation
+* Prevents overbooking
 
-📜 View booking history
+---
 
-❌ Cancel bookings
+# ⚡ Performance Optimizations
 
-🔐 Login using Google Authentication
+* Pagination
+* Filtering
+* Sorting
+* Optimized MongoDB Aggregation Queries
+* Infinite Scroll
+* Response Time Logging
 
-🎤 Organizer Features
+---
 
-📝 Organizer onboarding with verification
+# 🚀 Redis Caching
 
-🪪 Upload PAN card and bank account details
+Redis is used to reduce database load and improve API performance using the **Cache-Aside Pattern**.
 
-🎪 Event creation and management
+### Cached APIs
 
-💰 Ticket pricing and seat management
+* 🏠 Home API
+* 🔎 Search API
+* 🎟️ Event Details API
+* 🍽️ Restaurant Details API
 
-📊 Event booking analytics
+### Benefits
 
-📷 QR / Code based ticket verification
-
-📈 Revenue and booking dashboard
-
-🍽️ Restaurant listing and reservation management
-
-🍽️ Dining Features
-
-🏪 Restaurant listing system
-
-🪑 Table reservation functionality
-
-⏰ Available dining time slot system
-
-👥 Guest management
-
-📊 Reservation analytics for restaurant owners
-
-👑 Admin Dashboard
-
-CityVibe includes an Admin Panel to manage the platform and verify organizers.
-
-Admin capabilities
-
-📑 Review organizer onboarding applications
-
-📄 View uploaded documents
-
-PAN card
-
-Business details
-
-Bank account details
-
-✅ Approve or reject organizer accounts
-
-🚫 Ensure only verified organizers can publish events or restaurants
-
-📊 Monitor platform activity
-
-The admin account is created using a seed script to prevent public admin signup.
-
-💳 Payments
-
-CityVibe integrates Stripe Checkout for secure event ticket payments.
-
-Features
-
-🔐 Secure payment processing using Stripe Checkout
-
-🧪 Stripe test mode (demo account) used during development
-
-✅ Automatic booking confirmation after payment
-
-🔔 Stripe Webhooks used to verify payment success
-
-🛡️ Secure backend payment verification
-
-⚠️ Note
-This project currently uses Stripe test environment, so no real payments are processed.
-
-🎟️ Ticket Inventory Management
-
-CityVibe includes a dynamic ticket inventory system.
-
-Key behavior
-
-📉 Available tickets decrease when a booking is made
-
-🔄 When a booking is cancelled, tickets are automatically restored
-
-🚫 Prevents overbooking and maintains accurate seat availability
-
-Booking Flow
-User books ticket
-      │
-Available tickets decrease
-      │
-Booking confirmed
-Cancel Booking
-User cancels booking
-      │
-Tickets restored
-      │
-Available seat count increases
-⚡ Performance & Query Optimization
-
-CityVibe APIs are optimized for large datasets and smooth browsing.
-
-Backend API capabilities
-
-📄 Pagination support
-
-🔎 Filtering options
-
-🔃 Sorting functionality
-
-⚡ Optimized MongoDB queries
-
-Example API query:
-
-GET /api/events?page=1&limit=10&sort=latest&city=Delhi
-🔄 Infinite Scroll (Frontend)
-
-CityVibe implements infinite scrolling for event and restaurant listings.
-
-Benefits
-
-Loads more results automatically while scrolling
-
-Reduces initial page load time
-
-Improves browsing experience
-
-Uses backend pagination APIs
-
-This creates a browsing experience similar to Instagram, Airbnb, or Zomato.
-
-🧰 Tech Stack
-🎨 Frontend
-
-React (Vite)
-
-TailwindCSS
-
-Redux Toolkit
-
-React Router
-
-⚙️ Backend
-
-Node.js
-
-Express.js
-
+* Faster response times
+* Reduced MongoDB queries
+* Lower server load
+* Automatic cache expiration using TTL
+
+Example Flow:
+
+```
+Client
+   │
+Redis Cache
+   │
+Cache Hit
+   ▼
+Response (Few ms)
+
+Cache Miss
+   ▼
 MongoDB
+   ▼
+Redis Store
+   ▼
+Response
+```
 
-Mongoose
+---
 
-🔐 Authentication
+# 🧰 Tech Stack
 
-Firebase Authentication
+## Frontend
 
-Google OAuth
+* React (Vite)
+* Tailwind CSS
+* Redux Toolkit
+* React Router
 
-Phone OTP (planned feature)
+## Backend
 
-💳 Payments
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+* Redis
 
-Stripe Checkout
+## Authentication
 
-Stripe Webhooks
+* Firebase Authentication
+* Google OAuth
 
-☁️ Storage
+## Payments
 
-Cloudinary (Image Uploads)
+* Stripe Checkout
+* Stripe Webhooks
 
-📚 API Documentation
+## Storage
 
-All backend APIs are documented using Swagger (OpenAPI).
+* Cloudinary
 
-Swagger provides:
+## Documentation
 
-📖 Interactive API documentation
+* Swagger (OpenAPI)
 
-📦 Request and response schema definitions
+---
 
-🧪 API testing through Swagger UI
+# 📚 API Modules
 
-🔍 Clear endpoint references for developers
+* Authentication
+* Events
+* Event Booking
+* Restaurants
+* Dining Booking
+* Organizer
+* Admin
+* Search
+* Home
 
-🧩 Core API Modules
+---
 
-CityVibe backend exposes REST APIs for the following modules.
+# 🔒 Security
 
-🔐 Authentication APIs
+* JWT Authentication
+* Firebase Token Verification
+* Organizer Authorization
+* Admin Authorization
+* Rate Limiting
+* Input Validation
 
-Google login
+---
 
-Firebase token verification
+# 🐳 Docker Support
 
-User profile update
+CityVibe is fully containerized using Docker & Docker Compose.
 
-🎪 Event APIs
+### Containers
 
-Create event
-
-Get event details
-
-Get trending events
-
-Cancel event
-
-Delete event
-
-🎟️ Event Booking APIs
-
-Book event tickets
-
-Create Stripe payment session
-
-Verify event ticket
-
-Cancel booking
-
-View booking history
-
-🍽️ Restaurant APIs
-
-Restaurant listing
-
-Restaurant details
-
-Available dining slots
-
-🪑 Dining Booking APIs
-
-Create reservation
-
-Cancel reservation
-
-View reservation history
-
-Get booking details
-
-🎤 Organizer APIs
-
-Organizer onboarding
-
-Upload verification documents
-
-Update business profile
-
-Dashboard statistics
-
-Event management analytics
-
-Dining management analytics
-
-🔎 Search APIs
-
-Search events
-
-Search restaurants
-
-Trending results
-
-🔒 Security Features
-
-🔑 JWT based authentication
-
-🔐 Firebase ID token verification
-
-🛡️ Organizer authorization middleware
-
-👮 Admin-level organizer verification
-
-🚦 Rate limiting for authentication & booking APIs
-
-✔️ Input validation and API protection
-
-👑 Admin Setup
-
-The admin account is created using a seed script.
-
-Example:
-
-node scripts/createAdmin.js
-
-This script inserts an admin user into the database with permissions required to manage organizers and platform activities.
-
-🚀 Future Improvements
-
-📱 Phone OTP authentication
-
-🤖 Event recommendation system
-
-🔔 Real-time booking notifications
-
-📧 Email notifications for bookings
-
-📊 Advanced analytics dashboard 
-
-🐳 Devops Section
-
-## 🐳 Docker Support
-
-CityVibe is fully containerized using Docker and Docker Compose, allowing developers to run the complete platform with a consistent development environment.
-
-### Services
-
-The application is split into multiple containers:
-
-* ⚙️ Backend API Server
+* ⚙️ Backend API
 * 👤 User Frontend
 * 🎤 Organizer Dashboard
 * 👑 Admin Dashboard
+* 🚀 Redis Server
 
-### Prerequisites
+### Run Project
 
-Before running the project, make sure you have installed:
-
-* Docker
-* Docker Compose
-
-### Run with Docker
-
-Clone the repository:
+Clone the repository
 
 ```bash
 git clone <repository-url>
 cd cityvibe
 ```
 
-Create the required environment files:
+Create environment files
 
-```bash
+```
 backend/.env
 frontend/.env
 organizer-frontend/.env
 admin-frontend/.env
 ```
 
-Start all services:
+Start all services
 
 ```bash
 docker compose up --build
 ```
 
-Run in detached mode:
+Run in background
 
 ```bash
 docker compose up -d
 ```
 
-Stop all services:
+Stop services
 
 ```bash
 docker compose down
 ```
 
-### Available Services
+---
+
+# 🌐 Local Services
 
 | Service             | URL                   |
 | ------------------- | --------------------- |
@@ -410,16 +246,24 @@ docker compose down
 | Organizer Dashboard | http://localhost:5174 |
 | Admin Dashboard     | http://localhost:5175 |
 
-### Benefits
+---
 
-* Consistent development environment across all machines
-* No dependency or Node.js version conflicts
-* One-command project setup
-* Simplified onboarding for contributors
-* Isolated services using Docker containers
+# 🚀 Future Improvements
 
- 
+* 📱 Phone OTP Authentication
+* 🤖 Event Recommendation System
+* 🔔 Real-time Notifications
+* 📧 Email Notifications
+* 📊 Advanced Analytics Dashboard
 
-Live Link For user:[https://cityvibe-full-stack-event-dining-booking-d2nc.onrender.com]
-For Organizer:[https://cityvibe-full-stack-event-dining-booking-ul1e.onrender.com]
+---
 
+# 🌍 Live Demo
+
+### 👤 User
+
+https://cityvibe-full-stack-event-dining-booking-d2nc.onrender.com
+
+### 🎤 Organizer
+
+https://cityvibe-full-stack-event-dining-booking-ul1e.onrender.com
