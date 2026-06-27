@@ -19,6 +19,7 @@ const responseTimeLogger = require("./middleware/responsetimelogger.js")
 const { limiter} = require("./middleware/ratelimiters.js")
 const setupSwagger = require("./config/swagger.js")
 const redisClient = require("./config/redis.js")
+const { observixMiddleware } = require("./middleware/ObservixMiddleware.js")
 
 dotenv.config()
 
@@ -28,7 +29,7 @@ const app = express()
 app.use("/api",WebhookRoute)
 app.set("trust proxy", 1);
 
-
+app.use(observixMiddleware(process.env.OBSERVIX_API_KEY))
 // middlewares
 app.use(cors({
     origin:[
