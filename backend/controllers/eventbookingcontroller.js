@@ -332,6 +332,7 @@ const UserAllBookedEvents = async(req,res)=>{
     return Response(res,500,"Internal server error")
   }
 }
+
 // Each booking details 
 const GetEventBookingDetail = async(req,res)=>{
   try {

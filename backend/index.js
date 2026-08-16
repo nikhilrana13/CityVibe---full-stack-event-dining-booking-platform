@@ -20,6 +20,7 @@ const { limiter} = require("./middleware/ratelimiters.js")
 const setupSwagger = require("./config/swagger.js")
 const redisClient = require("./config/redis.js")
 const { observixMiddleware } = require("./middleware/ObservixMiddleware.js")
+const AgentRoute = require("./routes/agentsroutes.js")
 
 dotenv.config()
 
@@ -63,6 +64,8 @@ app.use("/api",HomeRoute)
 app.use("/api",RestaurantBookingRoute) 
 app.use("/api",EventBooking)
 app.use("/api/user",UserRoute) 
+app.use("/api/agents",AgentRoute)
+
 
 
 // connect to db  
