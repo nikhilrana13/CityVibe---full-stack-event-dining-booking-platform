@@ -3,7 +3,7 @@ import React from 'react';
 
 const TypeButton = ({active, icon, title, subtitle, onClick }) => {
   return (
-    <button onClick={onClick} className={`relative overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 ${active ? "border-blue-200 bg-blue-50/70 shadow-[0_8px_25px_rgba(37,99,235,0.08)]" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50" }`}
+    <button type='button' onClick={onClick} className={`relative overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 ${active ? "border-blue-200 bg-blue-50/70 shadow-[0_8px_25px_rgba(37,99,235,0.08)]" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50" }`}
     >
       {active && (
         <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-[#000000] text-white">

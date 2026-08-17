@@ -34,10 +34,10 @@ const BookingAgentChatInterface = ({onClose,}) => {
     setSelectedQuestion(question)
     setStep(2)
   }
-
+  
   return (
       <div onClick={onClose} className="fixed inset-0 z-[100] flex items-end justify-end bg-black/20 p-3 backdrop-blur-[3px] sm:p-5">
-      <div className="relative flex h-[min(760px,calc(100vh-24px))] w-full max-w-[470px] flex-col overflow-hidden rounded-[28px] border border-white/70 bg-white/95 shadow-[0_25px_80px_rgba(0,0,0,0.22)] backdrop-blur-2xl"
+      <div onClick={(e) => e.stopPropagation()} className="relative flex h-[min(760px,calc(100vh-24px))] w-full max-w-[470px] flex-col overflow-hidden rounded-[28px] border border-white/70 bg-white/95 shadow-[0_25px_80px_rgba(0,0,0,0.22)] backdrop-blur-2xl"
       >
         {/* Background glow */}
         <div className="pointer-events-none absolute -right-24 -top-24 h-52 w-52 rounded-full bg-blue-500/10 blur-3xl" />
