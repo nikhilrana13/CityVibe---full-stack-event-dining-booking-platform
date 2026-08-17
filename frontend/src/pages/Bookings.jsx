@@ -9,6 +9,7 @@ import { formatDateRange, formatTime } from '@/utils/Helpers';
 import { useGetUserDiningBookingsQuery, useGetUserEventBookingsQuery } from '@/redux/api/BookingApi';
 import { LuMessageCircleWarning } from 'react-icons/lu';
 import ChatInterface from '@/components/Agentbot/BookingAgentChatInterface';
+import useLockBodyScroll from '@/hooks/useLockBodyScroll';
 
 const Bookings = () => {
     const navigate = useNavigate()
@@ -32,6 +33,7 @@ const Bookings = () => {
     const scrollRef = useRef()
     const displayedBookings = page === 1 ? bookings : allbookings;
     const [openAgent, setOpenAgent] = useState(false)
+    useLockBodyScroll(openAgent)
 
 
     // Append paginated bookings to local state
