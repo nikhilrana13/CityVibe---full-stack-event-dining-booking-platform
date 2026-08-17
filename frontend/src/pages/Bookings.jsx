@@ -7,6 +7,8 @@ import BookingCardShimmer from '../components/bookings/BookingCardShimmer';
 import NoBookingFallback from '../components/bookings/NoBookingFallback';
 import { formatDateRange, formatTime } from '@/utils/Helpers';
 import { useGetUserDiningBookingsQuery, useGetUserEventBookingsQuery } from '@/redux/api/BookingApi';
+import { LuMessageCircleWarning } from 'react-icons/lu';
+import ChatInterface from '@/components/Agentbot/BookingAgentChatInterface';
 
 const Bookings = () => {
     const navigate = useNavigate()
@@ -29,6 +31,7 @@ const Bookings = () => {
     const loaderRef = useRef()
     const scrollRef = useRef()
     const displayedBookings = page === 1 ? bookings : allbookings;
+    const [openAgent, setOpenAgent] = useState(false)
 
 
     // Append paginated bookings to local state
@@ -55,8 +58,8 @@ const Bookings = () => {
     useEffect(() => {
         setPage(1);
     }, [type]);
-  
-  // Infinite Scroll Observer Loads next page when bottom loader comes into viewport
+
+    // Infinite Scroll Observer Loads next page when bottom loader comes into viewport
     useEffect(() => {
         const hasNextPage = pagination?.currentpage < pagination?.totalPages
         if (!hasNextPage || isFetchingMore) return
@@ -78,67 +81,85 @@ const Bookings = () => {
     // console.log("bookings", bookings) 
     // console.log("pagination", pagination)
     return (
-        <div className='w-full'>
-            <BookNavbar title={"Review your bookings"} handleBack={() => navigate("/")} showBack />
-            <section className='bg-[#F9F9FA] min-h-screen w-full'>
-                <div className='flex flex-col w-full md:max-w-2xl  mx-auto p-5 justify-center items-center  space-y-8'>
-                    {/* tabs */}
-                    <div className='bg-[#E5E7EB] relative rounded-full py-1 w-fit mx-auto'>
-                        {/* sliding indicator */}
-                        <div className={`absolute top-1 bottom-1 w-[50%] bg-black rounded-full transition-all duration-300 ease-out ${type === "dining" ? "left-1" : "left-[50%]"}`} />
-                        <div className="relative flex items-center">
-                            <button onClick={() => setType("dining")} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${type === "dining" ? "text-white" : "text-gray-700"}`}>
-                                Dining
-                            </button>
-                            <button onClick={() => setType("events")} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${type === "events" ? "text-white" : "text-gray-700"}`}>
-                                Events
-                            </button>
+        <>
+            <div className='w-full'>
+                <BookNavbar title={"Review your bookings"} handleBack={() => navigate("/")} showBack />
+                <section className='bg-[#F9F9FA] min-h-screen w-full'>
+                    <div className='flex flex-col w-full md:max-w-2xl  mx-auto p-5 justify-center items-center  space-y-8'>
+                        {/* tabs */}
+                        <div className='bg-[#E5E7EB] relative rounded-full py-1 w-fit mx-auto'>
+                            {/* sliding indicator */}
+                            <div className={`absolute top-1 bottom-1 w-[50%] bg-black rounded-full transition-all duration-300 ease-out ${type === "dining" ? "left-1" : "left-[50%]"}`} />
+                            <div className="relative flex items-center">
+                                <button onClick={() => setType("dining")} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${type === "dining" ? "text-white" : "text-gray-700"}`}>
+                                    Dining
+                                </button>
+                                <button onClick={() => setType("events")} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${type === "events" ? "text-white" : "text-gray-700"}`}>
+                                    Events
+                                </button>
+                            </div>
+                        </div>
+                        {/* cards */}
+                        <div ref={scrollRef} className='flex flex-col md:px-5 w-full place-items-center h-[90vh] overflow-y-auto space-y-5 '>
+                            {
+                                showShimmer ? (
+                                    Array.from({ length: 3 }).map((_, i) => (
+                                        <BookingCardShimmer key={i} />
+                                    ))
+                                ) : displayedBookings?.length > 0 ? (
+                                    displayedBookings?.map((booking) => {
+                                        return (
+                                            <BookingCard key={booking?._id}
+                                                title={(booking?.event?.title || booking?.restaurant?.name)}
+                                                subtitle={`${booking?.tickets?.length || booking?.numberofguests} ${type === "events" ? "Tickets" : "Guests"}`}
+                                                date={(formatDateRange(booking?.bookingdate) || formatDateRange(booking?.event?.startDate))}
+                                                time={(formatTime(booking?.event?.starttime) || formatTime(booking?.timeSlot))}
+                                                location={(booking?.event?.location) || booking?.restaurant?.location}
+                                                image={(booking?.event?.coverimage) || booking?.restaurant?.images?.[0]}
+                                                status={booking?.bookingStatus}
+                                                onClick={() => navigate(`/booking/${type}/${booking?._id}`)}
+                                            />
+                                        )
+                                    })
+                                ) : showNoBookings ? (
+                                    <NoBookingFallback type={type} onExplore={() =>
+                                        navigate(type === "events" ? "/events" : "/dining")} />
+                                ) : null
+                            }
+                            {/* Infinite Scroll Loader */}
+                            {pagination?.totalPages && pagination?.currentpage < pagination?.totalPages && (
+                                <div ref={loaderRef} className="h-40 flex justify-center items-center">
+                                    {isFetchingMore ? (
+                                        <div className="flex gap-2">
+                                            <Loader2 className='text-black w-8 h-8 animate-spin' />
+                                        </div>
+                                    ) : (
+                                        <span className='text-sm text-gray-400'>Scroll for more bookings</span>
+                                    )
+                                    }
+                                </div>
+                            )}
                         </div>
                     </div>
-                    {/* cards */}
-                    <div ref={scrollRef} className='flex flex-col md:px-5 w-full place-items-center h-[90vh] overflow-y-auto space-y-5 '>
-                        {
-                            showShimmer ? (
-                                Array.from({ length: 3 }).map((_, i) => (
-                                    <BookingCardShimmer key={i} />
-                                ))
-                            ) : displayedBookings?.length > 0 ? (
-                                displayedBookings?.map((booking) => {
-                                    return (
-                                        <BookingCard key={booking?._id}
-                                            title={(booking?.event?.title || booking?.restaurant?.name)}
-                                            subtitle={`${booking?.tickets?.length || booking?.numberofguests} ${type === "events" ? "Tickets" : "Guests"}`}
-                                            date={(formatDateRange(booking?.bookingdate) || formatDateRange(booking?.event?.startDate))}
-                                            time={(formatTime(booking?.event?.starttime) || formatTime(booking?.timeSlot))}
-                                            location={(booking?.event?.location) || booking?.restaurant?.location}
-                                            image={(booking?.event?.coverimage) || booking?.restaurant?.images?.[0]}
-                                            status={booking?.bookingStatus}
-                                            onClick={() => navigate(`/booking/${type}/${booking?._id}`)}
-                                        />
-                                    )
-                                })
-                            ) : showNoBookings ? (
-                                <NoBookingFallback type={type} onExplore={() =>
-                                    navigate(type === "events" ? "/events" : "/dining")} />
-                            ) : null
-                        }
-                        {/* Infinite Scroll Loader */}
-                        {pagination?.totalPages && pagination?.currentpage < pagination?.totalPages && (
-                            <div ref={loaderRef} className="h-40 flex justify-center items-center">
-                                {isFetchingMore ? (
-                                    <div className="flex gap-2">
-                                        <Loader2 className='text-black w-8 h-8 animate-spin' />
-                                    </div>
-                                ) : (
-                                    <span className='text-sm text-gray-400'>Scroll for more bookings</span>
-                                )
-                                }
+                    {/* agent open */}
+                    {
+                        !openAgent && (
+                            <div className='fixed bottom-20 right-6'>
+                                <button onClick={() => setOpenAgent(true)} className='w-[60px] hover:scale-110 transition h-[60px] cursor-pointer flex items-center  justify-center rounded-full bg-[#000000] '>
+                                    <LuMessageCircleWarning className='text-white' size={29} />
+                                </button>
                             </div>
-                        )}
-                    </div>
-                </div>
-            </section>
-        </div>
+                        )
+                    }
+
+                </section>
+            </div>
+            {/* open chat interface */}
+            {openAgent && (
+                <ChatInterface onClose={() => setOpenAgent(false)} />
+            )}
+        </>
+
     );
 }
 
