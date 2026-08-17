@@ -2,9 +2,13 @@ import { CalendarDays, ChevronRight, Sparkles, Utensils } from 'lucide-react';
 import React from 'react';
 import { bookingQuestions } from './BookingAgentChatInterface';
 import TypeButton from './TypeButton';
+import { useSelector } from 'react-redux';
 
 const StepOne = ({bookingType,onTypeChange,onQuestionClick}) => {
     const questions = bookingQuestions[bookingType]
+    const user = useSelector((state)=>state.Auth.user)
+
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
       {/* Welcome */}
@@ -17,7 +21,7 @@ const StepOne = ({bookingType,onTypeChange,onQuestionClick}) => {
         </div>
 
         <h1 className="max-w-[350px] text-[27px] font-bold leading-[1.12] tracking-[-0.8px] text-slate-900">
-          Hey there 👋
+          Hey , {user?.name || "User"}
           <br />
           How can I help with your bookings?
         </h1>
