@@ -1,9 +1,11 @@
 import { CalendarDays, Check, Clock3, Sparkles } from 'lucide-react';
 import React from 'react';
+import ReactMarkdown from "react-markdown";
 
-const StepTwo = ({bookingType,question}) => {
+
+const StepTwo = ({ bookingType, question, AgentReply, isLoading }) => {
   return (
-     <div className="flex min-h-full flex-col animate-in fade-in duration-300">
+    <div className="flex min-h-full flex-col animate-in fade-in duration-300">
       {/* Step indicator */}
       <div className="mb-5 flex items-center justify-between">
         <div>
@@ -52,30 +54,46 @@ const StepTwo = ({bookingType,question}) => {
             </div>
 
             <div className="rounded-[18px] rounded-tl-md border border-slate-100 bg-slate-50 px-4 py-3.5 text-[13px] leading-6 text-slate-600">
-              <p>
-                You have a confirmed booking for{" "}
-                <span className="font-semibold text-slate-900">
-                  Diljit Dosanjh Dil-Luminati Tour Chandigarh
-                </span>
-                .
-              </p>
+              {isLoading ? (
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 [animation-delay:150ms]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 [animation-delay:300ms]" />
+                </div>
+              ) : (
+                <div className="text-[13px] leading-6 text-slate-600">
+                  <ReactMarkdown
+                    components={{
+                      ul: ({ children }) => (
+                        <ul className="mt-2 space-y-2">
+                          {children}
+                        </ul>
+                      ),
 
-              <div className="mt-3 space-y-2.5 border-t border-slate-200/70 pt-3">
-                <InfoRow
-                  icon={<CalendarDays size={13} />}
-                  text="January 2, 2027"
-                />
+                      li: ({ children }) => (
+                        <li className="flex items-start gap-2">
+                          <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
+                          <span>{children}</span>
+                        </li>
+                      ),
 
-                <InfoRow
-                  icon={<Clock3 size={13} />}
-                  text="7:30 PM"
-                />
+                      strong: ({ children }) => (
+                        <strong className="font-semibold text-slate-900">
+                          {children}
+                        </strong>
+                      ),
 
-                <InfoRow
-                  icon={<Check size={13} />}
-                  text="2 × Silver Zone tickets"
-                />
-              </div>
+                      p: ({ children }) => (
+                        <p className="mb-2 last:mb-0">
+                          {children}
+                        </p>
+                      ),
+                    }}
+                  >
+                    {AgentReply}
+                  </ReactMarkdown>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -87,11 +105,3 @@ const StepTwo = ({bookingType,question}) => {
 export default StepTwo;
 
 
-function InfoRow({ icon, text }) {
-  return (
-    <div className="flex items-center gap-2.5 text-[11px] text-slate-500">
-      <span className="text-blue-500">{icon}</span>
-      <span>{text}</span>
-    </div>
-  );
-}

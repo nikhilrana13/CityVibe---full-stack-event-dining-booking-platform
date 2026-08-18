@@ -15,6 +15,7 @@ const BookingAgent = async (req, res) => {
   try {
     const userId = req.user;
     const { type, question } = req.body;
+    // console.log("req",req.body)
     // field validation
     if (!type || !question?.trim()) {
       return Response(res, 400, "Type and Question is required");

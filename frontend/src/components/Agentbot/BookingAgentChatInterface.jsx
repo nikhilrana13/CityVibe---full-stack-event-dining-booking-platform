@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { ArrowLeft, Sparkles, X,} from "lucide-react";
 import StepOne from './StepOne';
 import StepTwo from './StepTwo';
+import { useGetAgentMessageMutation } from '@/redux/api/AgentApi';
+import { toast } from 'sonner';
 
 
 
@@ -21,18 +23,30 @@ export const bookingQuestions = {
   ],
 };
 const BookingAgentChatInterface = ({onClose,}) => {
-     const [step,setStep] = useState(1)
-     const [bookingType,setBookingType] = useState("event")
-     const [selectedQuestion,setSelectedQuestion] = useState("")
+const [step,setStep] = useState(1)
+const [bookingType,setBookingType] = useState("event")
+const [selectedQuestion,setSelectedQuestion] = useState("")
+const [GetAgentMessage,{isLoading}] = useGetAgentMessageMutation()
+const [AgentReply,setAgentReply] = useState("")
+
 
   const handleTypeChange = (type)=>{
     setBookingType(type)
     setSelectedQuestion("")
   }
 
-  const handleQuestionClick = (question)=>{
-    setSelectedQuestion(question)
-    setStep(2)
+  const handleQuestionClick = async(question)=>{
+    try {
+      setSelectedQuestion(question)
+      setAgentReply("")
+      setStep(2)
+      const response = await GetAgentMessage({type:bookingType,question}).unwrap()
+      const message = response?.message?.message
+      setAgentReply(message || "I couldn't generate a response.")
+    } catch (error) {
+      console.error("failed to chat with agent",error)
+      toast.error(error?.data?.message || "Internal server error")
+    }
   }
   
   return (
@@ -95,6 +109,8 @@ const BookingAgentChatInterface = ({onClose,}) => {
             <StepTwo
               bookingType={bookingType}
               question={selectedQuestion}
+              isLoading={isLoading}
+              AgentReply={AgentReply}
             />
           )}
         </div>
