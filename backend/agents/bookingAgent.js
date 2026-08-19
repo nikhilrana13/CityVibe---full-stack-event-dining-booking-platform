@@ -50,8 +50,7 @@ const BookingAgent = async (req, res) => {
     console.time("gemini");
     const interaction = await genAI.interactions.create({
         model:"gemini-3.6-flash",
-        // input:Prompt,
-        input: "Say hello in one sentence.",
+        input:Prompt,
         generation_config:{
             temperature:0.7,
             max_output_tokens:1024,
