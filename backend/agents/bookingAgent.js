@@ -24,16 +24,12 @@ const BookingAgent = async (req, res) => {
     if (!allowedTypes.includes(type)) {
       return Response(res,400,`${type} is not valid`);
     }
-    console.time("booking-agent-total")
     // check user exists or not
-    console.time("user-db")
     const user = await User.findById(userId);
-    console.timeEnd("user-db");
     if (!user) {
       return Response(res, 404, "User not found");
     }
     // get booking data based on type
-    console.time("booking-data");
     let bookingData
     if(type === "event"){
         bookingData = await GetUserEventBookingsForAgent(userId)
@@ -42,12 +38,8 @@ const BookingAgent = async (req, res) => {
     }else{
          return Response(res, 400, "Invalid booking type");
     }
-    console.timeEnd("booking-data")
-    console.time("prompt");;
     const Prompt = BookingAgentPrompt({type,question,bookingData})
-    console.timeEnd("prompt");
     // config gemini 
-    console.time("gemini");
     const interaction = await genAI.interactions.create({
         model:"gemini-3.6-flash",
         input:Prompt,
@@ -62,13 +54,11 @@ const BookingAgent = async (req, res) => {
         },
       ],
     })
-    console.timeEnd("gemini-test");
-    // get gemini output
+    // get gemini output");
     let output = interaction.output_text?.trim()
     if (!output) {
       throw new Error("Gemini returned an empty response");
     }
-    console.timeEnd("booking-agent-total");
     return Response(res,200,{role:"agent",message:output})
   } catch (error) {
     console.error("Failed to Connect With Booking Agent",error)
