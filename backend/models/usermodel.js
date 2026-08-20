@@ -22,7 +22,8 @@ const userschema = new mongoose.Schema({
   dob:{type:String,default:null},
   isVerified:{type:Boolean,default:false},
   gender:{type:String,default:null,enum:["male","female","other"]},
-  hasOrganizerAccount:{type:Boolean,default:false,}
+  hasOrganizerAccount:{type:Boolean,default:false,},
+  lastLogin:{type:Date,default:null},
 },{timestamps:true})
 
 const User = mongoose.model("User",userschema)

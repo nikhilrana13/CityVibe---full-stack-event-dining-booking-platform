@@ -47,13 +47,15 @@ const LoginWithGoogle = async (req, res) => {
         profilepic: picture,
         provider: "google",
         role: "user",
-        isVerified: true
+        isVerified: true,
+        lastLogin:new Date()
       });
     } else {
       // Update existing user
       user.uid = uid;
       user.isVerified = true;
       user.profilepic = picture;
+      user.lastLogin = new Date()
       await user.save();
     }
     // Generate JWT
