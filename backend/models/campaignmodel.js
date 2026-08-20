@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 
 const campaignSchema = new mongoose.Schema({
   adminId: { type: mongoose.Types.ObjectId, ref: "Admin", required: true },
-  title: { type: String, required: true, maxlength: 40 },
+  title: { type: String, required: true, maxlength: 40,lowercase:true},
   discountType: { type: String, enum: ["percentage", "flat"], required: true },
   discountValue: { type: Number, required: true },
   maxDiscount: { type: Number, default: null }, // for % cap
   minOrderAmount: { type: Number, default: 0 },
-  bannerImageurl:{url:String,fileId:String},
+  bannerImageUrl:{url:String,fileId:String},
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   isActive: { type: Boolean, default: true },

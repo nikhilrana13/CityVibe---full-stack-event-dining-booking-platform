@@ -21,6 +21,7 @@ const setupSwagger = require("./config/swagger.js")
 const redisClient = require("./config/redis.js")
 const { observixMiddleware } = require("./middleware/ObservixMiddleware.js")
 const AgentRoute = require("./routes/agentsroutes.js")
+const CampaignRoute = require("./routes/campaignroutes.js")
 
 dotenv.config()
 
@@ -65,6 +66,7 @@ app.use("/api",RestaurantBookingRoute)
 app.use("/api",EventBooking)
 app.use("/api/user",UserRoute) 
 app.use("/api/agents",AgentRoute)
+app.use("/api/campaigns",CampaignRoute)
 
 
 
