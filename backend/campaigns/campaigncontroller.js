@@ -1,13 +1,25 @@
 const User = require("../models/usermodel.js");
 const cloudinary = require("../config/cloudinary.js");
 const Campaign = require("../models/campaignmodel.js");
+const Response = require("../utils/responsehandler.js");
 
 // create campaigns
 const CreateCampaign = async (req, res) => {
   try {
     const adminId = req.user;
-    let {title,discountType,discountValue,startDate,endDate,usageLimit,maxDiscount,minOrderAmount,perUserLimit,displayOnHome,
-      applicableFor} = req.body;
+    let {
+      title,
+      discountType,
+      discountValue,
+      startDate,
+      endDate,
+      usageLimit,
+      maxDiscount,
+      minOrderAmount,
+      perUserLimit,
+      displayOnHome,
+      applicableFor,
+    } = req.body;
     // Normalize FormData boolean
     displayOnHome = displayOnHome === true || displayOnHome === "true";
 
@@ -16,9 +28,6 @@ const CreateCampaign = async (req, res) => {
     const admin = await User.findById(adminId);
     if (!admin) {
       return Response(res, 404, "Admin not found");
-    }
-    if (admin.role !== "admin") {
-      return Response(res, 403, "Access denied Admin only");
     }
     // validations
     const allowedFields = [
@@ -129,7 +138,7 @@ const CreateCampaign = async (req, res) => {
         url: cloudResponse.secure_url,
         fileId: cloudResponse.public_id,
       };
-    } 
+    }
     // create campaign
     const campaign = await Campaign.create({
       adminId: adminId,
@@ -154,6 +163,155 @@ const CreateCampaign = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
+// Get all campaigns
+const GetAllCampaign = async (req, res) => {
+  try {
+    const adminId = req.user;
+    // checks admin exists or not
+    const admin = await User.findById(adminId);
+    if (!admin) {
+      return Response(res, 404, "Admin not found");
+    }
+    const campaigns = await Campaign.find({ adminId: adminId });
+    if (!campaigns) {
+      return Response(res, 200, "No Campaigns found", []);
+    }
+    return Response(res, 200, "Campaigns found", { campaigns });
+  } catch (error) {
+    console.error("failed to get campaigns", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+// update campaigns
+const UpdateCampaignDetails = async (req, res) => {
+  try {
+    const adminId = req.user;
+    const campaignId = req.params.id;
+    let { title, startDate, endDate, displayOnHome, usageLimit } = req.body;
+    let file = req.file;
+    // checks admin exists or not
+    const admin = await User.findById(adminId);
+    if (!admin) {
+      return Response(res, 404, "Admin not found");
+    }
+    // find campaign exist or not
+    const campaign = await Campaign.findById(campaignId);
+    if (!campaign) {
+      return Response(res, 400, "Campaign not found");
+    }
+    // image
+    let bannerimg = campaign?.bannerImageUrl;
+    if (file) {
+      const imageBase64 = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+      const cloudResponse = await cloudinary.uploader.upload(imageBase64, {
+        folder: "city-vibe-campaigns-banner-images",
+        resource_type: "image",
+      });
+      bannerimg = {
+        url: cloudResponse.secure_url,
+        fileId: cloudResponse.public_id,
+      };
+    }
+    // update data
+    let updateData = {};
+    let start = campaign.startDate;
+    let end = campaign.endDate;
+    if (title !== undefined) {
+      title = title.trim();
+      if (title.length > 40) {
+        return Response(res, 400, "Only 40 characters allowed");
+      }
+      updateData.title = title.toLowerCase();
+    }
+    if (displayOnHome !== undefined) {
+      // Normalize FormData boolean
+      displayOnHome = displayOnHome === true || displayOnHome === "true";
+      updateData.displayOnHome = displayOnHome;
+    }
 
+    if (startDate !== undefined) {
+      start = new Date(startDate);
 
-module.exports = {CreateCampaign}
+      if (isNaN(start.getTime())) {
+        return Response(res, 400, "Invalid startDate format");
+      }
+      updateData.startDate = start;
+    }
+    if (endDate !== undefined) {
+      end = new Date(endDate);
+
+      if (isNaN(end.getTime())) {
+        return Response(res, 400, "Invalid endDate format");
+      }
+      updateData.endDate = end;
+    }
+    if (end <= start) {
+      return Response(res, 400, "endDate must be after startDate");
+    }
+    if (usageLimit !== undefined) {
+      if (usageLimit < 1) {
+        return Response(res, 400, "Invalid usageLimit");
+      }
+      if (usageLimit < campaign.usedCount) {
+        return Response(
+          res,
+          400,
+          `Usage limit cannot be less than used count (${campaign.usedCount})`,
+        );
+      }
+      updateData.usageLimit = usageLimit;
+    }
+    if (file) updateData.bannerImageUrl = bannerimg;
+    if (Object.keys(updateData).length === 0) {
+      return Response(res, 400, "No fields provided to update");
+    }
+     // check campaign already exists or not
+    const existing = await Campaign.findOne({
+      _id: { $ne: campaignId },
+      title:  updateData.title || campaign.title,
+      startDate: updateData.startDate || campaign.startDate,
+      endDate: updateData.endDate || campaign.endDate,
+    });
+    if (existing) {
+      return Response(res, 400, "Campaign already exists");
+    }
+    // update campaign
+    const updatedCampaign = await Campaign.findByIdAndUpdate(
+      campaignId,
+      updateData,
+      { new: true, runValidators: true },
+    );
+    return Response(res, 200, "Updated successfully", {
+      campaign: updatedCampaign,
+    });
+  } catch (error) {
+    console.error("failed to update campaign", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+// enable and disable campaign
+const ToggleCampaignStatus = async (req, res) => {
+  try {
+    const adminId = req.user;
+    const  campaignId  = req.params.id;
+    const admin = await User.findById(adminId);
+    if (!admin || admin.role !== "admin") {
+      return Response(res, 403, "Forbidden");
+    }
+    const campaign = await Campaign.findById(campaignId);
+    // console.log("campaign",campaign)
+    if (!campaign) {
+      return Response(res, 404, "Campaign not found");
+    }
+    campaign.isActive = !campaign.isActive;
+    await campaign.save();
+    return Response(res, 200, "Campaign status updated", {
+      isActive: campaign.isActive,
+    });
+  } catch (error) {
+    console.error("Toggle campaign error", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+
+module.exports = { CreateCampaign, GetAllCampaign,UpdateCampaignDetails,ToggleCampaignStatus};
