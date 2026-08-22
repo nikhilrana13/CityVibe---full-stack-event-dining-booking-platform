@@ -2,6 +2,7 @@ const User = require("../models/usermodel.js");
 const cloudinary = require("../config/cloudinary.js");
 const Campaign = require("../models/campaignmodel.js");
 const Response = require("../utils/responsehandler.js");
+const CalculateOffer = require("../helpers/calculateOffer.js")
 
 // create campaigns
 const CreateCampaign = async (req, res) => {
@@ -163,7 +164,7 @@ const CreateCampaign = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
-// Get all campaigns
+// Get all campaigns for admin
 const GetAllCampaign = async (req, res) => {
   try {
     const adminId = req.user;
@@ -265,10 +266,10 @@ const UpdateCampaignDetails = async (req, res) => {
     if (Object.keys(updateData).length === 0) {
       return Response(res, 400, "No fields provided to update");
     }
-     // check campaign already exists or not
+    // check campaign already exists or not
     const existing = await Campaign.findOne({
       _id: { $ne: campaignId },
-      title:  updateData.title || campaign.title,
+      title: updateData.title || campaign.title,
       startDate: updateData.startDate || campaign.startDate,
       endDate: updateData.endDate || campaign.endDate,
     });
@@ -293,7 +294,7 @@ const UpdateCampaignDetails = async (req, res) => {
 const ToggleCampaignStatus = async (req, res) => {
   try {
     const adminId = req.user;
-    const  campaignId  = req.params.id;
+    const campaignId = req.params.id;
     const admin = await User.findById(adminId);
     if (!admin || admin.role !== "admin") {
       return Response(res, 403, "Forbidden");
@@ -313,5 +314,58 @@ const ToggleCampaignStatus = async (req, res) => {
     return Response(res, 500, "Internal server error");
   }
 };
+// apply offers validation
+const ApplyOffer = async(req, res) => {
+  try {
+    const userId = req.user;
+    let { campaignId, eventId, tickets } = req.body;
 
-module.exports = { CreateCampaign, GetAllCampaign,UpdateCampaignDetails,ToggleCampaignStatus};
+    if (!campaignId || !eventId) {
+      return Response(res, 400, "Event and Campaign Id is required");
+    }
+    // tickets validation
+    if (!tickets) {
+      return Response(res, 400, "Tickets is required");
+    }
+    // parse if tickets come as string
+    if (typeof tickets === "string") {
+      try {
+        tickets = JSON.parse(tickets);
+      } catch (error) {
+        return Response(res, 400, "Invalid tickets format", error);
+      }
+    }
+    if (!Array.isArray(tickets) || tickets.length === 0) {
+      return Response(res, 400, "At least one ticket must be selected");
+    }
+    // apply offer
+    let result;
+    try {
+      result = await CalculateOffer({
+        userId,
+        campaignId,
+        eventId,
+        tickets
+      });
+    } catch (err) {
+      return Response(res, 400, err.message);
+    }
+    return Response(res, 200, "Offer applied successfully",{
+       totalAmount: result.subtotal,
+       finalAmount: result.finalAmount,
+       campaign: {
+       id: result.campaignId,
+       title: result.campaignTitle,
+       discountType: result.discountType,
+       discountValue: result.discountValue,
+      },
+      savings: result.discountAmount,
+    });
+
+  } catch (error) {
+    console.error("failed to Apply offer",error)
+    Response(res,500,"Internal server error")
+  }
+};
+
+module.exports = {CreateCampaign,GetAllCampaign,UpdateCampaignDetails,ToggleCampaignStatus,ApplyOffer};
