@@ -4,12 +4,15 @@ const Ticket = require("../models/ticketmodel.js");
 const User = require("../models/usermodel.js");
 const Response = require("../utils/responsehandler.js");
 const StripeInstance = require("../utils/stripe.js");
-const {nanoid} = require("nanoid")
+const { nanoid } = require("nanoid");
 const moment = require("moment-timezone");
 const Organizer = require("../models/organizermodel.js");
+const CalculateOffer = require("../helpers/calculateOffer.js");
+const Campaign = require("../models/campaignmodel.js");
+const CampaignUsage = require("../models/campaignusagemodel.js");
 
-/** 
- * 
+/**
+ *
  * Create Event Booking & Initiate Stripe Payment
  *
  * Flow:
@@ -41,11 +44,12 @@ const Organizer = require("../models/organizermodel.js");
  *   ]
  * }
  */
+
 // event booking
 const CreateEventBooking = async (req, res) => {
   try {
     const userId = req.user;
-    let { eventId, tickets } = req.body;
+    let { eventId, tickets, campaignId } = req.body;
     if (!eventId) {
       return Response(res, 400, "Eventid is required");
     }
@@ -71,6 +75,7 @@ const CreateEventBooking = async (req, res) => {
     if (!event || !event.eventIsActive) {
       return Response(res, 404, "Event not found or inactive");
     }
+
     let totalAmount = 0;
     let totalSeatsToBook = 0;
     let bookingTickets = [];
@@ -114,10 +119,36 @@ const CreateEventBooking = async (req, res) => {
     const existingBooking = await Eventbooking.findOne({
       event: eventId,
       user: userId,
-      bookingStatus:"pending",
+      bookingStatus: "pending",
     });
     if (existingBooking) {
       return Response(res, 400, "You have already booked this event");
+    }
+    // campaign calculate
+    let finalAmount = totalAmount;
+    let discountAmount = 0;
+    let campaign = null;
+
+    if (campaignId) {
+      try {
+        const offerResult = await CalculateOffer({
+          userId,
+          campaignId,
+          eventId,
+          tickets,
+        });
+        totalAmount = offerResult.subtotal;
+        discountAmount = offerResult.discountAmount;
+        finalAmount = offerResult.finalAmount;
+
+        campaign = {
+          campaignId: offerResult.campaignId,
+          title: offerResult.campaignTitle,
+          discountAmount,
+        };
+      } catch (error) {
+        return Response(res, 400, error.message);
+      }
     }
     // create booking
     const booking = await Eventbooking.create({
@@ -125,27 +156,30 @@ const CreateEventBooking = async (req, res) => {
       event: event._id,
       tickets: bookingTickets,
       totalAmount,
+      finalAmount,
+      discountAmount,
+      campaign: campaignId || null,
       paymentStatus: "pending",
       bookingStatus: "pending",
       totalSeats: totalSeatsToBook,
     });
-    
+
     // Create Stripe line items
-    const lineItems = [];
-    for (let item of bookingTickets) {
-      const ticketDoc = await Ticket.findById(item.ticket);
-      lineItems.push({
+    const lineItems = [
+      {
         price_data: {
           currency: "inr",
           product_data: {
-            name: `${event.title} - ${ticketDoc.name}`,
-            description: `Qty:${item.quantity}`,
+            name: `${event.title} Booking`,
+            description: campaignId
+              ? "Booking with campaign discount"
+              : "Event booking",
           },
-          unit_amount: item.price * 100,
+          unit_amount: Math.round(finalAmount * 100),
         },
-        quantity: item.quantity,
-      });
-    }
+        quantity: 1,
+      },
+    ];
     // Stripe Checkout Session
     const session = await StripeInstance.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -157,6 +191,7 @@ const CreateEventBooking = async (req, res) => {
         bookingId: booking._id.toString(),
         userId: user._id.toString(),
         eventId: eventId.toString(),
+        campaignId: campaignId || "",
       },
     });
     const populatedBooking = await Eventbooking.findById(booking._id).populate(
@@ -189,7 +224,7 @@ const StripeWebhookHandler = async (req, res) => {
   }
   //  console.log("Stripe Event:", event.type);
   // console.log("EVENT DATA:", event.data.object);
-// console.log("METADATA:", event.data.object.metadata);
+  // console.log("METADATA:", event.data.object.metadata);
   // Handle event types
   // payment success
   if (event.type === "checkout.session.completed") {
@@ -203,8 +238,42 @@ const StripeWebhookHandler = async (req, res) => {
     }
     booking.paymentStatus = "paid";
     booking.bookingStatus = "confirmed";
-    booking.ticketCode = nanoid(10)
+    booking.ticketCode = nanoid(10);
     await booking.save();
+    // Apply campaign usage after successful payment
+    if (booking.campaign) {
+      const campaign = await Campaign.findById(booking.campaign);
+      if (campaign) {
+        // Atomic global usage increment
+        const updatedCampaign = await Campaign.findOneAndUpdate(
+          {
+            _id: campaign._id,
+            isActive: true,
+            usedCount: { $lt: campaign.usageLimit },
+          },
+          {
+            $inc: { usedCount: 1 },
+          },
+          {
+            new: true,
+          },
+        );
+        if (updatedCampaign) {
+          // Create campaign usage record
+          await CampaignUsage.create({
+            campaignId: campaign._id,
+            userId: booking.user,
+            bookingId: booking._id,
+            discountAmount: booking.discountAmount,
+
+          });
+        } else {
+          console.log(
+            `Campaign ${campaign._id} usage limit reached or inactive`,
+          );
+        }
+      }
+    }
     // Deduct ticket quantities
     for (let item of booking.tickets) {
       const ticket = await Ticket.findById(item.ticket);
@@ -221,7 +290,7 @@ const StripeWebhookHandler = async (req, res) => {
     }
   }
   //payment expired
-  if (event.type === "checkout.session.expired" ) {
+  if (event.type === "checkout.session.expired") {
     const session = event.data.object;
     const bookingId = session.metadata?.bookingId;
     const booking = await Eventbooking.findById(bookingId);
@@ -237,9 +306,9 @@ const StripeWebhookHandler = async (req, res) => {
     // console.log("FAILED PAYMENT INTENT:", paymentIntent);
     const bookingId = paymentIntent.metadata?.bookingId;
     if (!bookingId) {
-    console.log("BookingId missing in metadata");
-    return res.json({ received: true });
-  }
+      console.log("BookingId missing in metadata");
+      return res.json({ received: true });
+    }
     const booking = await Eventbooking.findById(bookingId);
     if (booking) {
       booking.paymentStatus = "failed";
@@ -248,113 +317,162 @@ const StripeWebhookHandler = async (req, res) => {
     }
   }
   res.json({ received: true });
-}; 
+};
 //test only - Manual payment confirmation
-// const UpdatePaymentStatus = async (req, res) => {
-//   try {
-//     const userId = req.user;
-//     const bookingId = req.params.id;
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return Response(res, 404, "User not found");
-//     }
-//     const booking = await Eventbooking.findById(bookingId);
-//     if (!booking) {
-//       return Response(res, 404, "Booking not found");
-//     }
-//      if (booking.user.toString() !== userId) {
-//       return Response(res, 403, "Unauthorized");
-//     }
-//     // Prevent double processing
-//     if (booking.paymentStatus === "paid") {
-//       return Response(res, 400, "Booking already paid");
-//     }
-//     // Update booking status
-//     booking.paymentStatus = "paid";
-//     booking.bookingStatus = "confirmed";
-//     booking.ticketCode = nanoid(10)
-//     await booking.save();
-//     // Deduct ticket quantities
-//     for (let item of booking.tickets) {
-//       const ticket = await Ticket.findById(item.ticket);
-//       if (ticket) {
-//         ticket.availableQuantity -= item.quantity;
-//         await ticket.save();
-//       }
-//     }
-//     // Deduct event seats
-//     const event = await Event.findById(booking.event);
-//      if (isNaN(booking.totalSeats)) {
-//       return Response(res, 400, "Invalid booking seat data");
-//     }
-//   // console.log("Booking totalSeats:", booking.totalSeats);
-//   // console.log("Event availableSeats before:", event.availableSeats);
-//     if (event) {
-//       event.availableSeats -= booking.totalSeats;
-//       await event.save();
-//     }
-//     // // Optional: Send email
-//     // if (event) {
-//     //   await SendBookingDetails(user, booking, event);
-//     // }
-//     return Response(res, 200, "Payment marked as successful", booking);
-//   } catch (error) {
-//     console.log("failed to update payment status", error);
-//     return Response(res, 500, "Internal server error");
-//   }
-// };
-// User all booked events
-const UserAllBookedEvents = async(req,res)=>{
+const UpdatePaymentStatus = async (req, res) => {
   try {
-      const userId = req.user
-      // console.log("req.user", req.user);
-       let {page=1} = req.query 
-       const limit = 5 
-       page = parseInt(page)
-       const skip = (page - 1) * limit
-
-       const user = await User.findById(userId)
-       if(!user){
-        return Response(res,404,"User not found")
-       }
-       const bookings = await Eventbooking.find({user:userId}).populate("user","name phonenumber email").populate("event","startDate starttime title location coverimage").sort({createdAt:-1}).skip(skip).limit(limit).populate("tickets.ticket",
-      "name price paxCount",)
-       const totalbookings = await Eventbooking.countDocuments({user:userId})
-       const totalPages = Math.ceil(totalbookings / limit)
-       if(bookings.length === 0){
-        return  Response(res,200,"No Bookings found",[])
-       }
-       return Response(res,200,"bookings found",{bookings,pagination:{
-        totalbookings,totalPages,currentpage:page,limit
-       }})
-  } catch (error) {
-    console.log("failed to get event bookings",error)
-    return Response(res,500,"Internal server error")
-  }
-}
-
-// Each booking details 
-const GetEventBookingDetail = async(req,res)=>{
-  try {
-      const userId = req.user 
-      const bookingId = req.params.id;
-
-      const user = await User.findById(userId)
-      if(!user){
-        return Response(res,404,"User not found")
-      }
-      const booking = await Eventbooking.findById(bookingId).populate("tickets.ticket","name paxCount price").populate("event","title startDate starttime title location coverimage ")
-      if (!booking) {
-        return Response(res, 404, "booking not found");
-      }
-      return Response(res, 200, "booking details found", {booking });
-    } catch (error) {
-      console.log("failed to get booking details", error);
-      return Response(res, 500, "Internal server error");
+    const userId = req.user;
+    const bookingId = req.params.id;
+    const user = await User.findById(userId);
+    if (!user) {
+      return Response(res, 404, "User not found");
     }
-}
+    const booking = await Eventbooking.findById(bookingId);
+    if (!booking) {
+      return Response(res, 404, "Booking not found");
+    }
+     if (booking.user.toString() !== userId) {
+      return Response(res, 403, "Unauthorized");
+    }
+    // Prevent double processing
+    if (booking.paymentStatus === "paid") {
+      return Response(res, 400, "Booking already paid");
+    }
+    // Update booking status
+    booking.paymentStatus = "paid";
+    booking.bookingStatus = "confirmed";
+    booking.ticketCode = nanoid(10)
+    await booking.save();
+    // Apply campaign usage after successful payment
+    if (booking.campaign) {
+      const campaign = await Campaign.findById(booking.campaign);
+      if (campaign) {
+        // Atomic global usage increment
+        const updatedCampaign = await Campaign.findOneAndUpdate(
+          {
+            _id: campaign._id,
+            isActive: true,
+            usedCount: { $lt: campaign.usageLimit },
+          },
+          {
+            $inc: { usedCount: 1 },
+          },
+          {
+            new: true,
+          },
+        );
+        if (updatedCampaign) {
+          // Create campaign usage record
+          await CampaignUsage.create({
+            campaignId: campaign._id,
+            userId: booking.user,
+            bookingId: booking._id,
+            discountAmount: booking.discountAmount,
+          });
+        } else {
+          console.log(
+            `Campaign ${campaign._id} usage limit reached or inactive`,
+          );
+        }
+      }
+    }
+    // Deduct ticket quantities
+    for (let item of booking.tickets) {
+      const ticket = await Ticket.findById(item.ticket);
+      if (ticket) {
+        ticket.availableQuantity -= item.quantity;
+        await ticket.save();
+      }
+    }
+    // Deduct event seats
+    const event = await Event.findById(booking.event);
+     if (isNaN(booking.totalSeats)) {
+      return Response(res, 400, "Invalid booking seat data");
+    }
+  // console.log("Booking totalSeats:", booking.totalSeats);
+  // console.log("Event availableSeats before:", event.availableSeats);
+    if (event) {
+      event.availableSeats -= booking.totalSeats;
+      await event.save();
+    }
+    // // Optional: Send email
+    // if (event) {
+    //   await SendBookingDetails(user, booking, event);
+    // }
+    return Response(res, 200, "Payment marked as successful", booking);
+  } catch (error) {
+    console.log("failed to update payment status", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+// User all booked events
+const UserAllBookedEvents = async (req, res) => {
+  try {
+    const userId = req.user;
+    // console.log("req.user", req.user);
+    let { page = 1 } = req.query;
+    const limit = 5;
+    page = parseInt(page);
+    const skip = (page - 1) * limit;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return Response(res, 404, "User not found");
+    }
+    const bookings = await Eventbooking.find({ user: userId })
+      .populate("user", "name phonenumber email")
+      .populate("event", "startDate starttime title location coverimage")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("tickets.ticket", "name price paxCount");
+    const totalbookings = await Eventbooking.countDocuments({ user: userId });
+    const totalPages = Math.ceil(totalbookings / limit);
+    if (bookings.length === 0) {
+      return Response(res, 200, "No Bookings found", []);
+    }
+    return Response(res, 200, "bookings found", {
+      bookings,
+      pagination: {
+        totalbookings,
+        totalPages,
+        currentpage: page,
+        limit,
+      },
+    });
+  } catch (error) {
+    console.log("failed to get event bookings", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
+
+// Each booking details
+const GetEventBookingDetail = async (req, res) => {
+  try {
+    const userId = req.user;
+    const bookingId = req.params.id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return Response(res, 404, "User not found");
+    }
+    const booking = await Eventbooking.findById(bookingId)
+      .populate("tickets.ticket", "name paxCount price")
+      .populate(
+        "event",
+        "title startDate starttime title location coverimage ",
+      );
+    if (!booking) {
+      return Response(res, 404, "booking not found");
+    }
+    return Response(res, 200, "booking details found", { booking });
+  } catch (error) {
+    console.log("failed to get booking details", error);
+    return Response(res, 500, "Internal server error");
+  }
+};
 // Cancel user Event booking
-  const CancelEventBooking = async (req, res) => {
+const CancelEventBooking = async (req, res) => {
   try {
     const userId = req.user;
     const bookingId = req.params.id;
@@ -375,7 +493,6 @@ const GetEventBookingDetail = async(req,res)=>{
 
     // Restore only if paid
     if (booking.paymentStatus === "paid") {
-      
       // Restore ticket quantities
       for (let item of booking.tickets) {
         const ticket = await Ticket.findById(item.ticket);
@@ -389,74 +506,85 @@ const GetEventBookingDetail = async(req,res)=>{
       const event = await Event.findById(booking.event);
       if (event) {
         event.availableSeats += booking.totalSeats;
-        event.totalTicketsSold -= booking.totalSeats; 
+        event.totalTicketsSold -= booking.totalSeats;
         await event.save();
       }
     }
     booking.bookingStatus = "cancelled";
     await booking.save();
-    return Response(res, 200, "Booking cancelled successfully",{booking});
-
+    return Response(res, 200, "Booking cancelled successfully", { booking });
   } catch (error) {
     console.log("Cancel booking error", error);
     return Response(res, 500, "Internal server error");
   }
-}
-// verify ticket 
-const VerifyTicket = async(req,res)=>{
+};
+// verify ticket
+const VerifyTicket = async (req, res) => {
   try {
-  const { ticketCode } = req.body;
+    const { ticketCode } = req.body;
     const userId = req.user; // organizer
     if (!ticketCode) {
       return Response(res, 400, "Ticket code required");
     }
     // check organiser is approved or exists
-        const organizer = await Organizer.findOne({
-          user: userId,
-          isApproved: true,
-        });
-        if (!organizer) {
-          return Response(res, 403, "Only approved organizers can verify ticket");
-        }
+    const organizer = await Organizer.findOne({
+      user: userId,
+      isApproved: true,
+    });
+    if (!organizer) {
+      return Response(res, 403, "Only approved organizers can verify ticket");
+    }
     // Find booking (populate event and user details)
-     const booking = await Eventbooking.findOne({ ticketCode })
-       .populate({ path: "event", select: "title organizer endDate startDate" })
-       .populate({ path: "user", select: "name email" });
-      if (!booking) {
+    const booking = await Eventbooking.findOne({ ticketCode })
+      .populate({ path: "event", select: "title organizer endDate startDate" })
+      .populate({ path: "user", select: "name email" });
+    if (!booking) {
       return Response(res, 404, "Invalid ticket");
-      }
-      // Organizer ownership check
-      if (booking.event.organizer.toString() !== organizer._id.toString()) {
+    }
+    // Organizer ownership check
+    if (booking.event.organizer.toString() !== organizer._id.toString()) {
       return Response(res, 403, "You cannot verify tickets for this event");
-      }
-     // Only confirmed & paid bookings allowed
-     if (booking.paymentStatus !== "paid" || booking.bookingStatus !== "confirmed") {
+    }
+    // Only confirmed & paid bookings allowed
+    if (
+      booking.paymentStatus !== "paid" ||
+      booking.bookingStatus !== "confirmed"
+    ) {
       return Response(res, 400, "Ticket not valid");
-     }
+    }
     // Prevent double scan
     if (booking.isScan) {
       return Response(res, 400, "Ticket already used");
     }
     // Check event not expired
     const today = moment().tz("Asia/Kolkata").startOf("day").toDate();
-    const isExpired = (booking.event.endDate && booking.event.endDate < today || !booking.event.endDate && booking.event.startDate < today)
-       if (isExpired){
+    const isExpired =
+      (booking.event.endDate && booking.event.endDate < today) ||
+      (!booking.event.endDate && booking.event.startDate < today);
+    if (isExpired) {
       return Response(res, 400, "Event already ended");
-       }
+    }
     booking.isScan = true;
-    booking.scanTime = new Date(); 
+    booking.scanTime = new Date();
     await booking.save();
 
     return Response(res, 200, "Ticket verified successfully", {
-      user: booking.user, 
+      user: booking.user,
       event: booking.event.title,
       totalSeats: booking.totalSeats,
-      scanTime: booking.scanTime
+      scanTime: booking.scanTime,
     });
-
   } catch (error) {
     console.log("Ticket verification failed", error);
     return Response(res, 500, "Internal server error");
   }
-}
-module.exports = { CreateEventBooking, StripeWebhookHandler,UserAllBookedEvents,GetEventBookingDetail,CancelEventBooking,VerifyTicket}
+};
+module.exports = {
+  CreateEventBooking,
+  StripeWebhookHandler,
+  UserAllBookedEvents,
+  GetEventBookingDetail,
+  CancelEventBooking,
+  VerifyTicket,
+  UpdatePaymentStatus
+};
