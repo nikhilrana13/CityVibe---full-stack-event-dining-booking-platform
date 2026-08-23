@@ -8,8 +8,10 @@ const AuthMiddleware = async(req,res,next)=>{
             if(!authheader || !authheader.startsWith("Bearer ")){
                 return Response(res,401,"Unauthorized token missing")
             }
+            // console.log("authHeader",authheader)
             try {
                 const token = authheader.split(" ")[1]
+                //  console.log("token",token)
                 const decoded = jwt.verify(token,process.env.JWT_SECRET_KEY)
                 req.user = decoded.id 
                 // console.log("req.user",req.user)

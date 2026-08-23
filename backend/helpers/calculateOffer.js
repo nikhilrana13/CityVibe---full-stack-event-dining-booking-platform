@@ -2,7 +2,8 @@ const User = require("../models/usermodel.js");
 const Campaign = require("../models/campaignmodel.js");
 const CampaignUsage = require("../models/campaignusagemodel.js");
 const Eventbooking = require("../models/bookings/eventbookingmodel.js");
-
+const Event = require("../models/eventmodel.js");
+const Ticket = require("../models/ticketmodel.js");
 const CalculateOffer = async ({ userId, campaignId, eventId, tickets }) => {
   try {
     // basic validation
@@ -113,13 +114,13 @@ const CalculateOffer = async ({ userId, campaignId, eventId, tickets }) => {
       if (!ticket.ticketId) {
         throw new Error("Ticket ID is required");
       }
-      // duplicate ticket   
+      // duplicate ticket
       const ticketId = ticket.ticketId.toString();
       if (selectedTicketIds.has(ticketId)) {
         throw new Error("Duplicate ticket selected");
       }
       selectedTicketIds.add(ticketId);
-       // Quantity validation
+      // Quantity validation
       if (ticket.quantity === undefined || ticket.quantity === null) {
         throw new Error("Ticket quantity is required");
       }
@@ -127,14 +128,14 @@ const CalculateOffer = async ({ userId, campaignId, eventId, tickets }) => {
       if (!Number.isInteger(quantity) || quantity <= 0) {
         throw new Error("Invalid ticket quantity");
       }
-       // Ticket belongs to event
-      const eventTicket = event.tickets?.find(
-        (item) => item._id.toString() === ticketId
-      );
+      // Ticket belongs to event
+      const eventTicket = await Ticket.findOne({
+        _id: ticketId,
+        event: eventId,
+      });
+
       if (!eventTicket) {
-        throw new Error(
-          `Ticket ${ticketId} does not belong to this event`,
-        );
+        throw new Error(`Ticket ${ticketId} does not belong to this event`);
       }
       const ticketPrice = Number(eventTicket.price);
       if (!Number.isFinite(ticketPrice) || ticketPrice < 0) {
@@ -191,4 +192,4 @@ const CalculateOffer = async ({ userId, campaignId, eventId, tickets }) => {
   }
 };
 
-module.exports = CalculateOffer
+module.exports = CalculateOffer;

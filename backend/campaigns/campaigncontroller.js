@@ -319,7 +319,6 @@ const ApplyOffer = async(req, res) => {
   try {
     const userId = req.user;
     let { campaignId, eventId, tickets } = req.body;
-
     if (!campaignId || !eventId) {
       return Response(res, 400, "Event and Campaign Id is required");
     }
