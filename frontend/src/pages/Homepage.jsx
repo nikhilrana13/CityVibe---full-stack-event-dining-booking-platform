@@ -8,6 +8,7 @@ import Footer from '../components/pages/listyourevent/Footer'
 import ComedySection from '../components/pages/Homepage/ComedySection'
 import { useLocationContext } from '../context/useLocationContext'
 import { useGetHomePageDataQuery } from '@/redux/api/HomeApi'
+import HomeOfferSection from '@/components/offers/HomeOfferSection'
 
 
 const Homepage = () => {
@@ -37,6 +38,8 @@ const Homepage = () => {
       <Navbar />
       <section className='w-full  bg-[linear-gradient(to_bottom,#EFEBFF_0%,#FFFFFF_60%)] 
        pb-10 md:py-10 space-y-16'>
+        {/* offer section */}
+        <HomeOfferSection />
         {/* trending section according to city name */}
         <TrendingSection trending={trending} loading={loading} city={location?.city} />
         {/* Music event in Your city */}

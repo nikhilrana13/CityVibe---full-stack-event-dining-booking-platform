@@ -109,3 +109,25 @@ export const formatDateRange = (start, end) => {
 export const generateSlug = (text) => slugify(text || "", { lower: true, strict: true })
 
 
+// ---- Formatting helpers for homepage to show offer section (kept out of the UI layer) ------------------------
+export const formatRupees = (amount) =>
+  new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(amount);
+ 
+export const getDiscountHeadline = (offer) => {
+  if (!offer) return "";
+  if (offer.discountType === "percentage") return `${offer.discountValue}% OFF`;
+  return `₹${formatRupees(offer.discountValue)} OFF`;
+};
+ 
+export const getDiscountSubline = (offer) => {
+  if (!offer) return null;
+  if (offer.discountType === "percentage" && offer.maxDiscount) {
+    return `Up to ₹${formatRupees(offer.maxDiscount)}`;
+  }
+  return null;
+};
+export const getMinOrderLine = (offer) => {
+  if (!offer?.minOrderAmount) return null;
+  return `On bookings above ₹${formatRupees(offer.minOrderAmount)}`;
+};
+
