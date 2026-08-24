@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const AuthMiddleware = require("../middleware/AuthMiddleware.js");
 const IsAdmin = require("../middleware/IsAdmin");
-const { CreateCampaign, GetAllCampaign, UpdateCampaignDetails, ToggleCampaignStatus, ApplyOffer } = require("../campaigns/campaigncontroller.js");
+const { CreateCampaign, GetAllCampaign, UpdateCampaignDetails, ToggleCampaignStatus, ApplyOffer, ActiveOffers, DisplayOnHomeOffer } = require("../campaigns/campaigncontroller.js");
 
 
 // multer config 
@@ -20,6 +20,8 @@ router.patch("/toggle/:id",AuthMiddleware,IsAdmin,ToggleCampaignStatus)
 
 // for users 
 router.post("/apply-offer",AuthMiddleware,ApplyOffer)
+router.get("/active-offers",AuthMiddleware,ActiveOffers)
+router.get("/display-on-home",DisplayOnHomeOffer)
 
 
 

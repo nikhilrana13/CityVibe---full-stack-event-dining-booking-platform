@@ -13,6 +13,7 @@ const campaignSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   perUserLimit:{type:Number,default:1},
   usageLimit:{type:Number,required:true},
+  displayPriority: { type: Number,default: 0},
   usedCount:{type:Number,default:0},
   displayOnHome:{type:Boolean,default:false},
   applicableFor:{type:String,enum:["all","first_booking","inactive_users"],default:"all"}

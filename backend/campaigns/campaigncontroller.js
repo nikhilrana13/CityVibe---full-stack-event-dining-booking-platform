@@ -20,6 +20,7 @@ const CreateCampaign = async (req, res) => {
       perUserLimit,
       displayOnHome,
       applicableFor,
+      displayPriority
     } = req.body;
     // Normalize FormData boolean
     displayOnHome = displayOnHome === true || displayOnHome === "true";
@@ -155,6 +156,7 @@ const CreateCampaign = async (req, res) => {
       displayOnHome,
       perUserLimit,
       usageLimit,
+      displayPriority
     });
     return Response(res, 201, "Campaign created Successfully", {
       campaign: campaign,
@@ -188,7 +190,7 @@ const UpdateCampaignDetails = async (req, res) => {
   try {
     const adminId = req.user;
     const campaignId = req.params.id;
-    let { title, startDate, endDate, displayOnHome, usageLimit } = req.body;
+    let { title, startDate, endDate, displayOnHome, usageLimit,displayPriority} = req.body;
     let file = req.file;
     // checks admin exists or not
     const admin = await User.findById(adminId);
@@ -248,6 +250,12 @@ const UpdateCampaignDetails = async (req, res) => {
     }
     if (end <= start) {
       return Response(res, 400, "endDate must be after startDate");
+    }
+    if(displayPriority !== undefined){
+      if (displayPriority < 1) {
+        return Response(res, 400, "Invalid DisplayPriority");
+      }
+      updateData.displayPriority = displayPriority
     }
     if (usageLimit !== undefined) {
       if (usageLimit < 1) {
@@ -366,5 +374,56 @@ const ApplyOffer = async(req, res) => {
     Response(res,500,"Internal server error")
   }
 };
+// get all active offers for user 
+const ActiveOffers = async(req,res)=>{
+  try{
+      const userId = req.user 
+      // check user exits or not 
+      const user = await User.findById(userId)
+      if(!user){
+        return Response(res,404,"User not found") 
+      }
+      const now = new Date();
+      // find active offers
+      const activeOffers = await Campaign.find({
+        isActive:true,
+        startDate: { $lte: now },
+        endDate: { $gt: now },
+        $expr: {
+          $lt: ["$usedCount", "$usageLimit"],
+       },
+      }).sort({createdAt:-1})
+      if(activeOffers.length === 0){
+        return Response(res,200,"No Offers found",[])
+      }
+      return Response(res,200,"Offers found",{offers:activeOffers})
+  }catch(error){
+  console.error("failed to get offers",error)
+  Response(res,500,"Internal server error")
+  }
+}
+// for home page offer section 
+const DisplayOnHomeOffer = async(req,res)=>{
+  try{
+      const now = new Date()
+      // find current active offer
+      const activeOffer = await Campaign.findOne({
+        isActive:true,
+        startDate:{$lte:now},
+        endDate:{$gt:now},
+        displayOnHome:true,
+        $expr: {
+        $lt: ["$usedCount", "$usageLimit"]
+        }
+      }).sort({displayPriority:-1,createdAt: -1,})
+      if(!activeOffer){
+        return Response(res,200,"No display on home Offer found",{offer:null})
+      }
+    return Response(res,200,"Display Offer found",{offer:activeOffer})
+  }catch(error){
+  console.error("failed to display offer",error)
+  Response(res,500,"Internal server error")  
+  }
+}
 
-module.exports = {CreateCampaign,GetAllCampaign,UpdateCampaignDetails,ToggleCampaignStatus,ApplyOffer};
+module.exports = {CreateCampaign,GetAllCampaign,UpdateCampaignDetails,ToggleCampaignStatus,ApplyOffer,ActiveOffers,DisplayOnHomeOffer};
