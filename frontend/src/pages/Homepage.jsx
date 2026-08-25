@@ -9,6 +9,7 @@ import ComedySection from '../components/pages/Homepage/ComedySection'
 import { useLocationContext } from '../context/useLocationContext'
 import { useGetHomePageDataQuery } from '@/redux/api/HomeApi'
 import HomeOfferSection from '@/components/offers/HomeOfferSection'
+import { useGetDisplayOnHomeOfferQuery } from '@/redux/api/OfferApi'
 
 
 const Homepage = () => {
@@ -16,12 +17,16 @@ const Homepage = () => {
   const homeQuery = useGetHomePageDataQuery(location?.city,{
     skip:!location?.city
   })
+  const offerQuery = useGetDisplayOnHomeOfferQuery()
+  const offerloading = offerQuery?.isLoading 
+  const offerdata = offerQuery?.data?.data?.offer
   const loading = homeQuery?.isLoading
   const trending = homeQuery?.data?.data?.trending || []
   const music = homeQuery?.data?.data?.music || []
   const thisweek = homeQuery?.data?.data?.thisweek || []
   const comedy = homeQuery?.data?.data?.comedy || []
   const indiatop = homeQuery?.data?.data?.indiasTopEvents || []
+
   
   // scroll to top on city change
   useEffect(() => {
@@ -39,7 +44,7 @@ const Homepage = () => {
       <section className='w-full  bg-[linear-gradient(to_bottom,#EFEBFF_0%,#FFFFFF_60%)] 
        pb-10 md:py-10 space-y-16'>
         {/* offer section */}
-        <HomeOfferSection />
+        <HomeOfferSection offer={offerdata} loading={offerloading} />
         {/* trending section according to city name */}
         <TrendingSection trending={trending} loading={loading} city={location?.city} />
         {/* Music event in Your city */}

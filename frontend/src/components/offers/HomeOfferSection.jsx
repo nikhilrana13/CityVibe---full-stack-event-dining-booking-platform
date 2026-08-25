@@ -4,26 +4,26 @@ import { getDiscountHeadline, getDiscountSubline, getMinOrderLine } from '@/util
 
 
  
-// ---- Mock data (swap for RTK Query / Axios response) -----------------------
-const MOCK_OFFER = {
-  title: "Weekend Live Music Pass",
-  discountType: "percentage",
-  discountValue: 20,
-  maxDiscount: 200,
-  minOrderAmount: 500,
-  bannerImageUrl: {
-    url: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=1600&auto=format&fit=crop",
-    fileId: "mock-banner-01",
-  },
-  startDate: "2026-08-20",
-  endDate: "2026-09-30",
-  isActive: true,
-  displayOnHome: true,
-};
+// Mock data 
+// const MOCK_OFFER = {
+//   title: "Weekend Live Music Pass",
+//   discountType: "percentage",
+//   discountValue: 20,
+//   maxDiscount: 200,
+//   minOrderAmount: 500,
+//   bannerImageUrl: {
+//     url: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=1600&auto=format&fit=crop",
+//     fileId: "mock-banner-01",
+//   },
+//   startDate: "2026-08-20",
+//   endDate: "2026-09-30",
+//   isActive: true,
+//   displayOnHome: true,
+// };
 
-const HomeOfferSection = ({offer = MOCK_OFFER,isLoading = false,onExplore,viewAllHref = "#",}) => {
+const HomeOfferSection = ({offer,loading,onExplore,viewAllHref = "#",}) => {
   const [imgLoaded, setImgLoaded] = useState(false);
-  if (isLoading) return <HomeOfferSkeleton />;
+  if (loading) return <HomeOfferSkeleton />;
   const shouldRender = offer && offer.isActive && offer.displayOnHome && offer.bannerImageUrl?.url;
   if (!shouldRender) return null;
  
