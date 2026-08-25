@@ -6,7 +6,7 @@ import { MdAddCircle } from 'react-icons/md';
 const Campaigns = () => {
     const [ShowModel,setShowModel] = useState(false)
     const {data,isLoading,isError} = useGetAllCampaignsQuery()
-    const campaigns = data?.data?.campaign || []
+    const campaigns = data?.data?.campaigns || []
     
 
   return (
