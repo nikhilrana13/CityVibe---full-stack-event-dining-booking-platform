@@ -6,6 +6,7 @@ import AdminGuard from './middleware/AdminGuard';
 import DashboardLayout from './components/layout/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Organizers from './pages/Organizers';
+import Campaigns from './pages/Campaigns';
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
             {/*dashboard routes*/}
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="organizers" element={<Organizers />} />
+            <Route path="campaigns" element={<Campaigns />} />
          </Route>
                     
         </Route>
