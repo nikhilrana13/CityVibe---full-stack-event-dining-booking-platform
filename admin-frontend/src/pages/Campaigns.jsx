@@ -1,3 +1,4 @@
+import AddandUpdateCampaignForm from '@/components/campaigns/AddandUpdateCampaignForm';
 import CampaignsTable from '@/components/campaigns/CampaignsTable';
 import { useGetAllCampaignsQuery } from '@/redux/api/CampaignApi';
 import React, { useState } from 'react';
@@ -5,12 +6,20 @@ import { MdAddCircle } from 'react-icons/md';
 
 const Campaigns = () => {
     const [ShowModel,setShowModel] = useState(false)
-    const {data,isLoading,isError} = useGetAllCampaignsQuery()
-    const campaigns = data?.data?.campaigns || []
-    
+    const {data,isLoading,isError,refetch} = useGetAllCampaignsQuery()
+    const campaigns = data?.data?.campaigns 
+    const [selectedCampaign,setSelectedCampaign] = useState(null)
+    const [IsEdit,setSelectedEdit] = useState(false)
+
+    const handleCampaignEdit = (campaign)=>{
+      setSelectedEdit(true)
+      setSelectedCampaign(campaign)
+      setShowModel(true)
+    }
 
   return (
-    <div className='w-full px-5 py-5 flex flex-col gap-3'>
+    <>
+      <div className='w-full px-5 py-5 flex flex-col gap-3'>
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
           {/* Left */}
           <div className="max-w-2xl">
@@ -26,7 +35,7 @@ const Campaigns = () => {
           </div>
           {/* Button */}
           <div className="w-full md:w-auto">
-            <button onClick={()=>setShowModel(true)} className="w-full md:w-auto bg-gradient-to-r from-[#6a4dff] to-[#8b5cf6] text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition">
+            <button onClick={()=>{setShowModel(true),setSelectedEdit(false),setSelectedCampaign(null)}} className="w-full md:w-auto bg-gradient-to-r from-[#6a4dff] to-[#8b5cf6] text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition">
               <MdAddCircle className="text-xl" />
               Create Campaign
             </button>
@@ -34,10 +43,17 @@ const Campaigns = () => {
         </div>
         {/* campaign table */}
         <div className="w-full bg-[#f3f4f6] rounded-xl p-2 overflow-hidden">
-          <CampaignsTable campaigns={campaigns} Loading={isLoading} isError={isError} />
+          <CampaignsTable campaigns={campaigns} Loading={isLoading} isError={isError} onEdit={handleCampaignEdit} />
         </div>
-         
-    </div>
+      </div>
+      {/* create and edit campaign form */}
+      {
+        ShowModel && ( 
+          <AddandUpdateCampaignForm onClose={()=>{setShowModel(false),setSelectedEdit(false),setSelectedCampaign(null),refetch()}} IsEdit={IsEdit} campaign={selectedCampaign} />
+        )
+      }
+    </>
+  
   );
 }
 

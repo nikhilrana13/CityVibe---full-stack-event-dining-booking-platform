@@ -13,7 +13,24 @@ export const CampaignApi = createApi({
                     query:()=>"/api/campaigns/all",
                     providesTags:["Campaign"],
                 }),
-            
+                // Add Campaign
+                AddCampaign:builder.mutation({
+                 query:(formdata)=>({
+                    url:"/api/campaigns/create-campaign",
+                    method:"POST",
+                    body:formdata
+                 }),
+                 invalidatesTags:["Campaign"]
+                }),
+                // Update campaign
+                UpdateCampaign:builder.mutation({
+                    query:({formdata,id})=>({
+                    url:`/api/campaigns/update/${id}`,
+                    method:"PUT",
+                    body:formdata
+                    }),
+                    invalidatesTags:["Campaign"]
+                })
     })
 })
-export const {useGetAllCampaignsQuery} = CampaignApi 
+export const {useGetAllCampaignsQuery,useAddCampaignMutation,useUpdateCampaignMutation} = CampaignApi 

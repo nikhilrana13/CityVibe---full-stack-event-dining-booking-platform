@@ -3,7 +3,7 @@ import CampaignTableShimmer from './CampaignTableShimmer';
 import CampaignsEmptyState from './CampaignEmptyState';
 import { CiEdit } from 'react-icons/ci';
 
-const CampaignsTable = ({ campaigns, loading, isError }) => {
+const CampaignsTable = ({ campaigns, loading, isError,onEdit}) => {
     // console.log("campaigns", campaigns)
     return (
         <div className=' overflow-x-auto'>
@@ -103,6 +103,7 @@ const CampaignsTable = ({ campaigns, loading, isError }) => {
                                     <td className="px-4 py-3 text-right">
                                         <button
                                             type="button"
+                                            onClick={()=>onEdit(campaign)}
                                             className="inline-flex items-center justify-center p-1.5 rounded-md hover:bg-gray-100 transition"
                                         >
                                             <CiEdit size={22} />
