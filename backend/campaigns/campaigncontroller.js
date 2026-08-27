@@ -175,7 +175,7 @@ const GetAllCampaign = async (req, res) => {
     if (!admin) {
       return Response(res, 404, "Admin not found");
     }
-    const campaigns = await Campaign.find({ adminId: adminId });
+    const campaigns = await Campaign.find({ adminId: adminId }).sort({createdAt:-1})
     if (!campaigns) {
       return Response(res, 200, "No Campaigns found", []);
     }

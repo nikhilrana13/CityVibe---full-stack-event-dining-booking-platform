@@ -1,8 +1,9 @@
 import AddandUpdateCampaignForm from '@/components/campaigns/AddandUpdateCampaignForm';
 import CampaignsTable from '@/components/campaigns/CampaignsTable';
-import { useGetAllCampaignsQuery } from '@/redux/api/CampaignApi';
+import { useGetAllCampaignsQuery,useToggleCampaignStatusMutation} from '@/redux/api/CampaignApi';
 import React, { useState } from 'react';
 import { MdAddCircle } from 'react-icons/md';
+import { toast } from 'react-toastify';
 
 const Campaigns = () => {
     const [ShowModel,setShowModel] = useState(false)
@@ -10,13 +11,25 @@ const Campaigns = () => {
     const campaigns = data?.data?.campaigns 
     const [selectedCampaign,setSelectedCampaign] = useState(null)
     const [IsEdit,setSelectedEdit] = useState(false)
+    const [ToggleCampaignStatus,{isLoading:isUpdating}] = useToggleCampaignStatusMutation()
 
     const handleCampaignEdit = (campaign)=>{
       setSelectedEdit(true)
       setSelectedCampaign(campaign)
       setShowModel(true)
     }
-
+  // disable and enable campaign
+    const handleToggleStatus = async (id) => {
+        try {
+            const res = await ToggleCampaignStatus(id).unwrap()
+            toast.success(res?.message)
+        } catch (error) {
+            console.error("failed to toggle campaign", error)
+            toast.error(error?.data?.message || "Internal server error")
+        }
+    }
+    
+    
   return (
     <>
       <div className='w-full px-5 py-5 flex flex-col gap-3'>
@@ -43,7 +56,7 @@ const Campaigns = () => {
         </div>
         {/* campaign table */}
         <div className="w-full bg-[#f3f4f6] rounded-xl p-2 overflow-hidden">
-          <CampaignsTable campaigns={campaigns} Loading={isLoading} isError={isError} onEdit={handleCampaignEdit} />
+          <CampaignsTable campaigns={campaigns} loading={isLoading} isError={isError} onEdit={handleCampaignEdit} onToggle={handleToggleStatus} />
         </div>
       </div>
       {/* create and edit campaign form */}

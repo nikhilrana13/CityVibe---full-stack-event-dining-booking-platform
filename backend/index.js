@@ -68,8 +68,6 @@ app.use("/api/user",UserRoute)
 app.use("/api/agents",AgentRoute)
 app.use("/api/campaigns",CampaignRoute)
 
-
-
 // connect to db  
 configure()
 

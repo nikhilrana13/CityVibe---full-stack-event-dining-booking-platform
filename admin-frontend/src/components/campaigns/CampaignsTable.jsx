@@ -3,8 +3,9 @@ import CampaignTableShimmer from './CampaignTableShimmer';
 import CampaignsEmptyState from './CampaignEmptyState';
 import { CiEdit } from 'react-icons/ci';
 
-const CampaignsTable = ({ campaigns, loading, isError,onEdit}) => {
+const CampaignsTable = ({ campaigns, loading, isError,onEdit,onToggle}) => {
     // console.log("campaigns", campaigns)
+
     return (
         <div className=' overflow-x-auto'>
             <table className="w-full text-left border-collapse">
@@ -83,6 +84,7 @@ const CampaignsTable = ({ campaigns, loading, isError,onEdit}) => {
                                                 {campaign.isActive ? "Active" : "Inactive"}
                                             </span>
                                             <button
+                                              onClick={()=>onToggle(campaign?._id)}
                                                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition
                                                    ${campaign?.isActive
                                                         ? "bg-[#7C55FA]"

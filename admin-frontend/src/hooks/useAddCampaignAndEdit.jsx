@@ -18,7 +18,7 @@ const useAddCampaignAndEdit = ({ IsEdit, campaignId, onSuccess }) => {
             formdata.append("displayOnHome", data.displayOnHome);
             formdata.append("usageLimit", data.usageLimit);
             formdata.append("displayPriority", data.displayPriority);
-            if (selectedImage) {
+            if (selectedImage instanceof File) {
                 formdata.append("bannerImageUrl", selectedImage);
             }
         } else {

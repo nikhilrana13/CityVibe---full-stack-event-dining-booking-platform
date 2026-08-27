@@ -30,7 +30,15 @@ export const CampaignApi = createApi({
                     body:formdata
                     }),
                     invalidatesTags:["Campaign"]
+                }),
+                // toggle campaign Status
+                ToggleCampaignStatus:builder.mutation({
+                    query:(id)=>({
+                        url:`/api/campaigns/toggle/${id}`,
+                        method:"PATCH"
+                    }),
+                    invalidatesTags:["Campaign"]
                 })
     })
 })
-export const {useGetAllCampaignsQuery,useAddCampaignMutation,useUpdateCampaignMutation} = CampaignApi 
+export const {useGetAllCampaignsQuery,useAddCampaignMutation,useUpdateCampaignMutation,useToggleCampaignStatusMutation} = CampaignApi 
