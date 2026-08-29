@@ -14,7 +14,20 @@ export const OfferApi = createApi({
             // get display on homepage offer 
             GetDisplayOnHomeOffer:builder.query({
                 query:()=>"/api/campaigns/display-on-home"
+            }),
+            // apply offer 
+            ApplyOffer:builder.mutation({
+                query:({campaignId,eventId,tickets})=>({
+                    url:"/api/campaigns/apply-offer",
+                    method:"POST",
+                    body:{
+                        campaignId,
+                        eventId,
+                        tickets
+                    }
+                })
             })
+
     })
 })
-export const {useGetActiveOffersQuery,useGetDisplayOnHomeOfferQuery} = OfferApi 
+export const {useGetActiveOffersQuery,useGetDisplayOnHomeOfferQuery,useApplyOfferMutation} = OfferApi 

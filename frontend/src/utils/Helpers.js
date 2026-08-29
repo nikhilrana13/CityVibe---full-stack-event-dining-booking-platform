@@ -131,3 +131,14 @@ export const getMinOrderLine = (offer) => {
   return `On bookings above ₹${formatRupees(offer.minOrderAmount)}`;
 };
 
+export const  FormatValidity = (endDate)=> {
+  if (!endDate) return null;
+  const date = new Date(endDate);
+  if (Number.isNaN(date.getTime())) return null;
+  const formatted = date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year:"numeric"
+  });
+  return `Valid till ${formatted}`;
+}
