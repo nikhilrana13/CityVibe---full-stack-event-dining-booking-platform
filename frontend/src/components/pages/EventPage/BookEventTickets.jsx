@@ -101,7 +101,6 @@ const BookEventTickets = () => {
       ticketId,
       quantity,
     }));
-
     try {
       setApplyingCampaignId(campaignId)
       const response = await ApplyOffer({
