@@ -2,7 +2,7 @@ import { formatDateRange, formatTime, generateSlug } from "@/utils/Helpers"
 import React from "react"
 import { useNavigate } from "react-router-dom"
 
-const EventCard = ({ event }) => {
+const EventCard = ({ event}) => {
     // console.log("event",event)
      const navigate = useNavigate()
     const handleClick = () => {
@@ -41,7 +41,7 @@ const EventCard = ({ event }) => {
           ₹{event?.minPrice || "NA"} onwards
         </p>
       </div>
-    </div>
+    </div> 
   )
 }
 
