@@ -8,11 +8,13 @@ CityVibe is a full-stack urban discovery platform where users can discover local
 
 * 🎟️ Event discovery & ticket booking
 * 🍽️ Restaurant reservation system
+* 🎁 Promotional campaigns & offers
+* 💸 Dynamic discount & offer application
 * 🔐 Firebase Google Authentication
 * 💳 Stripe Checkout & Webhooks (Test Mode)
 * 📚 Swagger API Documentation
 * 📊 Organizer Analytics Dashboard
-* 👑 Admin Verification Panel
+* 👑 Admin Verification & Campaign Management
 * ⚡ Pagination, Filtering & Sorting
 * 🔄 Infinite Scroll
 * 🎫 Dynamic Ticket Inventory
@@ -30,6 +32,9 @@ CityVibe is a full-stack urban discovery platform where users can discover local
 * Book event tickets
 * Reserve restaurant tables
 * View & cancel bookings
+* View active promotional offers
+* Apply, change, or remove offers during event booking
+* Dynamic booking price calculation after applying discounts
 * Google Authentication
 
 ---
@@ -51,7 +56,65 @@ CityVibe is a full-stack urban discovery platform where users can discover local
 * Verify organizer applications
 * Review uploaded documents
 * Approve / Reject organizers
-* Monitor platform activities
+* Create & manage promotional campaigns
+* Configure flat & percentage discounts
+* Set minimum order requirements
+* Configure usage limits & per-user limits
+* Configure campaign start & end dates
+* Control campaign visibility on the home page
+* Set campaign display priority
+* Monitor campaign usage
+
+---
+
+# 🎁 Campaign & Offers System
+
+CityVibe includes a complete promotional campaign system designed to help admins create and manage customer offers.
+
+### Campaign Features
+
+* Flat discount campaigns
+* Percentage-based discount campaigns
+* Maximum discount limits
+* Minimum booking amount
+* Per-user usage limits
+* Global campaign usage limits
+* Campaign start & end dates
+* Active / inactive campaign control
+* Home-page promotional campaign display
+* Campaign display priority
+
+### User Offer Flow
+
+Users can view all currently active offers during the ticket booking process.
+
+```text
+Select Tickets
+      │
+      ▼
+View Available Offers
+      │
+      ▼
+Apply Offer
+      │
+      ▼
+Validate Eligibility
+      │
+      ▼
+Calculate Discount
+      │
+      ▼
+Update Final Booking Amount
+      │
+      ▼
+Stripe Checkout
+```
+
+Users can also change or remove an applied offer before proceeding to payment.
+
+### Campaign Usage
+
+Campaign usage is recorded only after successful payment confirmation through the Stripe webhook, preventing unsuccessful or abandoned payments from consuming campaign limits.
 
 ---
 
@@ -61,6 +124,8 @@ CityVibe is a full-stack urban discovery platform where users can discover local
 * Stripe Webhooks
 * Secure payment verification
 * Automatic booking confirmation
+* Campaign-aware checkout pricing
+* Campaign usage tracking after successful payment
 
 > **Note:** Stripe Test Mode is used. No real payments are processed.
 
@@ -68,9 +133,12 @@ CityVibe is a full-stack urban discovery platform where users can discover local
 
 # 🎟️ Ticket Inventory
 
-* Available tickets decrease after booking
+* Available tickets decrease after successful payment
 * Tickets restore automatically after cancellation
 * Prevents overbooking
+* Pax count based seat calculation
+* Event-level seat availability validation
+* Inventory deduction handled after successful payment
 
 ---
 
@@ -82,6 +150,7 @@ CityVibe is a full-stack urban discovery platform where users can discover local
 * Optimized MongoDB Aggregation Queries
 * Infinite Scroll
 * Response Time Logging
+* Redis caching for frequently accessed APIs
 
 ---
 
@@ -105,7 +174,7 @@ Redis is used to reduce database load and improve API performance using the **Ca
 
 Example Flow:
 
-```
+```text
 Client
    │
 Redis Cache
@@ -167,6 +236,7 @@ Response
 * Authentication
 * Events
 * Event Booking
+* Campaigns & Offers
 * Restaurants
 * Dining Booking
 * Organizer
@@ -184,6 +254,7 @@ Response
 * Admin Authorization
 * Rate Limiting
 * Input Validation
+* Stripe Webhook Signature Verification
 
 ---
 
@@ -210,7 +281,7 @@ cd cityvibe
 
 Create environment files
 
-```
+```text
 backend/.env
 frontend/.env
 organizer-frontend/.env
