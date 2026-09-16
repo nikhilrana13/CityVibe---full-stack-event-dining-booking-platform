@@ -84,7 +84,7 @@ const HomeOfferSection = ({offer,loading,onExplore,viewAllHref = "#",}) => {
               className={`h-full w-full object-cover object-center transition-[transform,opacity] duration-700 ease-out group-hover:scale-[1.04] ${
                 imgLoaded ? "opacity-100" : "opacity-0"
               }`}
-              loading="lazy"
+              fetchPriority='high'
             />
  
             {/* Cinematic gradient overlays for legibility */}
