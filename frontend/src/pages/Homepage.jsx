@@ -10,16 +10,19 @@ import { useLocationContext } from '../context/useLocationContext'
 import { useGetHomePageDataQuery } from '@/redux/api/HomeApi'
 import HomeOfferSection from '@/components/offers/HomeOfferSection'
 import { useGetDisplayOnHomeOfferQuery } from '@/redux/api/OfferApi'
+import { useNavigate } from 'react-router-dom'
 
 
 const Homepage = () => {
   const {location} = useLocationContext()
+  const navigate = useNavigate()
   const homeQuery = useGetHomePageDataQuery(location?.city,{
     skip:!location?.city
   })
   const offerQuery = useGetDisplayOnHomeOfferQuery()
   const offerloading = offerQuery?.isLoading 
   const offerdata = offerQuery?.data?.data?.offer
+  // console.log("data",offerdata)
   const loading = homeQuery?.isLoading
   const trending = homeQuery?.data?.data?.trending || []
   const music = homeQuery?.data?.data?.music || []
@@ -44,7 +47,7 @@ const Homepage = () => {
       <section className='w-full  bg-[linear-gradient(to_bottom,#EFEBFF_0%,#FFFFFF_60%)] 
        pb-10 md:py-10 space-y-16'>
         {/* offer section */}
-        <HomeOfferSection offer={offerdata} loading={offerloading} />
+        <HomeOfferSection offer={offerdata} loading={offerloading} onExplore={()=>navigate("/events")} />
         {/* trending section according to city name */}
         <TrendingSection trending={trending} loading={loading} city={location?.city} />
         {/* Music event in Your city */}

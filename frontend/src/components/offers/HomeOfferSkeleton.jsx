@@ -1,29 +1,29 @@
 import React from 'react';
 
-const HomeOfferSkeleton = () => {
-  return (
-    <section aria-hidden="true" className="w-full">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-end justify-between sm:mb-8">
-          <div>
-            <div className="h-3 w-32 animate-pulse rounded-full bg-slate-200" />
-            <div className="mt-3 h-7 w-48 animate-pulse rounded-md bg-slate-200 sm:h-8 sm:w-64" />
-          </div>
-          <div className="hidden h-4 w-28 animate-pulse rounded-full bg-slate-200 sm:block" />
+const HomeOfferSkeleton = () => (
+  <section aria-hidden="true" className="w-full pt-12 sm:pt-16 lg:pt-20">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mb-6 flex items-end justify-between gap-4 sm:mb-8">
+        <div className="space-y-2">
+          <div className="h-7 w-64 animate-pulse rounded bg-neutral-200 sm:h-8 sm:w-96" />
+          <div className="h-4 w-48 animate-pulse rounded bg-neutral-200 sm:w-80" />
         </div>
- 
-        <div className="relative w-full overflow-hidden rounded-[24px] bg-slate-200 sm:rounded-[28px]">
-          <div className="aspect-[4/5] w-full animate-pulse bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 sm:aspect-[16/7]" />
-          <div className="absolute inset-x-0 bottom-0 space-y-3 p-6 sm:p-10">
-            <div className="h-3 w-24 animate-pulse rounded-full bg-white/30" />
-            <div className="h-9 w-40 animate-pulse rounded-md bg-white/30 sm:h-11 sm:w-56" />
-            <div className="h-4 w-52 animate-pulse rounded-md bg-white/20" />
-            <div className="h-11 w-36 animate-pulse rounded-full bg-white/30 sm:mt-2" />
+        <div className="h-4 w-24 animate-pulse rounded bg-neutral-200" />
+      </div>
+
+      <div className="flex flex-col lg:flex-row">
+        <div className="aspect-[16/10] w-full animate-pulse rounded-t-[28px] bg-neutral-200 sm:aspect-[16/8] lg:aspect-auto lg:min-h-[380px] lg:flex-1 lg:rounded-l-[28px] lg:rounded-tr-none" />
+        <div className="flex min-h-[300px] w-full flex-col justify-between rounded-b-[28px] bg-neutral-300 p-6 lg:w-[360px] lg:shrink-0 lg:rounded-b-none lg:rounded-r-[28px] lg:p-9">
+          <div className="space-y-3">
+            <div className="h-4 w-24 animate-pulse rounded bg-neutral-200" />
+            <div className="h-14 w-44 animate-pulse rounded bg-neutral-200" />
+            <div className="h-5 w-32 animate-pulse rounded bg-neutral-200" />
           </div>
+          <div className="h-12 w-full animate-pulse rounded-xl bg-neutral-200" />
         </div>
       </div>
-    </section>
-  );
-}
+    </div>
+  </section>
+);
 
 export default HomeOfferSkeleton;

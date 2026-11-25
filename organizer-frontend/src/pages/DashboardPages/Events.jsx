@@ -51,7 +51,7 @@ const Events = () => {
                 {/* dashboard header */}
                 <div className="flex gap-8 md:items-center flex-col md:flex-row  md:justify-between">
                     <div className="flex flex-col">
-                        <span className="text-[1.5rem]  font-bold text-black dark:text-white">
+                        <span className="text-[1.5rem]  font-bold text-black ">
                             Manage Events
                         </span>
                         <span className="text-sm text-gray-500 font-normal">
